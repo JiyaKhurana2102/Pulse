@@ -1,17 +1,11 @@
+
 {
-  "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "strict": true,
-    "paths": {
-      "@/*": [
-        "./*"
-      ]
-    }
+    // ... other settings
+    "jsx": "react-native", // Or "react" if it's a web project
+    "module": "esnext",
+    "target": "es2020",
+    // ... other settings
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    ".expo/types/**/*.ts",
-    "expo-env.d.ts"
-  ]
+  // ... other settings
 }

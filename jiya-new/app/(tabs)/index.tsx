@@ -1,9 +1,10 @@
-import { Text, View, StyleSheet } from 'react-native';
+import * as React from 'react'; // This is a namespace import
+import { View, Text, StyleSheet } from 'react-native';
 
-export default function HomePage() {
+export default function Index() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome to Pulse</Text>
+      <Text style={styles.text}>Welcome to Pulse!</Text>
     </View>
   );
 }
@@ -11,12 +12,12 @@ export default function HomePage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: '#fff',
   },
-  title: {
+  text: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: '600',
   },
 });
