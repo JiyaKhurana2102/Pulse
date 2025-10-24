@@ -1,11 +1,20 @@
-
 {
   "compilerOptions": {
-    // ... other settings
-    "jsx": "react-native", // Or "react" if it's a web project
-    "module": "esnext",
-    "target": "es2020",
-    // ... other settings
+    "jsx": "react-native",
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"]
+    }
   },
-  // ... other settings
+  "extends": "expo/tsconfig.base",
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    ".expo/types/**/*.ts",
+    "expo-env.d.ts"
+  ]
 }
