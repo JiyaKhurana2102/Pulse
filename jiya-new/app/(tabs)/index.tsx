@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react'; // This is a namespace import
 import { View, Text, StyleSheet } from 'react-native';
 
 export default function Index() {
