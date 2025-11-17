@@ -1,82 +1,68 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Pressable, type GestureResponderEvent } from 'react-native';
-import  * as Haptics from 'expo-haptics';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Ionicons } from '@expo/vector-icons';
+import { View, Text } from 'react-native';
 
-export const HapticTab = (props: any) => {
-  const { onPress, ...rest } = props;
-  const handlePress = (event: GestureResponderEvent) => {
-    // Voids the promise if Haptics is not available or if the call fails
-    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    if (typeof onPress === 'function') onPress(event);
-  };
-  return <Pressable {...rest} onPress={handlePress} />;
-};
+const ACCENT_COLOR = '#4DB6AC'; 
+const TAB_ICON_SIZE = 24;
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarStyle: {
-            // Added styling for better appearance and touch size
-            paddingVertical: 5,
-            height: 60,
-        },
-      }}>
-
-      {/* 1. Home Tab (index) */}
+        tabBarActiveTintColor: ACCENT_COLOR,
+        // The header is usually hidden here because the nested stack handles it
+        headerShown: false, 
+      }}
+    >
       <Tabs.Screen
-        name="index"
+        name="index" // Assuming this is your Home screen, matching your screenshot
         options={{
           title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-        }}
-      />
-
-      {/* 2. Search Tab (renamed from 'explore' to match typical search function) */}
-      <Tabs.Screen
-        name="search" // You will need a file named 'search.tsx' in the (tabs) directory
-        options={{
-          title: 'Search',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="magnifyingglass" color={color} />,
-        }}
-      />
-
-      {/* 3. Create/Add Tab (New Tab) */}
-      <Tabs.Screen
-        name="create" // You will need a file named 'create.tsx'
-        options={{
-          title: 'Add',
-          // Using a larger, filled circle plus icon to match the wireframe's central icon
-          tabBarIcon: ({ color }) => <IconSymbol size={32} name="plus.circle.fill" color={color} />,
-        }}
-      />
-
-      {/* 4. Settings Tab (New Tab) */}
-      <Tabs.Screen
-        name="settings" // You will need a file named 'settings.tsx'
-        options={{
-          title: 'Settings',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="gearshape.fill" color={color} />,
+          tabBarIcon: ({ color }) => <Ionicons name="home-outline" size={TAB_ICON_SIZE} color={color} />,
         }}
       />
       
-      {/* 5. Messages Tab (New Tab) */}
+      {/* This is the CRITICAL part. It must point to the 'settings' folder.
+        The router will automatically look inside this folder for a file named '_layout.tsx' 
+        to handle the stack navigation.
+      */}
       <Tabs.Screen
-        name="messages" // You will need a file named 'messages.tsx'
+        name="settings" 
         options={{
-          title: 'Chat',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="message.fill" color={color} />,
+          title: 'Settings',
+          tabBarIcon: ({ color }) => <Ionicons name="settings-outline" size={TAB_ICON_SIZE} color={color} />,
         }}
       />
+      
+      {/* Add other screens as needed based on your file structure */}
+      <Tabs.Screen
+        name="create" 
+        options={{
+          title: 'Add',
+          tabBarIcon: ({ color }) => <Ionicons name="add-circle-outline" size={TAB_ICON_SIZE} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="search" 
+        options={{
+          title: 'Search',
+          tabBarIcon: ({ color }) => <Ionicons name="search-outline" size={TAB_ICON_SIZE} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="messages" 
+        options={{
+          title: 'Chat',
+          tabBarIcon: ({ color }) => <Ionicons name="chatbox-outline" size={TAB_ICON_SIZE} color={color} />,
+        }}
+      />
+      
+      {/* We exclude any other files like modal.tsx or _layout.tsx itself */}
+      <Tabs.Screen name="modal" options={{ headerShown: false, href: null }} />
+
+      {/* Any other routes like the placeholders you made must be excluded or linked: */}
+      {/* <Tabs.Screen name="notifications" options={{ href: null }} /> */}
 
     </Tabs>
   );
