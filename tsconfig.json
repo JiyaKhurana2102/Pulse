@@ -1,43 +1,32 @@
 {
-  // This extends the base configuration provided by Expo for a standard application.
-  // It ensures all necessary React Native and JSX types are correctly loaded.
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    // We removed previous settings that were for building a module/library.
-    
-    // FIX: Changing rootDir to "." (the current folder) to include all files 
-    // like components/, hooks/, etc., which are outside the 'app' directory.
     "rootDir": ".",
-    
-    // Setting module to 'commonjs' is sometimes required for older dependencies,
-    // but the 'expo' base handles this correctly.
-    "module": "commonjs",
-
-    // Ensure JSX compilation works correctly
     "jsx": "react-native",
-
-    // --- FIX FOR ALIAS IMPORTS (@components, @constants, @hooks) ---
     "baseUrl": ".",
     "paths": {
-      // Maps @/components/* to the components/ folder.
-      "@components/*": ["components/*"],
-      // Maps @/constants/* to the constants/ folder.
-      "@constants/*": ["constants/*"],
-      // Maps @/hooks/* to the hooks/ folder.
-      "@hooks/*": ["hooks/*"],
-      // Add other common paths like app/ or assets/ if you use aliases for those
-      "@/*": ["*"] 
+      "@components/*": [
+        "components/*"
+      ],
+      "@constants/*": [
+        "constants/*"
+      ],
+      "@hooks/*": [
+        "hooks/*"
+      ],
+      "@/*": [
+        "*"
+      ]
     }
-    // -----------------------------------------------------------------
   },
-  // Ensure the TypeScript compiler looks in the correct folders
   "include": [
     "**/*.ts",
     "**/*.tsx",
     "**/*.jsx",
-    "**/*.js"
+    "**/*.js",
+    ".expo/types/**/*.ts",
+    "expo-env.d.ts"
   ],
-  // Exclude node_modules and other build/test folders
   "exclude": [
     "node_modules",
     "build"
