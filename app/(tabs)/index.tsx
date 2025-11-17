@@ -7,6 +7,7 @@ import {
   View,
   Dimensions,
 } from 'react-native';
+import { useRouter } from 'expo-router'; // Enables navigation
 
 // Get screen width for responsive layout
 const { width } = Dimensions.get('window');
@@ -16,34 +17,47 @@ const SPACING = 15; // Standard padding/margin
 interface ButtonData {
   id: number;
   label: string;
-  action: () => void; // Function to run when pressed (e.g., navigate)
+  route?: string; // Holds the destination route (optional for buttons without navigation)
 }
 
-// Dummy actions for the buttons
-const handlePress = (label: string) => {
-  console.log(`${label} button pressed!`);
-  // In a real app, this would be a navigation call (e.g., navigation.navigate('EventScreen'))
-};
-
-// Data for the main buttons
-const mainButtons: ButtonData[] = [
-  { id: 1, label: 'Find an Event', action: () => handlePress('Find an Event') },
-  { id: 2, label: 'Campus Map', action: () => handlePress('Campus Map') },
-  { id: 3, label: 'Join a group', action: () => handlePress('Join a group') },
-  { id: 4, label: 'Reserve a study room', action: () => handlePress('Reserve a study room') },
-];
-
 // Reusable component for the main blue-box buttons
-const HomeButton: React.FC<ButtonData> = ({ label, action }) => (
-  <TouchableOpacity style={styles.button} onPress={action}>
+interface HomeButtonProps extends ButtonData {
+    onPress: (route?: string) => void;
+}
+
+const HomeButton: React.FC<HomeButtonProps> = ({ label, route, onPress }) => (
+  <TouchableOpacity style={styles.button} onPress={() => onPress(route)}>
     <Text style={styles.buttonText}>{label}</Text>
   </TouchableOpacity>
 );
 
+
 // --- Main Component ---
 const HomeScreen: React.FC = () => {
+    // Get the router instance
+    const router = useRouter(); 
+    
+    // Function to handle all button presses
+    const handleButtonPress = (route?: string) => {
+        if (route && route.length > 0) {
+            // expo-router has strict route types; cast to any for dynamic routes
+            router.push(route as unknown as any);
+        } else {
+            console.log(`Button for route ${route} pressed! (No navigation defined)`);
+        }
+    };
+
+    // Data for the main buttons
+    const mainButtons: ButtonData[] = [
+      // Placeholder route for the new screen
+      { id: 1, label: 'Find an Event', route: '/events' }, 
+      { id: 2, label: 'Campus Map', route: undefined }, 
+      { id: 3, label: 'Join a group', route: undefined }, 
+      { id: 4, label: 'Reserve a study room', route: undefined },
+    ];
+
+
   return (
-    // SafeAreaView ensures content doesn't overlap status bars (for iOS)
     <SafeAreaView style={styles.container}>
       {/* Header Section */}
       <View style={styles.header}>
@@ -56,7 +70,11 @@ const HomeScreen: React.FC = () => {
       {/* Button Grid Section */}
       <View style={styles.buttonGrid}>
         {mainButtons.map(button => (
-          <HomeButton key={button.id} {...button} />
+          <HomeButton 
+            key={button.id} 
+            {...button} 
+            onPress={handleButtonPress} // Pass the navigation handler
+          />
         ))}
       </View>
 
@@ -66,34 +84,13 @@ const HomeScreen: React.FC = () => {
         {/* Placeholder for event list items */}
         <Text style={styles.eventListItem}>• No major events scheduled.</Text> 
       </View>
-
-      {/* Bottom Navigation Bar */}
-      <View style={styles.bottomNav}>
-        {/*
-          Placeholder for actual icon components (e.g., from 'react-native-vector-icons').
-          Using dummy views/text for now as requested.
-        */}
-        <TouchableOpacity style={styles.navItem}>
-          <Text style={styles.navIcon}>🏠</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <Text style={styles.navIcon}>🔍</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <Text style={styles.navIcon}>➕</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <Text style={styles.navIcon}>⚙️</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <Text style={styles.navIcon}>💬</Text>
-        </TouchableOpacity>
-      </View>
+      
+      {/* THE REDUNDANT BOTTOM NAVIGATION BAR CODE WAS REMOVED FROM HERE */}
     </SafeAreaView>
   );
 };
 
-// --- Stylesheet ---
+// --- Stylesheet (Cleaned up) ---
 const styles = StyleSheet.create({
   // General layout
   container: {
@@ -155,7 +152,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#A8DDEB', // Light blue background
     borderRadius: 10,
     padding: SPACING,
-    marginBottom: SPACING * 1.5,
   },
   eventsHeaderText: {
     fontSize: 18,
@@ -166,28 +162,6 @@ const styles = StyleSheet.create({
   eventListItem: {
       fontSize: 16,
       color: '#333',
-  },
-
-  // Bottom Navigation styles
-  bottomNav: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    height: 60, // Fixed height for the nav bar
-    borderTopWidth: 1,
-    borderTopColor: '#ccc',
-    backgroundColor: 'white', // White background for the nav bar
-    marginHorizontal: -SPACING, // Extend to screen edges
-    paddingHorizontal: SPACING / 2,
-    position: 'absolute', // Fixes it to the bottom
-    bottom: 0,
-    width: width,
-  },
-  navItem: {
-    padding: 5,
-  },
-  navIcon: {
-    fontSize: 24, // Size of the placeholder emoji icons
   },
 });
 
