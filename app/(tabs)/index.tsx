@@ -1,13 +1,13 @@
+import { useRouter } from 'expo-router'; // Enables navigation
 import React from 'react';
 import {
+  Dimensions,
   SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  Dimensions,
 } from 'react-native';
-import { useRouter } from 'expo-router'; // Enables navigation
 
 // Get screen width for responsive layout
 const { width } = Dimensions.get('window');
@@ -50,10 +50,10 @@ const HomeScreen: React.FC = () => {
     // Data for the main buttons
     const mainButtons: ButtonData[] = [
       // Placeholder route for the new screen
-      { id: 1, label: 'Find an Event', route: '/events' }, 
-      { id: 2, label: 'Campus Map', route: undefined }, 
-      { id: 3, label: 'Join a group', route: undefined }, 
-      { id: 4, label: 'Reserve a study room', route: undefined },
+      { id: 1, label: 'Find an Event', route: '/events' },
+      { id: 2, label: 'Campus Map', route: '' },          
+      { id: 3, label: 'Join a group', route: '/groups' }, 
+      { id: 4, label: 'Reserve a study room', route: '' },
     ];
 
 
