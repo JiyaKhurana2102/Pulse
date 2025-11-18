@@ -54,6 +54,12 @@ export default function SettingsScreen() {
         // CRITICAL FIX: Changed to relative path './my-events'
         href="./my-events" 
       />
+      {/* --- ADDED: My Groups Button --- */}
+      <SettingsButton 
+        iconName="people-outline" 
+        label="My Groups" 
+        href="./my-groups" 
+      />
       <SettingsButton 
         iconName="person-outline" // Changed icon to person-outline for Profile
         label="Profile" 
