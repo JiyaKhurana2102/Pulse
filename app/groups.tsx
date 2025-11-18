@@ -11,31 +11,32 @@ import {
     View,
 } from 'react-native';
 
-const groups = [
-  { name: 'Study Buddies', members: '234 members', category: 'Academic' },
-  { name: 'Campus Gamers', members: '567 members', category: 'Gaming' },
-  { name: 'Fitness Club', members: '189 members', category: 'Sports' },
-  { name: 'Art & Design', members: '345 members', category: 'Creative' },
-  { name: 'Book Club', members: '156 members', category: 'Literature' },
-  { name: 'Tech Innovators', members: '423 members', category: 'Technology' },
-];
+type Group = {
+  id: string;
+  name: string;
+  members: string;   // e.g. "234 members"
+  category: string;  // e.g. "Academic"
+};
 
-const categories = ['All', 'Academic', 'Sports', 'Creative', 'Social'];
+const categories = ['All', 'Academic', 'Sports', 'Creative', 'Social', 'Other'];
 
 const GroupsScreen: React.FC = () => {
   const router = useRouter();
 
+  
+  const [groups, setGroups] = useState<Group[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
-  const [searchQuery, setSearchQuery] = useState<string>('');
 
-  // filter by category + search
   const filteredGroups = groups.filter((group) => {
     const matchesCategory =
       selectedCategory === 'All' || group.category === selectedCategory;
 
     const q = searchQuery.trim().toLowerCase();
     const matchesSearch =
-      q.length === 0 || group.name.toLowerCase().includes(q);
+      q.length === 0 ||
+      group.name.toLowerCase().includes(q) ||
+      group.category.toLowerCase().includes(q);
 
     return matchesCategory && matchesSearch;
   });
@@ -43,14 +44,17 @@ const GroupsScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.content}>
-        {/* Back button */}
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => router.back()}
-          activeOpacity={0.7}
-        >
-          <Ionicons name="chevron-back" size={24} color="#5A9A7A" />
-        </TouchableOpacity>
+        {/* Header + back button */}
+        <View style={styles.headerRow}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => router.back()}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="chevron-back" size={24} color="#5A9A7A" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Join a Group</Text>
+        </View>
 
         {/* Search bar */}
         <View style={styles.searchContainer}>
@@ -67,13 +71,16 @@ const GroupsScreen: React.FC = () => {
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
-
         </View>
 
         {/* Categories */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Categories</Text>
-          <View style={styles.chipRow}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.categoryRow}
+          >
             {categories.map((category) => {
               const isSelected = selectedCategory === category;
               return (
@@ -82,14 +89,14 @@ const GroupsScreen: React.FC = () => {
                   onPress={() => setSelectedCategory(category)}
                   activeOpacity={0.8}
                   style={[
-                    styles.chip,
-                    isSelected && styles.chipSelected,
+                    styles.categoryChip,
+                    isSelected && styles.categoryChipSelected,
                   ]}
                 >
                   <Text
                     style={[
-                      styles.chipText,
-                      isSelected && styles.chipTextSelected,
+                      styles.categoryText,
+                      isSelected && styles.categoryTextSelected,
                     ]}
                   >
                     {category}
@@ -97,31 +104,37 @@ const GroupsScreen: React.FC = () => {
                 </TouchableOpacity>
               );
             })}
-          </View>
+          </ScrollView>
         </View>
 
         {/* Groups list */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Available Groups</Text>
-          <View style={styles.groupsList}>
-            {filteredGroups.map((group, index) => (
-              <View key={index} style={styles.groupCard}>
-                <View style={styles.groupInfo}>
-                  <Text style={styles.groupName}>{group.name}</Text>
-                  <Text style={styles.groupMembers}>{group.members}</Text>
-                </View>
-                <TouchableOpacity style={styles.joinButton}>
-                  <Text style={styles.joinButtonText}>Join</Text>
-                </TouchableOpacity>
-              </View>
-            ))}
 
-            {filteredGroups.length === 0 && (
-              <Text style={styles.emptyText}>
-                No groups match this category/search yet.
+          {filteredGroups.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyTitle}>No groups available yet</Text>
+              <Text style={styles.emptySubtitle}>
+                Once groups are created, they&apos;ll show up here so you can join them.
               </Text>
-            )}
-          </View>
+            </View>
+          ) : (
+            <View style={styles.groupsList}>
+              {filteredGroups.map((group) => (
+                <View key={group.id} style={styles.groupCard}>
+                  <View style={styles.groupInfo}>
+                    <Text style={styles.groupName}>{group.name}</Text>
+                    <Text style={styles.groupMeta}>
+                      {group.members} • {group.category}
+                    </Text>
+                  </View>
+                  <TouchableOpacity style={styles.joinButton}>
+                    <Text style={styles.joinButtonText}>Join</Text>
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -137,6 +150,11 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingTop: 20,
   },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
   backButton: {
     width: 48,
     height: 48,
@@ -144,7 +162,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#9BD9C3',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 16,
+    marginRight: 12,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#2D4A3A',
   },
   searchContainer: {
     flexDirection: 'row',
@@ -157,9 +180,6 @@ const styles = StyleSheet.create({
   },
   searchIcon: {
     marginRight: 8,
-  },
-  micIcon: {
-    marginLeft: 8,
   },
   searchInput: {
     flex: 1,
@@ -176,26 +196,26 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     fontWeight: '600',
   },
-  chipRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+  categoryRow: {
     gap: 8,
+    paddingRight: 8,
   },
-  chip: {
-    paddingHorizontal: 16,
+  categoryChip: {
+    paddingHorizontal: 14,
     paddingVertical: 8,
-    backgroundColor: '#9BD9C3',
     borderRadius: 999,
+    backgroundColor: '#9BD9C3',
   },
-  chipSelected: {
+  categoryChipSelected: {
     backgroundColor: '#7BC87B',
   },
-  chipText: {
-    color: '#2D4A3A',
+  categoryText: {
     fontSize: 14,
+    color: '#2D4A3A',
   },
-  chipTextSelected: {
-    fontWeight: '700',
+  categoryTextSelected: {
+    color: '#FFFFFF',
+    fontWeight: '600',
   },
   groupsList: {
     gap: 10,
@@ -217,7 +237,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#2D4A3A',
   },
-  groupMembers: {
+  groupMeta: {
     fontSize: 13,
     color: '#5A9A7A',
     marginTop: 2,
@@ -233,10 +253,20 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: 14,
   },
-  emptyText: {
-    marginTop: 8,
+  emptyState: {
+    backgroundColor: '#B5D4C5',
+    borderRadius: 18,
+    padding: 16,
+  },
+  emptyTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#2D4A3A',
+    marginBottom: 4,
+  },
+  emptySubtitle: {
     fontSize: 13,
-    color: '#7A9A8A',
+    color: '#5A9A7A',
   },
 });
 

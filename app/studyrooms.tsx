@@ -7,14 +7,13 @@ import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
     Alert,
-    Platform,
     SafeAreaView,
     ScrollView,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
-    View,
+    View
 } from 'react-native';
 
 type Room = {
@@ -151,7 +150,6 @@ const StudyRoomsScreen: React.FC = () => {
 
   // Date selection via calendar
   const [selectedDate, setSelectedDate] = useState<Date>(today);
-  const [showDatePicker, setShowDatePicker] = useState(false);
 
   // min/max for reservation: today → today+30 days
   const minDate = today;
@@ -215,17 +213,6 @@ const StudyRoomsScreen: React.FC = () => {
         r.dateKey === selectedDateKey &&
         r.timeSlot === selectedTime
     );
-
-  const handleDateChange = (event: DateTimePickerEvent, date?: Date) => {
-    if (Platform.OS === 'android') {
-      setShowDatePicker(false);
-    }
-
-    if (event.type === 'set' && date) {
-      const onlyDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-      setSelectedDate(onlyDate);
-    }
-  };
 
   const handleReservePress = (room: Room) => {
     if (!room.available) {
@@ -323,19 +310,22 @@ const StudyRoomsScreen: React.FC = () => {
         {/* Date selection */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Select Date</Text>
-          <TouchableOpacity
-            style={styles.dateRow}
-            activeOpacity={0.8}
-            onPress={() => setShowDatePicker(true)}
-          >
-            <Text style={styles.dateText}>{formatDate(selectedDate)}</Text>
-            <Ionicons
-              name="calendar-outline"
-              size={20}
-              color="#7A9A8A"
-              style={styles.calendarIcon}
+          <View style={styles.datePickerContainer}>
+            <DateTimePicker
+              value={selectedDate}
+              mode="date"
+              minimumDate={minDate}
+              maximumDate={maxDate}
+              display="spinner"
+              onChange={(event: DateTimePickerEvent, date?: Date) => {
+                if (event.type === 'set' && date) {
+                  const onlyDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+                  setSelectedDate(onlyDate);
+                }
+              }}
+              textColor="#2D4A3A"
             />
-          </TouchableOpacity>
+          </View>
         </View>
 
         {/* Time selection */}
@@ -478,18 +468,6 @@ const StudyRoomsScreen: React.FC = () => {
         </View>
       </ScrollView>
 
-      {/* Date picker */}
-      {showDatePicker && (
-        <DateTimePicker
-          value={selectedDate}
-          mode="date"
-          minimumDate={minDate}
-          maximumDate={maxDate}
-          display="default"
-          onChange={handleDateChange}
-        />
-      )}
-
       {/* Name prompt overlay */}
       {showNamePrompt && (
         <View style={styles.overlay}>
@@ -573,21 +551,11 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     fontWeight: '600',
   },
-  dateRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  datePickerContainer: {
+    borderRadius: 14,
+    overflow: 'hidden',
     backgroundColor: '#B5D4C5',
-    borderRadius: 999,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-  },
-  dateText: {
-    flex: 1,
-    fontSize: 16,
-    color: '#2D4A3A',
-  },
-  calendarIcon: {
-    marginLeft: 8,
+    paddingVertical: 8,
   },
   timeGrid: {
     flexDirection: 'row',
