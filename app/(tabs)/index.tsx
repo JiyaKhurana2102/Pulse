@@ -53,7 +53,7 @@ const HomeScreen: React.FC = () => {
       { id: 1, label: 'Find an Event', route: '/events' },
       { id: 2, label: 'Campus Map', route: '' },          
       { id: 3, label: 'Join a group', route: '/groups' }, 
-      { id: 4, label: 'Reserve a study room', route: '' },
+      { id: 4, label: 'Reserve a study room', route: '/studyrooms' },
     ];
 
 
