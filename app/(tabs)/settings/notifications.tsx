@@ -1,215 +1,192 @@
 import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
+import Svg, { Path, Circle } from 'react-native-svg';
 
-// --- Color Palette (Using your defined scheme) ---
+// --- Color Palette ---
 const colors = {
-  softMintBackground: '#D4EDE7', // Main light background
-  darkTealAccent: '#008080', // Primary accent (dark text/buttons)
-  mediumAccentGreen: '#66B2B2', // Secondary accent (toggles, highlights)
+  softMintBackground: '#D4EDE7', 
+  darkTealAccent: '#008080', 
+  mediumAccentGreen: '#66B2B2', 
   white: '#FFFFFF',
   lightGray: '#A0AEC0',
   darkText: '#1F2937',
-  offWhite: '#F7FCFA', // For section backgrounds
-  // We need a color for the active toggle state, choosing a vibrant teal
-  toggleActive: '#008080', 
+  offWhite: '#F7FCFA', 
+  toggleActive: '#008080',
 };
 
-// --- Custom Icon Components (Using SVG) ---
-
-// Chevron for back button
-const ChevronLeftIcon = ({ size = 24, color = colors.darkTealAccent }: { size?: number, color?: string }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="m15 18-6-6 6-6" />
-    </svg>
+// --- SVG Icon Components ---
+const ChevronLeftIcon = ({ size = 24, color = colors.darkTealAccent }: { size?: number; color?: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+    <Path d="M15 18L9 12L15 6" />
+  </Svg>
 );
 
-// User/Profile Icon
-const UserIcon = ({ size = 24, color = colors.darkTealAccent }: { size?: number, color?: string }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-        <circle cx="12" cy="7" r="4" />
-    </svg>
+const UserIcon = ({ size = 24, color = colors.darkTealAccent }: { size?: number; color?: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+    <Path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+    <Circle cx={12} cy={7} r={4} />
+  </Svg>
 );
 
-// --- Custom Toggle Switch Component ---
-// This mimics a mobile switch using pure CSS/JSX
-const ToggleSwitch = ({ isActive, onToggle }: { isActive: boolean, onToggle: () => void }) => {
-  const trackColor = isActive ? colors.toggleActive : colors.lightGray;
-  const thumbColor = colors.white;
+// --- Toggle Switch Component ---
+const ToggleSwitch = ({ isActive, onToggle }: { isActive: boolean; onToggle: () => void }) => (
+  <TouchableOpacity
+    onPress={onToggle}
+    style={[
+      styles.toggleTrack,
+      { backgroundColor: isActive ? colors.toggleActive : colors.lightGray },
+    ]}
+  >
+    <View
+      style={[
+        styles.toggleThumb,
+        { transform: [{ translateX: isActive ? 20 : 0 }] },
+      ]}
+    />
+  </TouchableOpacity>
+);
 
-  const toggleStyle: React.CSSProperties = {
-    width: '50px',
-    height: '30px',
-    borderRadius: '15px',
-    backgroundColor: trackColor,
-    padding: '3px',
-    transition: 'background-color 0.3s',
-    cursor: 'pointer',
-    position: 'relative',
-    boxSizing: 'content-box',
-    border: `1px solid ${trackColor}`,
-  };
-
-  const thumbStyle: React.CSSProperties = {
-    width: '24px',
-    height: '24px',
-    borderRadius: '50%',
-    backgroundColor: thumbColor,
-    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.2)',
-    transition: 'transform 0.3s',
-    transform: isActive ? 'translateX(20px)' : 'translateX(0)',
-  };
-
-  return (
-    <div style={toggleStyle} onClick={onToggle}>
-      <div style={thumbStyle} />
-    </div>
-  );
-};
+// --- Notification Setting Row ---
+const SettingRow = ({
+  label,
+  isActive,
+  onToggle,
+}: {
+  label: string;
+  isActive: boolean;
+  onToggle: () => void;
+}) => (
+  <View style={styles.settingItem}>
+    <Text style={styles.settingText}>{label}</Text>
+    <ToggleSwitch isActive={isActive} onToggle={onToggle} />
+  </View>
+);
 
 // --- Main Component ---
 const NotificationSettings: React.FC = () => {
-  // Initialize state for each toggle based on the screenshot
   const [pushEnabled, setPushEnabled] = useState(true);
   const [emailEnabled, setEmailEnabled] = useState(true);
   const [eventRemindersEnabled, setEventRemindersEnabled] = useState(true);
   const [soundsEnabled, setSoundsEnabled] = useState(true);
 
-  // Define styles using React Native conventions (camelCase, no hyphens)
-  // We use 'any' to suppress TypeScript errors for web compilation while using RN-style properties
-  const styles: any = { 
-    safeArea: {
-      minHeight: '100vh',
-      backgroundColor: colors.softMintBackground,
-      fontFamily: 'Inter, sans-serif',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-    },
-    container: {
-      width: '100%',
-      maxWidth: '400px', // Mobile simulation
-      paddingHorizontal: '20px',
-      paddingTop: '40px', // Space for status bar
-    },
-    // Top Navigation Header
-    navHeader: {
-      display: 'flex',
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginBottom: '30px',
-    },
-    navTitle: {
-      fontSize: '20px',
-      fontWeight: '600',
-      color: colors.darkTealAccent,
-    },
-    backButton: {
-      cursor: 'pointer',
-      padding: '5px',
-      backgroundColor: 'transparent',
-      border: 'none',
-    },
-    // Manage Alerts Bar
-    alertsBar: {
-      backgroundColor: colors.offWhite,
-      borderRadius: '12px',
-      paddingVertical: '10px',
-      paddingHorizontal: '15px',
-      marginBottom: '30px',
-      display: 'flex',
-      flexDirection: 'row',
-      alignItems: 'center',
-      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
-    },
-    alertsText: {
-      fontSize: '16px',
-      fontWeight: '500',
-      color: colors.darkTealAccent,
-      marginLeft: '10px',
-    },
-    // Setting Item
-    settingItem: {
-      backgroundColor: colors.white,
-      borderRadius: '12px',
-      paddingVertical: '18px',
-      paddingHorizontal: '20px',
-      marginBottom: '10px',
-      display: 'flex',
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
-      minHeight: '40px',
-    },
-    settingText: {
-      fontSize: '18px',
-      color: colors.darkText,
-      fontWeight: '400',
-      flex: 1,
-    }
-  };
-
-  // Helper function to render a single setting row
-  const SettingRow: React.FC<{ label: string, isActive: boolean, onToggle: () => void }> = ({ label, isActive, onToggle }) => (
-    <div style={styles.settingItem}>
-      <span style={styles.settingText}>{label}</span>
-      <ToggleSwitch isActive={isActive} onToggle={onToggle} />
-    </div>
-  );
-
   return (
-    <div style={styles.safeArea}>
-      <div style={styles.container}>
-        
-        {/* Top Navigation Header */}
-        <div style={styles.navHeader}>
-          <button style={styles.backButton} onClick={() => console.log('Go back')}>
-            <ChevronLeftIcon color={colors.darkTealAccent} />
-          </button>
-          <span style={styles.navTitle}>Notifications</span>
-          <UserIcon color={colors.darkTealAccent} />
-        </div>
+    <ScrollView style={styles.safeArea} contentContainerStyle={styles.container}>
+      {/* Top Navigation Header */}
+      <View style={styles.navHeader}>
+        <TouchableOpacity onPress={() => console.log('Go back')} style={styles.backButton}>
+          <ChevronLeftIcon />
+        </TouchableOpacity>
+        <Text style={styles.navTitle}>Notifications</Text>
+        <UserIcon />
+      </View>
 
-        {/* Manage Alerts Bar */}
-        <div style={styles.alertsBar}>
-            <ChevronLeftIcon size={18} color={colors.darkTealAccent} />
-            <span style={styles.alertsText}>Manage how you receive alerts</span>
-        </div>
+      {/* Manage Alerts Bar */}
+      <View style={styles.alertsBar}>
+        <ChevronLeftIcon size={18} />
+        <Text style={styles.alertsText}>Manage how you receive alerts</Text>
+      </View>
 
-        {/* Settings List */}
-        <div style={styles.settingsList}>
-          
-          <SettingRow 
-            label="Push Notification" 
-            isActive={pushEnabled} 
-            onToggle={() => setPushEnabled(!pushEnabled)} 
-          />
-          
-          <SettingRow 
-            label="Email Updates" 
-            isActive={emailEnabled} 
-            onToggle={() => setEmailEnabled(!emailEnabled)} 
-          />
-          
-          {/* Modified from Assignment Reminders to Event Reminders */}
-          <SettingRow 
-            label="Event Reminders" 
-            isActive={eventRemindersEnabled} 
-            onToggle={() => setEventRemindersEnabled(!eventRemindersEnabled)} 
-          />
-          
-          <SettingRow 
-            label="Sounds/Vibrations" 
-            isActive={soundsEnabled} 
-            onToggle={() => setSoundsEnabled(!soundsEnabled)} 
-          />
-
-        </div>
-
-      </div>
-    </div>
+      {/* Settings List */}
+      <View style={styles.settingsList}>
+        <SettingRow label="Push Notifications" isActive={pushEnabled} onToggle={() => setPushEnabled(!pushEnabled)} />
+        <SettingRow label="Email Updates" isActive={emailEnabled} onToggle={() => setEmailEnabled(!emailEnabled)} />
+        <SettingRow label="Event Reminders" isActive={eventRemindersEnabled} onToggle={() => setEventRemindersEnabled(!eventRemindersEnabled)} />
+        <SettingRow label="Sounds/Vibrations" isActive={soundsEnabled} onToggle={() => setSoundsEnabled(!soundsEnabled)} />
+      </View>
+    </ScrollView>
   );
 };
 
 export default NotificationSettings;
+
+// --- Styles ---
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: colors.softMintBackground,
+  },
+  container: {
+    alignItems: 'center',
+    paddingTop: 40,
+    paddingHorizontal: 20,
+  },
+  navHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 30,
+    width: '100%',
+  },
+  navTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: colors.darkTealAccent,
+  },
+  backButton: {
+    padding: 5,
+  },
+  alertsBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.offWhite,
+    borderRadius: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    marginBottom: 30,
+    width: '100%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  alertsText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: colors.darkTealAccent,
+    marginLeft: 10,
+  },
+  settingsList: {
+    width: '100%',
+  },
+  settingItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: colors.white,
+    borderRadius: 12,
+    paddingVertical: 18,
+    paddingHorizontal: 20,
+    marginBottom: 10,
+    minHeight: 40,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  settingText: {
+    fontSize: 18,
+    color: colors.darkText,
+    fontWeight: '400',
+    flex: 1,
+  },
+  toggleTrack: {
+    width: 50,
+    height: 30,
+    borderRadius: 15,
+    padding: 3,
+    justifyContent: 'center',
+    borderWidth: 1,
+  },
+  toggleThumb: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: colors.white,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+  },
+});

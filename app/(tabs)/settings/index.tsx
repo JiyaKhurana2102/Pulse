@@ -3,92 +3,72 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-// --- STYLES & CONSTANTS ---
-const ACCENT_COLOR = '#4DB6AC'; // Teal/Mint Green button color
-const TEXT_COLOR = '#1A1A1A'; // Dark gray for general text
+const ACCENT_COLOR = '#4DB6AC';
 const BACKGROUND_COLOR = '#F0FFF0';
 
+// --- Route Enum ---
+const SettingsRoutes = {
+  APPEARANCE: "/settings/appearance",
+  NOTIFICATIONS: "/settings/notifications",
+  MY_EVENTS: "/settings/my-events",
+  MY_GROUPS: "/settings/my-groups",
+  PROFILE: "/settings/profile",
+} as const;
+
+type SettingsRoute = typeof SettingsRoutes[keyof typeof SettingsRoutes];
+
+// --- Props ---
 interface SettingsButtonProps {
   iconName: keyof typeof Ionicons.glyphMap;
   label: string;
-  href: string;
+  href: SettingsRoute;
 }
 
-// Reusable component for the settings buttons
+// --- Button Component ---
 const SettingsButton: React.FC<SettingsButtonProps> = ({ iconName, label, href }) => (
-  // We use Link with asChild to make the TouchableOpacity the actual pressable element
-  <Link href={href as any} asChild>
+  <Link href={href} asChild>
     <TouchableOpacity style={styles.buttonContainer}>
       <Ionicons name={iconName} size={28} color={ACCENT_COLOR} style={styles.icon} />
       <View style={styles.buttonTextWrapper}>
-        {/* FIX: Set text color to white for contrast on the ACCENT_COLOR background */}
-        <Text style={styles.buttonText}>{label}</Text> 
+        <Text style={styles.buttonText}>{label}</Text>
       </View>
       <Ionicons name="chevron-forward-outline" size={24} color="white" />
     </TouchableOpacity>
   </Link>
 );
 
-// --- MAIN COMPONENT ---
+// --- Screen ---
 export default function SettingsScreen() {
   return (
     <View style={styles.container}>
-      {/* The "Settings" header title is handled by the _layout.tsx file. 
-        Tapping any button below will navigate to the correct sub-screen.
-      */}
-      <SettingsButton 
-        iconName="sunny-outline" 
-        label="Appearance" 
-        // CRITICAL FIX: Changed to relative path './appearance'
-        href="./appearance" 
-      />
-      <SettingsButton 
-        iconName="notifications-outline" 
-        label="Notifications" 
-        // CRITICAL FIX: Changed to relative path './notifications'
-        href="./notifications" 
-      />
-      <SettingsButton 
-        iconName="calendar-outline" 
-        label="My Events" 
-        // CRITICAL FIX: Changed to relative path './my-events'
-        href="./my-events" 
-      />
-      {/* --- ADDED: My Groups Button --- */}
-      <SettingsButton 
-        iconName="people-outline" 
-        label="My Groups" 
-        href="./my-groups" 
-      />
-      <SettingsButton 
-        iconName="person-outline" // Changed icon to person-outline for Profile
-        label="Profile" 
-        // CRITICAL FIX: Changed to relative path './profile'
-        href="./profile" 
-      />
+      <SettingsButton iconName="sunny-outline" label="Appearance" href={SettingsRoutes.APPEARANCE} />
+      <SettingsButton iconName="notifications-outline" label="Notifications" href={SettingsRoutes.NOTIFICATIONS} />
+      <SettingsButton iconName="calendar-outline" label="My Events" href={SettingsRoutes.MY_EVENTS} />
+      <SettingsButton iconName="people-outline" label="My Groups" href={SettingsRoutes.MY_GROUPS} />
+      <SettingsButton iconName="person-outline" label="Profile" href={SettingsRoutes.PROFILE} />
     </View>
   );
 }
 
-// --- STYLING ---
+// --- Styles ---
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: BACKGROUND_COLOR,
-    paddingTop: 30, // Add some vertical space below the header
+    paddingTop: 30,
     paddingHorizontal: 20,
     alignItems: 'center',
   },
   buttonContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between', // Distribute space
+    justifyContent: 'space-between',
     width: '90%',
     marginVertical: 10,
     paddingVertical: 12,
     paddingHorizontal: 20,
     backgroundColor: ACCENT_COLOR,
-    borderRadius: 15, // Rounded corners for buttons
+    borderRadius: 15,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -97,19 +77,17 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginRight: 15,
-    backgroundColor: 'white', // Creates the effect of a light circle behind the icon
+    backgroundColor: 'white',
     padding: 5,
     borderRadius: 50,
-    overflow: 'hidden',
   },
   buttonTextWrapper: {
-    flex: 1, // Allows the text to take up the middle space
+    flex: 1,
     justifyContent: 'center',
     paddingRight: 15,
   },
   buttonText: {
-    // CRITICAL: Text color changed to white for contrast
-    color: 'white', 
+    color: 'white',
     fontSize: 18,
     fontWeight: '600',
     fontFamily: Platform.OS === 'ios' ? 'serif' : 'serif',
