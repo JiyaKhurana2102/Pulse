@@ -1,195 +1,175 @@
-import React, { useState } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import React, { useEffect, useRef, useState } from 'react';
 import {
-  View,
-  Text,
+  Animated,
+  PanResponder,
+  Platform,
   StyleSheet,
   Switch,
-  Platform,
-  Alert,
+  Text,
   TouchableOpacity,
-  StyleProp,
-  ViewStyle,
-  TextStyle,
-  ImageStyle,
-  DimensionValue,
+  View,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 
-// --- STYLES & CONSTANTS ---
 const ACCENT_COLOR = '#4DB6AC';
-const TRACK_COLOR = '#B2DFDB'; // Lighter accent for the slider track
+const TRACK_COLOR = '#B2DFDB';
 const TEXT_COLOR = '#1A1A1A';
 const BACKGROUND_COLOR = '#F0FFF0';
 
-// A simple View-based placeholder for the Slider to resolve all compilation errors.
-const SliderPlaceholder = ({ value, style }: { value: number; style?: StyleProp<ViewStyle> }) => {
-  // Calculates the width of the colored track based on the value (0 to 1)
-  const trackWidth = `${value * 100}%` as DimensionValue;
+interface SliderProps {
+  value: number;
+  onValueChange: (val: number) => void;
+  min?: number;
+  max?: number;
+  width?: number;
+}
 
-  // We cast sliderPlaceholderBase to ViewStyle here to make compose's generic expectations satisfied.
+const CustomSlider = ({ value, onValueChange, min = 0, max = 1, width = 250 }: SliderProps) => {
+  const [sliderWidth, setSliderWidth] = useState(width);
+  const pan = useRef(new Animated.Value(value)).current;
+
+  useEffect(() => {
+    pan.setValue(value);
+  }, [value]);
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderMove: (_, gestureState) => {
+        let newVal = value + gestureState.dx / sliderWidth;
+        if (newVal < 0) newVal = 0;
+        if (newVal > 1) newVal = 1;
+        pan.setValue(newVal);
+        onValueChange(min + newVal * (max - min));
+      },
+      onPanResponderRelease: () => {},
+    })
+  ).current;
+
   return (
-    <View style={StyleSheet.compose(styles.sliderPlaceholderBase as ViewStyle, style)}>
-      {/* Active Track (Simulates minimumTrackTintColor) */}
-      <View style={[styles.sliderActiveTrack, { width: trackWidth }]} />
-      {/* Thumb (Simulates the draggable dot) */}
-      <View style={[styles.sliderThumb, { left: trackWidth }]} />
+    <View
+      style={[sliderStyles.track]}
+      onLayout={(e) => setSliderWidth(e.nativeEvent.layout.width)}
+    >
+      <Animated.View
+        style={[
+          sliderStyles.fill,
+          {
+            width: pan.interpolate({
+              inputRange: [0, 1],
+              outputRange: ['0%', '100%'],
+            }),
+          },
+        ]}
+      />
+      <Animated.View
+        {...panResponder.panHandlers}
+        style={[
+          sliderStyles.thumb,
+          {
+            transform: [
+              {
+                translateX: pan.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, sliderWidth - 20], // 20 = thumb size
+                }),
+              },
+            ],
+          },
+        ]}
+      />
     </View>
   );
 };
 
-// --- MAIN COMPONENT ---
 export default function AppearanceScreen() {
   const [brightness, setBrightness] = useState(0.5);
-  const [zoom, setZoom] = useState(0.5);
+  const [zoom, setZoom] = useState(1);
   const [isDarkMode, setIsDarkMode] = useState(false);
-
-  // Helper function to show a custom message instead of Alert
-  const showMessage = (title: string, message: string) => {
-    Alert.alert(title, message);
-  };
-
-  const toggleDarkMode = (value: boolean) => {
-    setIsDarkMode(value);
-    showMessage('Theme Change', `Dark Mode is now ${value ? 'ON' : 'OFF'}`);
-  };
 
   return (
     <View style={styles.container}>
-      {/* Brightness Control Section */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Brightness</Text>
-        <View style={styles.sliderContainer}>
-          <Ionicons name="moon-outline" size={24} color={TEXT_COLOR} style={styles.sliderIcon} />
-
-          <SliderPlaceholder value={brightness} style={styles.slider} />
-
-          <Ionicons name="sunny-outline" size={24} color={TEXT_COLOR} style={styles.sliderIcon} />
+        <View style={styles.sliderRow}>
+          <Ionicons name="moon-outline" size={24} color={TEXT_COLOR} />
+          <CustomSlider value={brightness} onValueChange={setBrightness} />
+          <Ionicons name="sunny-outline" size={24} color={TEXT_COLOR} />
         </View>
       </View>
 
-      {/* Zoom Control Section */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Zoom</Text>
-        <View style={styles.sliderContainer}>
-          <Ionicons name="remove-circle-outline" size={24} color={TEXT_COLOR} style={styles.sliderIcon} />
-
-          <SliderPlaceholder value={zoom} style={styles.slider} />
-
-          <Ionicons name="add-circle-outline" size={24} color={TEXT_COLOR} style={styles.sliderIcon} />
+        <View style={styles.sliderRow}>
+          <Ionicons name="remove-circle-outline" size={24} color={TEXT_COLOR} />
+          <CustomSlider value={zoom} onValueChange={setZoom} min={0.5} max={2} />
+          <Ionicons name="add-circle-outline" size={24} color={TEXT_COLOR} />
         </View>
       </View>
 
-      {/* Dark Mode Toggle Section */}
       <View style={styles.toggleSection}>
-        <View style={styles.toggleButtonLabel}>
-          <Text style={styles.toggleText}>Dark Mode</Text>
-        </View>
+        <Text style={styles.toggleText}>Dark Mode</Text>
         <Switch
           trackColor={{ false: TRACK_COLOR, true: ACCENT_COLOR }}
           thumbColor={BACKGROUND_COLOR}
-          onValueChange={toggleDarkMode}
+          onValueChange={setIsDarkMode}
           value={isDarkMode}
-          style={styles.switchControl}
+          style={Platform.OS === 'ios' ? { transform: [{ scaleX: 1.1 }, { scaleY: 1.1 }] } : {}}
         />
       </View>
 
-      {/* Back button shown at the bottom right */}
-      <TouchableOpacity
-        onPress={() => Alert.alert('Navigate', 'This would navigate back in the stack.')}
-        style={styles.floatingBackButton}
-      >
+      <TouchableOpacity style={styles.floatingBackButton} onPress={() => console.log('Go Back')}>
         <Ionicons name="arrow-back-outline" size={30} color="white" />
       </TouchableOpacity>
     </View>
   );
 }
 
-/**
- * NOTE:
- * Using Record<string, any> below avoids the cross-platform type inference problems
- * that cause 'TextStyle' to be inferred where 'ViewStyle' is expected (cursor/userSelect mismatches).
- * This keeps your visual layout identical while removing the long chains of type errors.
- */
-const styles = StyleSheet.create<Record<string, any>>({
-  container: {
-    flex: 1,
-    backgroundColor: BACKGROUND_COLOR,
-    paddingHorizontal: 20,
-  } as ViewStyle,
-  section: {
-    marginTop: 40,
-    marginBottom: 20,
-    width: '100%',
-  } as ViewStyle,
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: TEXT_COLOR,
-    marginBottom: 10,
-    textAlign: 'center',
-    fontFamily: Platform.OS === 'ios' ? 'serif' : 'serif',
-  } as TextStyle,
-  sliderContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 10,
-  } as ViewStyle,
-  slider: {
-    flex: 1,
-    height: 40,
-    marginHorizontal: 10,
-  } as ViewStyle,
-  // --- Slider placeholder styles ---
-  sliderPlaceholderBase: {
+const sliderStyles = StyleSheet.create({
+  track: {
     height: 6,
     borderRadius: 3,
     backgroundColor: TRACK_COLOR,
+    position: 'relative',
     justifyContent: 'center',
-  } as ViewStyle,
-  sliderActiveTrack: {
-    position: 'absolute',
+    flex: 1,
+    marginHorizontal: 10,
+  },
+  fill: {
     height: 6,
     borderRadius: 3,
     backgroundColor: ACCENT_COLOR,
-  } as ViewStyle,
-  sliderThumb: {
     position: 'absolute',
+  },
+  thumb: {
     width: 20,
     height: 20,
     borderRadius: 10,
     backgroundColor: ACCENT_COLOR,
-    borderColor: BACKGROUND_COLOR,
-    borderWidth: 3,
+    position: 'absolute',
     top: -7,
-    marginLeft: -10,
-  } as ViewStyle,
-  sliderIcon: {
-    opacity: 0.7,
-  } as ViewStyle,
+    borderWidth: 3,
+    borderColor: BACKGROUND_COLOR,
+  },
+});
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: BACKGROUND_COLOR, paddingHorizontal: 20, paddingTop: 40 },
+  section: { marginTop: 30 },
+  sectionTitle: { fontSize: 20, fontWeight: '600', color: TEXT_COLOR, textAlign: 'center', marginBottom: 12 },
+  sliderRow: { flexDirection: 'row', alignItems: 'center' },
   toggleSection: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 60,
-    width: '90%',
-    alignSelf: 'center',
+    alignItems: 'center',
+    marginTop: 50,
     paddingHorizontal: 10,
     paddingVertical: 15,
     borderRadius: 15,
     backgroundColor: TRACK_COLOR,
-  } as ViewStyle,
-  toggleButtonLabel: {
-    paddingHorizontal: 10,
-  } as ViewStyle,
-  toggleText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: TEXT_COLOR,
-  } as TextStyle,
-  switchControl: {
-    transform: Platform.OS === 'ios' ? [{ scaleX: 1.1 }, { scaleY: 1.1 }] : undefined,
-  } as ViewStyle,
+  },
+  toggleText: { fontSize: 18, fontWeight: '600', color: TEXT_COLOR },
   floatingBackButton: {
     position: 'absolute',
     right: 30,
@@ -205,5 +185,5 @@ const styles = StyleSheet.create<Record<string, any>>({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
-  } as ViewStyle,
+  },
 });
