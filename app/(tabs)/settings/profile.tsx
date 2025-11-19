@@ -1,33 +1,302 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import * as ImagePicker from 'expo-image-picker';
+import React, { useState } from 'react';
+import {
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-const BACKGROUND_COLOR = '#F0FFF0'; 
-const TEXT_COLOR = '#1A1A1A';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
-export default function ProfileScreen() {
+// ---- ICON TYPE SAFETY ----
+export type IoniconName = keyof typeof Ionicons.glyphMap;
+export type MaterialName = keyof typeof MaterialCommunityIcons.glyphMap;
+
+interface SafeIconProps {
+  name: IoniconName | MaterialName;
+  library: 'ion' | 'mci';
+  size: number;
+  color: string;
+}
+
+const SafeIcon = ({ name, library, size, color }: SafeIconProps) => {
+  return library === 'ion' ? (
+    <Ionicons name={name as IoniconName} size={size} color={color} />
+  ) : (
+    <MaterialCommunityIcons name={name as MaterialName} size={size} color={color} />
+  );
+};
+
+// ---- EDITABLE ROW ----
+interface EditableRowProps {
+  label: string;
+  value: string;
+  iconName: IoniconName | MaterialName;
+  library?: 'ion' | 'mci';
+  isPassword?: boolean;
+  onChangeText?: (text: string) => void;
+  onPress?: () => void;
+  keyboardType?: 'default' | 'number-pad' | 'phone-pad';
+}
+
+const EditableRow = ({
+  label,
+  value,
+  iconName,
+  library = 'mci',
+  isPassword = false,
+  onChangeText,
+  onPress,
+  keyboardType = 'default',
+}: EditableRowProps) => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Profile Screen Content</Text>
-      <Text style={styles.subText}>View and edit your personal information.</Text>
+    <View style={styles.row}>
+      <View style={styles.iconContainer}>
+        <SafeIcon name={iconName} library={library} size={28} color={ICON_COLOR} />
+      </View>
+
+      <Pressable style={styles.inputBox} onPress={onPress} disabled={!onPress}>
+        {onPress ? (
+          <Text style={styles.inputText}>{value || label}</Text>
+        ) : (
+          <TextInput
+            style={styles.inputText}
+            value={value}
+            onChangeText={onChangeText}
+            placeholder={label}
+            placeholderTextColor={TEXT_COLOR_DARK + '80'}
+            secureTextEntry={isPassword}
+            keyboardType={keyboardType}
+          />
+        )}
+      </Pressable>
+
+      <SafeIcon
+        name={isPassword ? ('eye-off' as MaterialName) : ('pencil' as MaterialName)}
+        library="mci"
+        size={24}
+        color={ICON_COLOR}
+      />
     </View>
+  );
+};
+
+// ---- MAIN SCREEN ----
+const BACKGROUND_COLOR = '#E0F2F1';
+const ACCENT_COLOR = '#B2DFDB';
+const ICON_COLOR = '#4DB6AC';
+const TEXT_COLOR_DARK = '#303030';
+
+export default function SettingsScreen() {
+  const [name, setName] = useState('Jiya Khurana');
+  const [dateOfBirth, setDateOfBirth] = useState(new Date(2000, 0, 1));
+  const [phoneNumber, setPhoneNumber] = useState('012-345-6789');
+  const [password, setPassword] = useState('********');
+  const [profileImageUri, setProfileImageUri] = useState<string | null>(null);
+
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
+  const handleDateChange = (event: any, selectedDate?: Date) => {
+    const currentDate = selectedDate || dateOfBirth;
+    setShowDatePicker(Platform.OS === 'ios');
+    setDateOfBirth(currentDate);
+  };
+
+  const formattedDate = dateOfBirth.toLocaleDateString('en-US', {
+    month: '2-digit',
+    day: '2-digit',
+    year: 'numeric',
+  });
+
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setProfileImageUri(result.assets[0].uri);
+    }
+  };
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+          
+          {/* Header */}
+          <View style={styles.header}>
+            <SafeIcon name="arrow-back" library="ion" size={28} color={ICON_COLOR} />
+            <Text style={styles.title}>Settings</Text>
+            <View style={{ width: 28 }} />
+          </View>
+
+          {/* Profile Button */}
+          <Pressable style={styles.profileButton}>
+            <Text style={styles.profileButtonText}>Profile</Text>
+          </Pressable>
+
+          {/* Image Upload */}
+          <TouchableOpacity style={styles.imageContainer} onPress={pickImage}>
+            {profileImageUri ? (
+              <Image source={{ uri: profileImageUri }} style={styles.profileImage} />
+            ) : (
+              <View style={styles.profilePlaceholder} />
+            )}
+            <View style={styles.uploadOverlay}>
+              <Text style={styles.uploadText}>Upload</Text>
+            </View>
+          </TouchableOpacity>
+
+          {/* Editable Fields */}
+          <View style={styles.settingsList}>
+            <EditableRow
+              label="Name"
+              value={name}
+              onChangeText={setName}
+              iconName="account-outline"
+              library="mci"
+            />
+
+            <EditableRow
+              label="MM/DD/YYYY"
+              value={formattedDate}
+              onPress={() => setShowDatePicker(true)}
+              iconName="calendar-outline"
+              library="ion"
+            />
+
+            {showDatePicker && (
+              <DateTimePicker
+                value={dateOfBirth}
+                mode="date"
+                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                onChange={handleDateChange}
+              />
+            )}
+
+            <EditableRow
+              label="Phone Number"
+              value={phoneNumber}
+              onChangeText={setPhoneNumber}
+              iconName="phone-outline"
+              library="mci"
+              keyboardType="phone-pad"
+            />
+
+            <EditableRow
+              label="Password"
+              value={password}
+              onChangeText={setPassword}
+              iconName="lock-outline"
+              library="mci"
+              isPassword
+            />
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
+// ---- STYLES ----
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: BACKGROUND_COLOR,
+  safeArea: { flex: 1, backgroundColor: BACKGROUND_COLOR },
+  flex: { flex: 1 },
+  scrollContainer: { paddingHorizontal: 20, paddingTop: 10, alignItems: 'center' },
+
+  header: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
+    paddingBottom: 15,
+  },
+
+  title: {
+    fontSize: 34,
+    fontFamily: 'serif',
+    fontWeight: '300',
+    color: TEXT_COLOR_DARK,
+    flex: 1,
+    textAlign: 'center',
+  },
+
+  profileButton: {
+    backgroundColor: ACCENT_COLOR,
+    paddingVertical: 10,
+    paddingHorizontal: 30,
+    borderRadius: 30,
+    marginTop: 5,
+    marginBottom: 25,
+  },
+
+  profileButtonText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: TEXT_COLOR_DARK,
+    fontFamily: 'serif',
+  },
+
+  imageContainer: {
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    backgroundColor: ACCENT_COLOR,
     justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 40,
+    overflow: 'hidden',
   },
-  text: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: TEXT_COLOR,
-    marginBottom: 10,
+
+  profilePlaceholder: { width: '100%', height: '100%', backgroundColor: ACCENT_COLOR },
+  profileImage: { width: '100%', height: '100%' },
+
+  uploadOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+    paddingVertical: 5,
+    backgroundColor: 'rgba(0,0,0,0.2)',
+    alignItems: 'center',
   },
-  subText: {
-    fontSize: 16,
-    color: TEXT_COLOR,
+
+  uploadText: { color: '#fff', fontSize: 12, fontWeight: '500' },
+
+  settingsList: { width: '100%', alignItems: 'center' },
+
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+    width: '100%',
   },
+
+  iconContainer: { width: 40, justifyContent: 'center', alignItems: 'center', marginRight: 10 },
+
+  inputBox: {
+    flex: 1,
+    backgroundColor: ACCENT_COLOR,
+    borderRadius: 12,
+    paddingVertical: Platform.OS === 'ios' ? 12 : 8,
+    paddingHorizontal: 15,
+    marginRight: 10,
+    justifyContent: 'center',
+    minHeight: 50,
+  },
+
+  inputText: { fontSize: 17, color: TEXT_COLOR_DARK, fontWeight: '400' },
+
+  editIcon: { width: 30, textAlign: 'center' },
 });
