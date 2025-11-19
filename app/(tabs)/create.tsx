@@ -13,15 +13,16 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
-// --- STYLING CONSTANTS (matching your mint theme) ---
+// --- STYLING CONSTANTS ---
 const BACKGROUND_COLOR = '#E0F2F1'; // Light mint/teal background
-const ACCENT_COLOR_LIGHT = '#B2DFDB'; // Lighter teal for button background
+const ACCENT_COLOR_LIGHT = '#B2DFDB'; // Lighter teal for buttons
 const ACCENT_COLOR_DARK = '#4DB6AC'; // Darker teal for borders/accents
 const TEXT_COLOR_DARK = '#303030'; // Dark gray for primary text
-const TEXT_COLOR_MINT = '#26A69A'; // Mint color for headers
+const TEXT_COLOR_MINT = '#26A69A'; // Mint color for selected date
 const TEXT_COLOR_WHITE = '#FFFFFF';
 
 // --- SCREENS ---
@@ -31,6 +32,7 @@ const SCREENS = {
   NEW_EVENT: 'new_event',
 };
 
+/* --- Buttons --- */
 const MobileButton = ({ children, onPress, disabled = false, style }: any) => {
   return (
     <Pressable
@@ -78,7 +80,6 @@ const NewGroupForm = ({ onBack }: { onBack: () => void }) => {
         <View style={styles.innerContainer}>
           <BackButton onPress={onBack} />
 
-          {/* Message Box */}
           {message && (
             <View style={styles.messageOverlay}>
               <Text style={styles.messageText}>{message}</Text>
@@ -128,11 +129,14 @@ const NewGroupForm = ({ onBack }: { onBack: () => void }) => {
   );
 };
 
-/* --- New Event Form --- */
+/* --- New Event Form with custom calendar card and native DateTimePicker --- */
 const NewEventForm = ({ onBack }: { onBack: () => void }) => {
   const [eventName, setEventName] = useState('');
   const [description, setDescription] = useState('');
   const [message, setMessage] = useState<string | null>(null);
+
+  const [date, setDate] = useState(new Date());
+  const [showPicker, setShowPicker] = useState(false);
 
   const handleScheduleEvent = () => {
     setMessage(`Event "${eventName || 'Untitled Event'}" Scheduled!`);
@@ -142,66 +146,14 @@ const NewEventForm = ({ onBack }: { onBack: () => void }) => {
     }, 1500);
   };
 
-  const CalendarPlaceholder = () => {
-    // Simple static "calendar" grid for display. Replace with a real calendar picker if desired.
-    const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
-    const dates = Array.from({ length: 30 }, (_, i) => i + 1);
-
-    return (
-      <View style={styles.calendarCard}>
-        <View style={styles.calendarHeader}>
-          <Text style={styles.calendarMonth}>April 2025</Text>
-          <View style={styles.calendarChevrons}>
-            <Text style={styles.chev}>{'<'}</Text>
-            <Text style={styles.chev}>{'>'}</Text>
-          </View>
-        </View>
-
-        <View style={styles.weekRow}>
-          {days.map((d) => (
-            <Text key={d} style={styles.weekDay}>
-              {d}
-            </Text>
-          ))}
-        </View>
-
-        <View style={styles.datesGrid}>
-          {/* For simplicity, we leave some blank columns at start to imitate month offset */}
-          <View style={{ width: SCREEN_WIDTH * 0.02 }} />
-          {dates.map((dt) => {
-            const isSelected = dt === 20;
-            return (
-              <View
-                key={dt}
-                style={[
-                  styles.dateCell,
-                  isSelected && styles.dateCellSelected,
-                ]}
-              >
-                <Text style={[styles.dateText, isSelected && styles.dateTextSelected]}>
-                  {dt}
-                </Text>
-              </View>
-            );
-          })}
-        </View>
-
-        <View style={styles.timeRow}>
-          <Text style={styles.timeLabel}>Time</Text>
-          <View style={styles.timeBubble}>
-            <Text style={styles.timeText}>9:41 AM</Text>
-          </View>
-        </View>
-      </View>
-    );
+  const onChange = (event: any, selectedDate?: Date) => {
+    setShowPicker(Platform.OS === 'ios');
+    if (selectedDate) setDate(selectedDate);
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView
-        style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
+      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <View style={styles.innerContainer}>
           <BackButton onPress={onBack} />
 
@@ -233,7 +185,29 @@ const NewEventForm = ({ onBack }: { onBack: () => void }) => {
               textAlignVertical="top"
             />
 
-            <CalendarPlaceholder />
+            {/* --- Custom Calendar Card --- */}
+            <View style={styles.calendarCard}>
+              <Text style={styles.calendarMonth}>Select Date & Time</Text>
+
+              <Pressable
+                onPress={() => setShowPicker(true)}
+                style={styles.timeBubble}
+              >
+                <Text style={[styles.timeText, { fontSize: 16 }]}>
+                  {date.toDateString()} {date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </Text>
+              </Pressable>
+
+              {showPicker && (
+                <DateTimePicker
+                  value={date}
+                  mode="datetime"
+                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                  onChange={onChange}
+                  minimumDate={new Date()}
+                />
+              )}
+            </View>
           </ScrollView>
 
           <MobileButton onPress={handleScheduleEvent} disabled={!!message}>
@@ -261,7 +235,7 @@ const SelectionScreen = ({ navigate }: { navigate: (screen: string) => void }) =
   );
 };
 
-/* --- MAIN APP COMPONENT --- */
+/* --- MAIN APP --- */
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState(SCREENS.SELECTION);
 
@@ -280,9 +254,7 @@ export default function App() {
 
   return (
     <View style={[styles.appRoot, { backgroundColor: BACKGROUND_COLOR }]}>
-      <View style={styles.mobileFrame}>
-        {renderScreen()}
-      </View>
+      <View style={styles.mobileFrame}>{renderScreen()}</View>
       <Text style={styles.footerNote}>Pulse</Text>
     </View>
   );
@@ -290,19 +262,13 @@ export default function App() {
 
 /* --- STYLES --- */
 const styles = StyleSheet.create({
-  appRoot: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 8,
-  },
+  appRoot: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 8 },
   mobileFrame: {
     width: '100%',
     maxWidth: 420,
     backgroundColor: '#ffffff',
     borderRadius: 28,
     overflow: 'hidden',
-    // occupy most of vertical space like your web layout
     height: '90%',
     elevation: 6,
     shadowColor: '#000',
@@ -310,16 +276,9 @@ const styles = StyleSheet.create({
     shadowRadius: 20,
     shadowOffset: { width: 0, height: 10 },
   },
-  footerNote: {
-    marginTop: 8,
-    fontSize: 12,
-    color: '#6B7280',
-  },
+  footerNote: { marginTop: 8, fontSize: 12, color: '#6B7280' },
 
-  container: {
-    flex: 1,
-    backgroundColor: 'transparent',
-  },
+  container: { flex: 1, backgroundColor: 'transparent' },
   flex: { flex: 1 },
   innerContainer: { flex: 1, padding: 18, position: 'relative' },
 
@@ -354,21 +313,8 @@ const styles = StyleSheet.create({
 
   scrollContent: { paddingTop: 48, paddingBottom: 12 },
 
-  titleInput: {
-    width: '100%',
-    fontSize: 36,
-    fontWeight: '300',
-    textAlign: 'center',
-    color: TEXT_COLOR_DARK,
-    marginBottom: 6,
-  },
-  titleDivider: {
-    height: 1,
-    width: '75%',
-    alignSelf: 'center',
-    marginBottom: 18,
-    backgroundColor: ACCENT_COLOR_DARK + '80',
-  },
+  titleInput: { width: '100%', fontSize: 36, fontWeight: '300', textAlign: 'center', color: TEXT_COLOR_DARK, marginBottom: 6 },
+  titleDivider: { height: 1, width: '75%', alignSelf: 'center', marginBottom: 18, backgroundColor: ACCENT_COLOR_DARK + '80' },
 
   label: { fontSize: 20, fontWeight: '300', marginBottom: 8, color: TEXT_COLOR_DARK },
 
@@ -383,17 +329,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
 
-  toggleRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 10,
-    marginTop: 8,
-    borderRadius: 999,
-    backgroundColor: ACCENT_COLOR_LIGHT,
-    borderWidth: 1,
-    borderColor: ACCENT_COLOR_DARK + '40',
-  },
+  toggleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10, marginTop: 8, borderRadius: 999, backgroundColor: ACCENT_COLOR_LIGHT, borderWidth: 1, borderColor: ACCENT_COLOR_DARK + '40' },
   toggleLabel: { fontSize: 16, fontWeight: '600', color: TEXT_COLOR_DARK },
 
   mobileButton: {
@@ -409,91 +345,34 @@ const styles = StyleSheet.create({
     borderColor: ACCENT_COLOR_DARK + '80',
     elevation: 2,
   },
-  mobileButtonText: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: TEXT_COLOR_DARK,
-  },
-  buttonDisabled: {
-    opacity: 0.5,
-  },
-  buttonPressed: {
-    transform: [{ scale: 0.995 }],
-  },
+  mobileButtonText: { fontSize: 18, fontWeight: '700', color: TEXT_COLOR_DARK },
+  buttonDisabled: { opacity: 0.5 },
+  buttonPressed: { transform: [{ scale: 0.995 }] },
 
-  selectionContainer: {
-    flex: 1,
-    alignItems: 'center',
-    paddingTop: 28,
-    paddingHorizontal: 22,
-  },
+  selectionContainer: { flex: 1, alignItems: 'center', paddingTop: 28, paddingHorizontal: 22 },
   pageTitle: { fontSize: 40, fontWeight: '300', marginTop: 36, marginBottom: 12, color: TEXT_COLOR_DARK },
   pageSubtitle: { fontSize: 18, fontWeight: '300', marginBottom: 20, color: TEXT_COLOR_DARK },
 
-  /* Calendar styles */
+  /* --- Custom Calendar Card --- */
   calendarCard: {
     marginTop: 18,
     backgroundColor: '#fff',
     borderRadius: 18,
-    padding: 14,
+    padding: 16,
     borderWidth: 1,
     borderColor: ACCENT_COLOR_DARK + '20',
     elevation: 2,
-  },
-  calendarHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
   },
-  calendarMonth: { fontSize: 18, fontWeight: '700', color: TEXT_COLOR_DARK },
-  calendarChevrons: { flexDirection: 'row', gap: 8 },
-  chev: { fontSize: 16, color: ACCENT_COLOR_DARK, marginHorizontal: 6 },
+  calendarMonth: { fontSize: 18, fontWeight: '700', color: TEXT_COLOR_DARK, marginBottom: 12 },
 
-  weekRow: {
-    flexDirection: 'row',
-    marginTop: 8,
-    justifyContent: 'space-between',
-    paddingHorizontal: 8,
-  },
-  weekDay: { fontSize: 12, fontWeight: '700', color: '#6B7280', flex: 1, textAlign: 'center' },
-
-  datesGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginTop: 8,
-    paddingHorizontal: 4,
-  },
-  dateCell: {
-    width: (SCREEN_WIDTH * 0.8) / 7 - 6,
-    height: 36,
-    margin: 3,
-    borderRadius: 18,
+  timeBubble: {
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    backgroundColor: ACCENT_COLOR_DARK,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  dateCellSelected: {
-    backgroundColor: ACCENT_COLOR_DARK + '20',
-    borderWidth: 1,
-    borderColor: ACCENT_COLOR_DARK + '40',
-  },
-  dateText: { fontSize: 14, color: TEXT_COLOR_DARK },
-  dateTextSelected: { color: TEXT_COLOR_MINT, fontWeight: '700' },
-
-  timeRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 12,
-    paddingTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: BACKGROUND_COLOR,
-    alignItems: 'center',
-  },
-  timeLabel: { fontSize: 16, fontWeight: '600', color: TEXT_COLOR_DARK },
-  timeBubble: {
-    borderRadius: 12,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    backgroundColor: ACCENT_COLOR_DARK,
-  },
-  timeText: { color: TEXT_COLOR_WHITE, fontWeight: '700', fontSize: 16 },
+  timeText: { color: TEXT_COLOR_WHITE, fontWeight: '700', fontSize: 18 },
 });
