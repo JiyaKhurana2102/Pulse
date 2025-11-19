@@ -12,12 +12,9 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
-<<<<<<< HEAD
     "@react-native-community/slider": "5.0.1",
-=======
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@react-native-community/datetimepicker": "^8.5.0",
->>>>>>> 5e494d9e6dda0d931e9c62e296e8d2016d597fb3
     "@react-navigation/bottom-tabs": "^7.4.0",
     "@react-navigation/elements": "^2.6.3",
     "@react-navigation/native": "^7.1.8",
