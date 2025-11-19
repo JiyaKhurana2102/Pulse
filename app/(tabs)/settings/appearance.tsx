@@ -1,14 +1,14 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
+  Alert,
+  Animated,
   StyleSheet,
   Switch,
-  Alert,
+  Text,
   TouchableOpacity,
-  Animated,
+  View,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 
 // --- COLORS ---
 const ACCENT_COLOR = '#4DB6AC';
