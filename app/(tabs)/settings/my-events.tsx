@@ -1,4 +1,12 @@
 import React, { useState, useMemo } from 'react';
+// IMPORT REACT NATIVE COMPONENTS
+import {
+  View,
+  Text,
+  TouchableOpacity, // Used for buttons
+  StyleSheet, // Used for optimized styling
+  Platform, // Used to handle web-specific styles
+} from 'react-native';
 
 // --- Color Palette (Based on third image: Soft Mint/Teal) ---
 const colors = {
@@ -8,40 +16,40 @@ const colors = {
   white: '#FFFFFF',
   lightGray: '#A0AEC0',
   darkText: '#1F2937',
+  eventDotColor: '#1F2937', // Use a dark color for better contrast
 };
 
-// --- Custom Icon Component (Using SVG for self-containment) ---
-// We use inline SVG for reliability in restricted environments.
+// --- Custom Icon Component (Replaced SVG with simple Text/View) ---
+// Note: In a real RN app, you'd use a library like 'react-native-vector-icons'.
+// We are keeping the structure but replacing web elements.
 const Icon = ({ name, size = 24, color = colors.darkTealAccent }: { name: string, size?: number, color?: string }) => {
+    // For simplicity in a self-contained example, we'll return a simple View/Text
+    // instead of complex SVG/path elements, which require a separate <Svg> component.
+    // For a calendar/pin/chevron, using an emoji or placeholder is safer for a quick fix.
+    
+    // In a real application, you would use 'react-native-svg' for the path elements.
+    // For this fix, we'll simplify all non-text icons to a placeholder view.
+    const iconStyle = {
+        width: size,
+        height: size,
+        backgroundColor: 'transparent',
+        justifyContent: 'center',
+        alignItems: 'center',
+    };
+    
     switch (name) {
         case 'Calendar':
-            return (
-                <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M8 2v4" /><path d="M16 2v4" /><rect width="18" height="18" x="3" y="4" rx="2" /><path d="M3 10h18" />
-                </svg>
-            );
+            return <Text style={{ fontSize: size, color }}>📅</Text>; // Placeholder
         case 'ChevronLeft':
-            return (
-                <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="m15 18-6-6 6-6" />
-                </svg>
-            );
+            return <Text style={{ fontSize: size, color }}>{'<'}</Text>;
         case 'ChevronRight':
-            return (
-                <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="m9 18 6-6-6-6" />
-                </svg>
-            );
+            return <Text style={{ fontSize: size, color }}>{'>'}</Text>;
         case 'MapPin':
-            return (
-                <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" />
-                </svg>
-            );
+            return <Text style={{ fontSize: size * 0.8, color }}>📍</Text>; // Placeholder
         case 'Close':
-            // Use a simple text character for the close button
+            // Use a simple Text character for the close button
             return (
-                <span style={{ fontSize: size, lineHeight: 1, color: colors.darkText }}>&times;</span>
+                <Text style={{ fontSize: size, lineHeight: size, color: colors.darkText }}>&times;</Text>
             );
         default:
             return null;
@@ -49,7 +57,6 @@ const Icon = ({ name, size = 24, color = colors.darkTealAccent }: { name: string
 };
 
 // --- Typescript Interfaces for Data and State ---
-
 interface CampusEvent {
   id: string;
   name: string;
@@ -68,7 +75,6 @@ interface SelectedDateEvents {
 }
 
 // --- Mock Data Setup ---
-
 // Helper to format date as YYYY-MM-DD
 const formatDate = (date: Date): string => {
   const year = date.getFullYear();
@@ -172,6 +178,227 @@ const getCalendarWeeks = (month: number, year: number): (Date | null)[][] => {
   return weeks;
 };
 
+// --- Styles using StyleSheet.create (React Native best practice) ---
+const styles = StyleSheet.create({
+    safeArea: {
+      flex: 1, // Use flex to take up the screen
+      backgroundColor: colors.softMintBackground,
+      // No need for fontFamily, display, justify/align, etc. on the root view
+    },
+    container: {
+      width: '100%',
+      maxWidth: 400, // Simulate a mobile screen width
+      padding: 20,
+      alignSelf: 'center', // Center the container on larger screens
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingVertical: 10,
+      marginBottom: 20,
+    },
+    title: {
+      fontSize: 28,
+      fontWeight: 'bold',
+      color: colors.darkTealAccent,
+    },
+    calendarHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 10,
+      paddingHorizontal: 10,
+    },
+    navButton: {
+      padding: 8,
+      borderRadius: 20,
+      backgroundColor: 'transparent',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    monthYearText: {
+      fontSize: 20,
+      fontWeight: '700',
+      color: colors.darkText,
+    },
+    dayNamesContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      textAlign: 'center', // Text alignment is done on the Text component
+      paddingBottom: 8,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.lightGray,
+      marginBottom: 5,
+    },
+    dayNameText: {
+      flex: 1, // Distribute evenly
+      fontSize: 12,
+      fontWeight: '600',
+      color: colors.darkTealAccent,
+      textAlign: 'center',
+    },
+    calendarGrid: {
+      // Use flex to simulate a grid layout (7 columns)
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 4,
+    },
+    dateButtonWrapper: {
+        width: `${100 / 7}%`, // Distribute 7 buttons per row
+        aspectRatio: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    dateButton: {
+      width: '90%', // Use percentage of the wrapper
+      aspectRatio: 1,
+      borderRadius: 12,
+      justifyContent: 'center',
+      alignItems: 'center',
+      position: 'relative',
+      paddingTop: 5,
+      backgroundColor: 'transparent',
+    },
+    dateButtonDisabled: {
+      opacity: 0.4,
+    },
+    dateButtonToday: {
+      borderWidth: 2,
+      borderColor: colors.darkTealAccent,
+      backgroundColor: `${colors.mediumAccentGreen}20`,
+    },
+    dateButtonSelected: {
+      backgroundColor: colors.mediumAccentGreen,
+    },
+    dateText: {
+      fontSize: 16,
+      fontWeight: '500',
+      color: colors.darkText,
+    },
+    dateTextSelected: {
+        color: colors.white,
+    },
+    dateTextToday: {
+      fontWeight: 'bold',
+    },
+    eventDotsContainer: {
+      position: 'absolute',
+      bottom: 5,
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    eventDot: {
+      width: 5,
+      height: 5,
+      borderRadius: 50,
+      marginHorizontal: 1,
+    },
+    eventDotSelected: {
+        backgroundColor: colors.white,
+    },
+    extraEventsText: {
+      fontSize: 10,
+      marginLeft: 2,
+      color: colors.darkText,
+    },
+    extraEventsTextSelected: {
+        color: colors.white,
+    },
+    // --- Modal Styles (Using RN conventions for positioning) ---
+    modalOverlay: {
+      // Use absolute fill or dimensions for RN overlay
+      ...StyleSheet.absoluteFillObject, 
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      justifyContent: 'flex-end', // Align to the bottom
+      zIndex: 100,
+      // For web, use 'fixed', for RN use 'absoluteFillObject'
+      ...Platform.select({
+        web: { position: 'fixed' as 'fixed' },
+      })
+    },
+    modalContent: {
+      backgroundColor: colors.white,
+      borderTopLeftRadius: 25,
+      borderTopRightRadius: 25,
+      padding: 25,
+      maxHeight: '70%',
+      width: '100%',
+      maxWidth: 400, 
+      alignSelf: 'center',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: -5 },
+      shadowOpacity: 0.1,
+      shadowRadius: 10,
+      elevation: 20, // Android shadow
+    },
+    modalHeader: {
+      marginBottom: 15,
+      position: 'relative',
+    },
+    modalTitle: {
+      fontSize: 22,
+      fontWeight: 'bold',
+      color: colors.darkText,
+    },
+    modalSubtitle: {
+      fontSize: 16,
+      color: colors.lightGray,
+      marginTop: 2,
+    },
+    modalCloseButton: {
+      position: 'absolute',
+      top: 0,
+      right: 0,
+      padding: 5,
+    },
+    eventList: {
+      maxHeight: 300,
+      marginBottom: 20,
+    },
+    eventItem: {
+      flexDirection: 'row',
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: '#eee',
+    },
+    eventAccentBar: {
+      width: 4,
+      backgroundColor: colors.mediumAccentGreen,
+      borderRadius: 2,
+      marginRight: 10,
+    },
+    eventName: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.darkText,
+    },
+    eventDetailsRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginTop: 4,
+    },
+    eventDetailsText: {
+      fontSize: 13,
+      color: colors.lightGray,
+      marginLeft: 4,
+    },
+    closeButton: {
+      backgroundColor: colors.darkTealAccent,
+      borderRadius: 10,
+      paddingVertical: 14,
+      marginTop: 10,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    closeButtonText: {
+      color: colors.white,
+      fontSize: 16,
+      fontWeight: '700',
+      textAlign: 'center',
+    },
+});
+
 // --- Main Component ---
 
 const MyEventsScreen: React.FC = () => {
@@ -206,281 +433,62 @@ const MyEventsScreen: React.FC = () => {
     setModalData(null);
   };
   
-  // Base styles using React Native style conventions
-  // Note: We use 'any' type here to allow React Native properties like 'paddingVertical'
-  const styles: any = { 
-    safeArea: {
-      minHeight: '100vh',
-      paddingTop: '20px',
-      backgroundColor: colors.softMintBackground,
-      fontFamily: 'Inter, sans-serif',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'flex-start',
-    },
-    container: {
-      width: '100%',
-      maxWidth: '400px', // Simulate a mobile screen width
-      padding: '20px',
-    },
-    header: {
-      display: 'flex',
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      // Reverted to React Native mobile syntax
-      paddingVertical: '10px', 
-      marginBottom: '20px',
-    },
-    title: {
-      fontSize: '28px',
-      fontWeight: 'bold',
-      color: colors.darkTealAccent,
-    },
-    calendarHeader: {
-      display: 'flex',
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginBottom: '10px',
-      // Reverted to React Native mobile syntax
-      paddingHorizontal: '10px', 
-    },
-    navButton: {
-      padding: '8px',
-      borderRadius: '20px',
-      cursor: 'pointer',
-      backgroundColor: 'transparent',
-      border: 'none',
-      transition: 'background-color 0.15s',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    navButtonHover: {
-      backgroundColor: `${colors.mediumAccentGreen}20`,
-    },
-    monthYearText: {
-      fontSize: '20px',
-      fontWeight: '700',
-      color: colors.darkText,
-    },
-    dayNamesContainer: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(7, 1fr)',
-      textAlign: 'center',
-      paddingBottom: '8px',
-      borderBottom: `1px solid ${colors.lightGray}`,
-      marginBottom: '5px',
-    },
-    dayNameText: {
-      fontSize: '12px',
-      fontWeight: '600',
-      color: colors.darkTealAccent,
-    },
-    calendarGrid: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(7, 1fr)',
-      gap: '4px 0',
-    },
-    dateButton: {
-      width: '90%',
-      aspectRatio: '1/1',
-      borderRadius: '12px',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-      position: 'relative',
-      paddingTop: '5px',
-      margin: 'auto',
-      cursor: 'pointer',
-      border: 'none',
-      backgroundColor: 'transparent',
-      transition: 'background-color 0.15s, border-color 0.15s',
-    },
-    dateButtonDisabled: {
-      opacity: 0.4,
-      cursor: 'default',
-    },
-    dateButtonCurrentMonth: {
-        opacity: 1,
-    },
-    dateButtonToday: {
-      border: `2px solid ${colors.darkTealAccent}`,
-      backgroundColor: `${colors.mediumAccentGreen}20`,
-    },
-    dateButtonSelected: {
-      backgroundColor: colors.mediumAccentGreen,
-      color: colors.white, // Text becomes white when selected
-    },
-    dateText: {
-      fontSize: '16px',
-      fontWeight: '500',
-      color: colors.darkText,
-    },
-    dateTextToday: {
-      fontWeight: 'bold',
-    },
-    eventDotsContainer: {
-      position: 'absolute',
-      bottom: '5px',
-      display: 'flex',
-      flexDirection: 'row',
-      alignItems: 'center',
-    },
-    eventDot: {
-      width: '5px',
-      height: '5px',
-      borderRadius: '50%',
-      // Reverted to React Native mobile syntax
-      marginHorizontal: '1px', 
-    },
-    extraEventsText: {
-      fontSize: '10px',
-      marginLeft: '2px',
-    },
-    // --- Modal Styles ---
-    modalOverlay: {
-      position: 'fixed',
-      inset: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'flex-end',
-      zIndex: 100,
-    },
-    modalContent: {
-      backgroundColor: colors.white,
-      borderTopLeftRadius: '25px',
-      borderTopRightRadius: '25px',
-      padding: '25px',
-      maxHeight: '70%',
-      width: '100%',
-      maxWidth: '400px', // Constrain modal to mobile width
-      boxShadow: '0 -10px 30px rgba(0, 0, 0, 0.1)',
-      cursor: 'default',
-    },
-    modalHeader: {
-      marginBottom: '15px',
-      position: 'relative',
-    },
-    modalTitle: {
-      fontSize: '22px',
-      fontWeight: 'bold',
-      color: colors.darkText,
-    },
-    modalSubtitle: {
-      fontSize: '16px',
-      color: colors.lightGray,
-      marginTop: '2px',
-    },
-    modalCloseButton: {
-      position: 'absolute',
-      top: '0',
-      right: '0',
-      padding: '5px',
-      cursor: 'pointer',
-      border: 'none',
-      backgroundColor: 'transparent',
-    },
-    eventList: {
-      maxHeight: '300px',
-      overflowY: 'auto',
-      marginBottom: '20px',
-    },
-    eventItem: {
-      display: 'flex',
-      flexDirection: 'row',
-      // Reverted to React Native mobile syntax
-      paddingVertical: '12px', 
-      borderBottom: '1px solid #eee',
-    },
-    eventAccentBar: {
-      width: '4px',
-      backgroundColor: colors.mediumAccentGreen,
-      borderRadius: '2px',
-      marginRight: '10px',
-    },
-    eventName: {
-      fontSize: '16px',
-      fontWeight: '600',
-      color: colors.darkText,
-    },
-    eventDetailsRow: {
-      display: 'flex',
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginTop: '4px',
-    },
-    eventDetailsText: {
-      fontSize: '13px',
-      color: colors.lightGray,
-      marginLeft: '4px',
-    },
-    closeButton: {
-      backgroundColor: colors.darkTealAccent,
-      borderRadius: '10px',
-      // Reverted to React Native mobile syntax
-      paddingVertical: '14px', 
-      textAlign: 'center',
-      marginTop: '10px',
-      cursor: 'pointer',
-      border: 'none',
-      transition: 'background-color 0.15s',
-    },
-    closeButtonText: {
-      color: colors.white,
-      fontSize: '16px',
-      fontWeight: '700',
-    },
-  };
+  // Custom button component to simulate hover/press feedback
+  const NavButton: React.FC<any> = ({ children, onPress, title }) => (
+    <TouchableOpacity
+      onPress={onPress}
+      style={styles.navButton}
+      // You can add logic here for touch feedback/opacity if needed
+      activeOpacity={0.7}
+      accessibilityLabel={title}
+    >
+      {children}
+    </TouchableOpacity>
+  );
 
   return (
-    <div style={styles.safeArea}>
-      <div style={styles.container}>
+    // Replaced <div> with <View>
+    <View style={styles.safeArea}>
+      <View style={styles.container}>
         {/* Header */}
-        <div style={styles.header}>
-          <h1 style={styles.title}>My Events</h1>
+        <View style={styles.header}>
+          {/* Replaced <h1> with <Text> */}
+          <Text style={styles.title}>My Events</Text>
           <Icon name="Calendar" size={24} color={colors.darkTealAccent} />
-        </div>
+        </View>
 
         {/* Calendar Header (Month/Year Navigation) */}
-        <div style={styles.calendarHeader}>
-          <button 
-            onClick={handlePrevMonth} 
-            style={styles.navButton} 
+        <View style={styles.calendarHeader}>
+          <NavButton 
+            onPress={handlePrevMonth} 
             title="Previous month"
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = styles.navButtonHover.backgroundColor}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = styles.navButton.backgroundColor}
           >
             <Icon name="ChevronLeft" size={24} color={colors.darkTealAccent} />
-          </button>
-          <span style={styles.monthYearText}>
+          </NavButton>
+          {/* Replaced <span> with <Text> */}
+          <Text style={styles.monthYearText}>
             {MONTH_NAMES[currentMonthIndex]} {currentYear}
-          </span>
-          <button 
-            onClick={handleNextMonth} 
-            style={styles.navButton} 
+          </Text>
+          <NavButton 
+            onPress={handleNextMonth} 
             title="Next month"
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = styles.navButtonHover.backgroundColor}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = styles.navButton.backgroundColor}
           >
             <Icon name="ChevronRight" size={24} color={colors.darkTealAccent} />
-          </button>
-        </div>
+          </NavButton>
+        </View>
 
         {/* Weekday Names */}
-        <div style={styles.dayNamesContainer}>
+        <View style={styles.dayNamesContainer}>
           {DAY_NAMES.map((day) => (
-            <span key={day} style={styles.dayNameText}>
+            // Replaced <span> with <Text>
+            <Text key={day} style={styles.dayNameText}>
               {day}
-            </span>
+            </Text>
           ))}
-        </div>
+        </View>
 
         {/* Calendar Grid */}
-        <div style={styles.calendarGrid}>
+        <View style={styles.calendarGrid}>
           {calendarWeeks.flat().map((date, index) => {
             const dateKey = date ? formatDate(date) : '';
             const events = date ? mockEvents[dateKey] : undefined;
@@ -489,113 +497,119 @@ const MyEventsScreen: React.FC = () => {
             const isSelected = modalData && date && formatDate(modalData.date) === dateKey;
             const isCurrentMonth = date && date.getMonth() === currentMonthIndex;
             
-            const buttonStyle: React.CSSProperties = {
-                ...styles.dateButton,
-                ...(!date || !isCurrentMonth ? styles.dateButtonDisabled : styles.dateButtonCurrentMonth),
-                ...(isToday ? styles.dateButtonToday : {}),
-                ...(isSelected ? styles.dateButtonSelected : {}),
-                backgroundColor: isSelected ? colors.mediumAccentGreen : isToday ? `${colors.mediumAccentGreen}20` : 'transparent',
-                color: isSelected ? colors.white : styles.dateText.color,
-                // Add hover style simulation for web
-                onMouseEnter: (e: React.MouseEvent<HTMLButtonElement>) => {
-                    if (date) {
-                        e.currentTarget.style.backgroundColor = isSelected ? colors.mediumAccentGreen : `${colors.mediumAccentGreen}40`;
-                    }
-                },
-                onMouseLeave: (e: React.MouseEvent<HTMLButtonElement>) => {
-                    if (date) {
-                        e.currentTarget.style.backgroundColor = isSelected ? colors.mediumAccentGreen : isToday ? `${colors.mediumAccentGreen}20` : 'transparent';
-                    }
-                }
-            };
-            
-            const dateTextStyle = {
-                ...styles.dateText,
-                ...(isToday ? styles.dateTextToday : {}),
-                color: isSelected ? colors.white : styles.dateText.color,
-            };
+            // Combine styles using an array for conditional styling
+            const dateButtonStyles = [
+                styles.dateButton,
+                (!date || !isCurrentMonth) && styles.dateButtonDisabled,
+                isToday && styles.dateButtonToday,
+                isSelected && styles.dateButtonSelected,
+            ];
+
+            const dateTextStyles = [
+                styles.dateText,
+                isToday && styles.dateTextToday,
+                isSelected && styles.dateTextSelected,
+            ];
 
             return (
-              <div key={index} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                <button
-                  onClick={() => date && handleDateClick(date)}
+              // Wrapper View to ensure correct flexible column layout
+              <View key={index} style={styles.dateButtonWrapper}>
+                {/* Replaced <button> with <TouchableOpacity> */}
+                <TouchableOpacity
+                  onPress={() => date && handleDateClick(date)}
                   disabled={!date}
-                  style={buttonStyle}
-                  title={date ? date.toDateString() : 'Empty day'}
+                  style={dateButtonStyles}
+                  activeOpacity={hasEvents ? 0.7 : 1}
+                  accessibilityLabel={date ? date.toDateString() : 'Empty day'}
                 >
-                  <span style={dateTextStyle}>
+                  {/* Replaced <span> with <Text> */}
+                  <Text style={dateTextStyles}>
                     {date ? date.getDate() : ''}
-                  </span>
+                  </Text>
                   {hasEvents && (
-                    <div style={styles.eventDotsContainer}>
+                    <View style={styles.eventDotsContainer}>
                       {[...Array(Math.min(events.length, 3))].map((_, i) => (
-                        <div
+                        <View
                           key={i}
-                          style={{ 
-                            ...styles.eventDot, 
-                            backgroundColor: isSelected ? colors.white : colors.mediumAccentGreen,
-                          }}
-                        ></div>
+                          style={[
+                            styles.eventDot, 
+                            { backgroundColor: isSelected ? colors.white : colors.mediumAccentGreen },
+                          ]}
+                        />
                       ))}
                       {events.length > 3 && (
-                        <span style={{ ...styles.extraEventsText, color: isSelected ? colors.white : styles.extraEventsText.color }}>
+                        <Text style={[styles.extraEventsText, isSelected && styles.extraEventsTextSelected]}>
                             +{events.length - 3}
-                        </span>
+                        </Text>
                       )}
-                    </div>
+                    </View>
                   )}
-                </button>
-              </div>
+                </TouchableOpacity>
+              </View>
             );
           })}
-        </div>
-      </div>
+        </View>
+      </View>
 
       {/* Event Details Modal/Panel */}
       {modalData && (
-        <div style={styles.modalOverlay} onClick={closeModal}>
-          <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <div style={styles.modalHeader}>
-              <h2 style={styles.modalTitle}>
+        // Replaced <div> with <View> for modal overlay
+        <TouchableOpacity
+            style={styles.modalOverlay}
+            onPress={closeModal} // Close on tapping outside
+            activeOpacity={1} // Prevents touch feedback on overlay
+        >
+          {/* Replaced <div> with <View> for modal content */}
+          <View style={styles.modalContent} onStartShouldSetResponder={() => true} // Allows View to block touch propagation
+          >
+            <View style={styles.modalHeader}>
+              {/* Replaced <h2> with <Text> */}
+              <Text style={styles.modalTitle}>
                 Events for the day:
-              </h2>
-              <p style={styles.modalSubtitle}>
+              </Text>
+              {/* Replaced <p> with <Text> */}
+              <Text style={styles.modalSubtitle}>
                 {modalData.date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
-              </p>
-              <button onClick={closeModal} style={styles.modalCloseButton} title="Close">
+              </Text>
+              {/* Replaced <button> with <TouchableOpacity> */}
+              <TouchableOpacity onPress={closeModal} style={styles.modalCloseButton} accessibilityLabel="Close">
                 <Icon name="Close" size={24} color={colors.darkText} />
-              </button>
-            </div>
+              </TouchableOpacity>
+            </View>
 
-            <div style={styles.eventList}>
+            <View style={styles.eventList}>
               {modalData.events.map((event) => (
-                <div key={event.id} style={styles.eventItem}>
-                  <div style={styles.eventAccentBar} />
-                  <div style={{ flex: 1, paddingLeft: '10px' }}>
-                    <p style={styles.eventName}>{event.name}</p>
-                    <div style={styles.eventDetailsRow}>
+                <View key={event.id} style={styles.eventItem}>
+                  <View style={styles.eventAccentBar} />
+                  <View style={{ flex: 1, paddingLeft: 10 }}>
+                    {/* Replaced <p> with <Text> */}
+                    <Text style={styles.eventName}>{event.name}</Text>
+                    <View style={styles.eventDetailsRow}>
                       <Icon name="MapPin" size={14} color={colors.mediumAccentGreen} />
-                      <span style={styles.eventDetailsText}>
+                      {/* Replaced <span> with <Text> */}
+                      <Text style={styles.eventDetailsText}>
                         {event.location} &bull; {event.time}
-                      </span>
-                    </div>
-                  </div>
-                </div>
+                      </Text>
+                    </View>
+                  </View>
+                </View>
               ))}
-            </div>
+            </View>
 
-            <button 
-                onClick={closeModal} 
+            {/* Replaced <button> with <TouchableOpacity> */}
+            <TouchableOpacity 
+                onPress={closeModal} 
                 style={styles.closeButton}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = colors.mediumAccentGreen}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = styles.closeButton.backgroundColor}
+                activeOpacity={0.8}
+                accessibilityLabel="Close Event Details"
             >
-              <span style={styles.closeButtonText}>Close</span>
-            </button>
-          </div>
-        </div>
+              {/* Replaced <span> with <Text> */}
+              <Text style={styles.closeButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
       )}
-    </div>
+    </View>
   );
 };
 
