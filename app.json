@@ -1,38 +1,38 @@
 {
   "expo": {
-    "name": "jiya-new",
-    "slug": "jiya-new",
+    "name": "Pulse",
+    "slug": "pulse",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "jiyanew",
+    "icon": "./app/assets/images/icon.png",
+    "scheme": "pulse",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.jiyanew"
+      "bundleIdentifier": "com.anonymous.pulse"
     },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "foregroundImage": "./app/assets/images/android-icon-foreground.png",
+        "backgroundImage": "./app/assets/images/android-icon-background.png",
+        "monochromeImage": "./app/assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.jiyanew"
+      "package": "com.anonymous.pulse"
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./app/assets/images/favicon.png"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./app/assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff",
@@ -51,7 +51,7 @@
       "eas": {
         "projectId": "de70ebf8-5760-4ca6-9103-7c8611453ec7"
       }
-    },
-    "owner": "okayyom"
+    }
+    // Removed "owner": "okayyom"
   }
 }
