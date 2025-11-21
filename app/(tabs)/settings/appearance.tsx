@@ -1,195 +1,189 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
+  Alert,
+  Animated,
   StyleSheet,
   Switch,
-  Platform,
-  Alert,
+  Text,
   TouchableOpacity,
-  StyleProp,
-  ViewStyle,
-  TextStyle,
-  ImageStyle,
-  DimensionValue,
+  View,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 
-// --- STYLES & CONSTANTS ---
+// --- COLORS ---
 const ACCENT_COLOR = '#4DB6AC';
-const TRACK_COLOR = '#B2DFDB'; // Lighter accent for the slider track
+const TRACK_COLOR = '#B2DFDB';
 const TEXT_COLOR = '#1A1A1A';
 const BACKGROUND_COLOR = '#F0FFF0';
 
-// A simple View-based placeholder for the Slider to resolve all compilation errors.
-const SliderPlaceholder = ({ value, style }: { value: number; style?: StyleProp<ViewStyle> }) => {
-  // Calculates the width of the colored track based on the value (0 to 1)
-  const trackWidth = `${value * 100}%` as DimensionValue;
-
-  // We cast sliderPlaceholderBase to ViewStyle here to make compose's generic expectations satisfied.
-  return (
-    <View style={StyleSheet.compose(styles.sliderPlaceholderBase as ViewStyle, style)}>
-      {/* Active Track (Simulates minimumTrackTintColor) */}
-      <View style={[styles.sliderActiveTrack, { width: trackWidth }]} />
-      {/* Thumb (Simulates the draggable dot) */}
-      <View style={[styles.sliderThumb, { left: trackWidth }]} />
-    </View>
-  );
-};
-
-// --- MAIN COMPONENT ---
 export default function AppearanceScreen() {
-  const [brightness, setBrightness] = useState(0.5);
-  const [zoom, setZoom] = useState(0.5);
+  const [brightness, setBrightness] = useState(1);      // 0 = darkest, 1 = normal
+  const [zoom, setZoom] = useState(1);                  // 1 = normal scale
   const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // Helper function to show a custom message instead of Alert
-  const showMessage = (title: string, message: string) => {
-    Alert.alert(title, message);
-  };
+  const scaleAnim = new Animated.Value(zoom);
 
   const toggleDarkMode = (value: boolean) => {
     setIsDarkMode(value);
-    showMessage('Theme Change', `Dark Mode is now ${value ? 'ON' : 'OFF'}`);
+    Alert.alert('Theme Change', `Dark Mode is now ${value ? 'ON' : 'OFF'}`);
   };
 
   return (
-    <View style={styles.container}>
-      {/* Brightness Control Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Brightness</Text>
-        <View style={styles.sliderContainer}>
-          <Ionicons name="moon-outline" size={24} color={TEXT_COLOR} style={styles.sliderIcon} />
+    // ⭐ IMPORTANT FIX — enables overlay brightness effect  
+    <View style={{ flex: 1, position: 'relative' }}>
+      <Animated.View style={{ flex: 1, transform: [{ scale: zoom }] }}>
+        <View style={styles.container}>
 
-          <SliderPlaceholder value={brightness} style={styles.slider} />
+          {/* BRIGHTNESS SECTION */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Brightness</Text>
 
-          <Ionicons name="sunny-outline" size={24} color={TEXT_COLOR} style={styles.sliderIcon} />
+            <View style={styles.sliderContainer}>
+              <Ionicons name="moon-outline" size={24} color={TEXT_COLOR} />
+
+              <View style={styles.slider}>
+                <Ionicons
+                  name="ellipse"
+                  size={22}
+                  color={ACCENT_COLOR}
+                  style={{ left: brightness * 110 }}
+                />
+              </View>
+
+              <Ionicons name="sunny-outline" size={24} color={TEXT_COLOR} />
+            </View>
+
+            <View style={styles.buttonRow}>
+              <TouchableOpacity onPress={() => setBrightness(Math.max(0, brightness - 0.1))}>
+                <Text style={styles.sliderButton}>-</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={() => setBrightness(Math.min(1, brightness + 0.1))}>
+                <Text style={styles.sliderButton}>+</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* ZOOM SECTION */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Zoom</Text>
+
+            <View style={styles.sliderContainer}>
+              <Ionicons name="remove-circle-outline" size={24} color={TEXT_COLOR} />
+
+              <View style={styles.slider}>
+                <Ionicons
+                  name="ellipse"
+                  size={22}
+                  color={ACCENT_COLOR}
+                  style={{ left: (zoom - 0.5) * 200 }}
+                />
+              </View>
+
+              <Ionicons name="add-circle-outline" size={24} color={TEXT_COLOR} />
+            </View>
+
+            <View style={styles.buttonRow}>
+              <TouchableOpacity onPress={() => setZoom(Math.max(0.5, zoom - 0.1))}>
+                <Text style={styles.sliderButton}>-</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={() => setZoom(Math.min(2, zoom + 0.1))}>
+                <Text style={styles.sliderButton}>+</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* DARK MODE */}
+          <View style={styles.toggleSection}>
+            <Text style={styles.toggleText}>Dark Mode</Text>
+            <Switch
+              trackColor={{ false: TRACK_COLOR, true: ACCENT_COLOR }}
+              thumbColor={BACKGROUND_COLOR}
+              onValueChange={toggleDarkMode}
+              value={isDarkMode}
+            />
+          </View>
+
+          {/* BACK BUTTON */}
+          <TouchableOpacity
+            onPress={() => Alert.alert('Navigation', 'Back button pressed')}
+            style={styles.floatingBackButton}
+          >
+            <Ionicons name="arrow-back-outline" size={30} color="white" />
+          </TouchableOpacity>
         </View>
-      </View>
+      </Animated.View>
 
-      {/* Zoom Control Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Zoom</Text>
-        <View style={styles.sliderContainer}>
-          <Ionicons name="remove-circle-outline" size={24} color={TEXT_COLOR} style={styles.sliderIcon} />
-
-          <SliderPlaceholder value={zoom} style={styles.slider} />
-
-          <Ionicons name="add-circle-outline" size={24} color={TEXT_COLOR} style={styles.sliderIcon} />
-        </View>
-      </View>
-
-      {/* Dark Mode Toggle Section */}
-      <View style={styles.toggleSection}>
-        <View style={styles.toggleButtonLabel}>
-          <Text style={styles.toggleText}>Dark Mode</Text>
-        </View>
-        <Switch
-          trackColor={{ false: TRACK_COLOR, true: ACCENT_COLOR }}
-          thumbColor={BACKGROUND_COLOR}
-          onValueChange={toggleDarkMode}
-          value={isDarkMode}
-          style={styles.switchControl}
-        />
-      </View>
-
-      {/* Back button shown at the bottom right */}
-      <TouchableOpacity
-        onPress={() => Alert.alert('Navigate', 'This would navigate back in the stack.')}
-        style={styles.floatingBackButton}
-      >
-        <Ionicons name="arrow-back-outline" size={30} color="white" />
-      </TouchableOpacity>
+      {/* ⭐ Brightness Overlay — NOW WORKS */}
+      <View
+        pointerEvents="none"
+        style={{
+          ...StyleSheet.absoluteFillObject,
+          backgroundColor: 'black',
+          opacity: 1 - brightness,
+        }}
+      />
     </View>
   );
 }
 
-/**
- * NOTE:
- * Using Record<string, any> below avoids the cross-platform type inference problems
- * that cause 'TextStyle' to be inferred where 'ViewStyle' is expected (cursor/userSelect mismatches).
- * This keeps your visual layout identical while removing the long chains of type errors.
- */
-const styles = StyleSheet.create<Record<string, any>>({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: BACKGROUND_COLOR,
     paddingHorizontal: 20,
-  } as ViewStyle,
+  },
   section: {
     marginTop: 40,
     marginBottom: 20,
     width: '100%',
-  } as ViewStyle,
+  },
   sectionTitle: {
     fontSize: 20,
     fontWeight: '600',
     color: TEXT_COLOR,
     marginBottom: 10,
     textAlign: 'center',
-    fontFamily: Platform.OS === 'ios' ? 'serif' : 'serif',
-  } as TextStyle,
+  },
   sliderContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     paddingHorizontal: 10,
-  } as ViewStyle,
+  },
   slider: {
     flex: 1,
     height: 40,
     marginHorizontal: 10,
-  } as ViewStyle,
-  // --- Slider placeholder styles ---
-  sliderPlaceholderBase: {
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: TRACK_COLOR,
     justifyContent: 'center',
-  } as ViewStyle,
-  sliderActiveTrack: {
-    position: 'absolute',
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: ACCENT_COLOR,
-  } as ViewStyle,
-  sliderThumb: {
-    position: 'absolute',
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: ACCENT_COLOR,
-    borderColor: BACKGROUND_COLOR,
-    borderWidth: 3,
-    top: -7,
-    marginLeft: -10,
-  } as ViewStyle,
-  sliderIcon: {
-    opacity: 0.7,
-  } as ViewStyle,
+    backgroundColor: '#E0F2F1',
+    borderRadius: 20,
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 5,
+  },
+  sliderButton: {
+    fontSize: 22,
+    color: ACCENT_COLOR,
+    fontWeight: '700',
+  },
   toggleSection: {
+    marginTop: 50,
+    paddingVertical: 15,
+    paddingHorizontal: 10,
+    borderRadius: 15,
+    backgroundColor: TRACK_COLOR,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 60,
-    width: '90%',
-    alignSelf: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 15,
-    borderRadius: 15,
-    backgroundColor: TRACK_COLOR,
-  } as ViewStyle,
-  toggleButtonLabel: {
-    paddingHorizontal: 10,
-  } as ViewStyle,
+  },
   toggleText: {
     fontSize: 18,
     fontWeight: '600',
     color: TEXT_COLOR,
-  } as TextStyle,
-  switchControl: {
-    transform: Platform.OS === 'ios' ? [{ scaleX: 1.1 }, { scaleY: 1.1 }] : undefined,
-  } as ViewStyle,
+  },
   floatingBackButton: {
     position: 'absolute',
     right: 30,
@@ -200,10 +194,5 @@ const styles = StyleSheet.create<Record<string, any>>({
     backgroundColor: ACCENT_COLOR,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  } as ViewStyle,
+  },
 });
