@@ -1,4 +1,3 @@
-// app/(tabs)/create.tsx
 import React, { useState } from 'react';
 import {
   Dimensions,
@@ -18,11 +17,11 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 // --- STYLING CONSTANTS ---
-const BACKGROUND_COLOR = '#c6fbf8ff'; // Light mint/teal background
-const ACCENT_COLOR_LIGHT = '#73fff3ff'; // Lighter teal for buttons
-const ACCENT_COLOR_DARK = '#a1fff6ff'; // Darker teal for borders/accents
-const TEXT_COLOR_DARK = '#303030'; // Dark gray for primary text
-const TEXT_COLOR_MINT = '#71a09aff'; // Mint color for selected date
+const BACKGROUND_COLOR = '#d5fcffff'; // Light mint/teal background
+const ACCENT_COLOR_LIGHT = '#c9f9fdff'; // Lighter teal for buttons
+const ACCENT_COLOR_DARK = '#71f3ffff'; // Darker teal for borders/accents
+const TEXT_COLOR_DARK = '#000000ff'; // Dark gray for primary text
+const TEXT_COLOR_MINT = '#bbe8e2ff'; // Mint color for selected date
 const TEXT_COLOR_WHITE = '#FFFFFF';
 
 // --- SCREENS ---
@@ -129,12 +128,11 @@ const NewGroupForm = ({ onBack }: { onBack: () => void }) => {
   );
 };
 
-/* --- New Event Form with custom calendar card and native DateTimePicker --- */
+/* --- New Event Form --- */
 const NewEventForm = ({ onBack }: { onBack: () => void }) => {
   const [eventName, setEventName] = useState('');
   const [description, setDescription] = useState('');
   const [message, setMessage] = useState<string | null>(null);
-
   const [date, setDate] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
 
@@ -185,7 +183,7 @@ const NewEventForm = ({ onBack }: { onBack: () => void }) => {
               textAlignVertical="top"
             />
 
-            {/* --- Custom Calendar Card --- */}
+            {/* --- Calendar Card --- */}
             <View style={styles.calendarCard}>
               <Text style={styles.calendarMonth}>Select Date & Time</Text>
 
@@ -220,20 +218,18 @@ const NewEventForm = ({ onBack }: { onBack: () => void }) => {
 };
 
 /* --- Selection Screen --- */
-const SelectionScreen = ({ navigate }: { navigate: (screen: string) => void }) => {
-  return (
-    <View style={styles.selectionContainer}>
-      <Text style={styles.pageTitle}>Create New</Text>
-      <Text style={styles.pageSubtitle}>Choose one of the following:</Text>
+const SelectionScreen = ({ navigate }: { navigate: (screen: string) => void }) => (
+  <View style={styles.selectionContainer}>
+    <Text style={styles.pageTitle}>Create New</Text>
+    <Text style={styles.pageSubtitle}>Choose one of the following:</Text>
 
-      <MobileButton onPress={() => navigate(SCREENS.NEW_GROUP)} style={{ marginBottom: 12 }}>
-        New group
-      </MobileButton>
+    <MobileButton onPress={() => navigate(SCREENS.NEW_GROUP)} style={{ marginBottom: 12 }}>
+      New group
+    </MobileButton>
 
-      <MobileButton onPress={() => navigate(SCREENS.NEW_EVENT)}>New event</MobileButton>
-    </View>
-  );
-};
+    <MobileButton onPress={() => navigate(SCREENS.NEW_EVENT)}>New event</MobileButton>
+  </View>
+);
 
 /* --- MAIN APP --- */
 export default function App() {
@@ -276,7 +272,7 @@ const styles = StyleSheet.create({
     shadowRadius: 20,
     shadowOffset: { width: 0, height: 10 },
   },
-  footerNote: { marginTop: 8, fontSize: 12, color: '#6B7280' },
+  footerNote: { marginTop: 8, fontSize: 12, color: '#6B7280', fontFamily: 'Lora' },
 
   container: { flex: 1, backgroundColor: 'transparent' },
   flex: { flex: 1 },
@@ -295,7 +291,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     elevation: 3,
   },
-  backButtonText: { color: TEXT_COLOR_WHITE, fontSize: 22, fontWeight: '600' },
+  backButtonText: { color: TEXT_COLOR_WHITE, fontSize: 22, fontWeight: '600', fontFamily: 'Lora' },
 
   messageOverlay: {
     position: 'absolute',
@@ -309,14 +305,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  messageText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  messageText: { color: '#fff', fontSize: 16, fontWeight: '600', fontFamily: 'Lora' },
 
   scrollContent: { paddingTop: 48, paddingBottom: 12 },
 
-  titleInput: { width: '100%', fontSize: 36, fontWeight: '300', textAlign: 'center', color: TEXT_COLOR_DARK, marginBottom: 6 },
+  titleInput: {
+    width: '100%',
+    fontSize: 36,
+    fontWeight: '300',
+    textAlign: 'center',
+    color: TEXT_COLOR_DARK,
+    marginBottom: 6,
+    fontFamily: 'Lora',
+  },
   titleDivider: { height: 1, width: '75%', alignSelf: 'center', marginBottom: 18, backgroundColor: ACCENT_COLOR_DARK + '80' },
 
-  label: { fontSize: 20, fontWeight: '300', marginBottom: 8, color: TEXT_COLOR_DARK },
+  label: { fontSize: 20, fontWeight: '300', marginBottom: 8, color: TEXT_COLOR_DARK, fontFamily: 'Lora' },
 
   textArea: {
     width: '100%',
@@ -327,10 +331,11 @@ const styles = StyleSheet.create({
     borderColor: ACCENT_COLOR_DARK + '40',
     backgroundColor: ACCENT_COLOR_LIGHT + '60',
     marginBottom: 12,
+    fontFamily: 'Lora',
   },
 
   toggleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10, marginTop: 8, borderRadius: 999, backgroundColor: ACCENT_COLOR_LIGHT, borderWidth: 1, borderColor: ACCENT_COLOR_DARK + '40' },
-  toggleLabel: { fontSize: 16, fontWeight: '600', color: TEXT_COLOR_DARK },
+  toggleLabel: { fontSize: 16, fontWeight: '600', color: TEXT_COLOR_DARK, fontFamily: 'Lora' },
 
   mobileButton: {
     width: '100%',
@@ -345,15 +350,14 @@ const styles = StyleSheet.create({
     borderColor: ACCENT_COLOR_DARK + '80',
     elevation: 2,
   },
-  mobileButtonText: { fontSize: 18, fontWeight: '700', color: TEXT_COLOR_DARK },
+  mobileButtonText: { fontSize: 18, fontWeight: '700', color: TEXT_COLOR_DARK, fontFamily: 'Lora' },
   buttonDisabled: { opacity: 0.5 },
   buttonPressed: { transform: [{ scale: 0.995 }] },
 
   selectionContainer: { flex: 1, alignItems: 'center', paddingTop: 28, paddingHorizontal: 22 },
-  pageTitle: { fontSize: 40, fontWeight: '300', marginTop: 36, marginBottom: 12, color: TEXT_COLOR_DARK },
-  pageSubtitle: { fontSize: 18, fontWeight: '300', marginBottom: 20, color: TEXT_COLOR_DARK },
+  pageTitle: { fontSize: 40, fontWeight: '300', marginTop: 36, marginBottom: 12, color: TEXT_COLOR_DARK, fontFamily: 'Lora' },
+  pageSubtitle: { fontSize: 18, fontWeight: '300', marginBottom: 20, color: TEXT_COLOR_DARK, fontFamily: 'Lora' },
 
-  /* --- Custom Calendar Card --- */
   calendarCard: {
     marginTop: 18,
     backgroundColor: '#fff',
@@ -364,7 +368,7 @@ const styles = StyleSheet.create({
     elevation: 2,
     alignItems: 'center',
   },
-  calendarMonth: { fontSize: 18, fontWeight: '700', color: TEXT_COLOR_DARK, marginBottom: 12 },
+  calendarMonth: { fontSize: 18, fontWeight: '700', color: TEXT_COLOR_DARK, marginBottom: 12, fontFamily: 'Lora' },
 
   timeBubble: {
     borderRadius: 12,
@@ -374,5 +378,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  timeText: { color: TEXT_COLOR_WHITE, fontWeight: '700', fontSize: 18 },
+  timeText: { color: TEXT_COLOR_WHITE, fontWeight: '700', fontSize: 18, fontFamily: 'Lora' },
 });

@@ -3,8 +3,8 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-const ACCENT_COLOR = '#4DB6AC';
-const BACKGROUND_COLOR = '#F0FFF0';
+const ACCENT_COLOR = '#46e0e0ff'; //46e0e0ff
+const BACKGROUND_COLOR = '#ffffffff';
 
 // --- Route Enum ---
 const SettingsRoutes = {
