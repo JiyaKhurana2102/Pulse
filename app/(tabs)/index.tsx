@@ -42,7 +42,7 @@ const HomeScreen: React.FC = () => {
 
   const mainButtons: ButtonData[] = [
     { id: 1, label: 'Find an Event', route: '/events' },
-    { id: 2, label: 'Campus Map', route: '' },
+    { id: 2, label: 'Campus Map', route: '/campus-map' },
     { id: 3, label: 'Join a group', route: '/groups' },
     { id: 4, label: 'Reserve a study room', route: '/studyrooms' },
   ];
