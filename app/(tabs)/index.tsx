@@ -1,5 +1,6 @@
-import { useRouter } from 'expo-router'; // Enables navigation
+import { useRouter } from 'expo-router';
 import React from 'react';
+import GlobalText from '@/components/GlobalText';
 import {
   Dimensions,
   SafeAreaView,
@@ -9,20 +10,17 @@ import {
   View,
 } from 'react-native';
 
-// Get screen width for responsive layout
 const { width } = Dimensions.get('window');
-const SPACING = 15; // Standard padding/margin
+const SPACING = 15;
 
-// Define the shape for our button data
 interface ButtonData {
   id: number;
   label: string;
-  route?: string; // Holds the destination route (optional for buttons without navigation)
+  route?: string;
 }
 
-// Reusable component for the main blue-box buttons
 interface HomeButtonProps extends ButtonData {
-    onPress: (route?: string) => void;
+  onPress: (route?: string) => void;
 }
 
 const HomeButton: React.FC<HomeButtonProps> = ({ label, route, onPress }) => (
@@ -31,137 +29,154 @@ const HomeButton: React.FC<HomeButtonProps> = ({ label, route, onPress }) => (
   </TouchableOpacity>
 );
 
-
-// --- Main Component ---
 const HomeScreen: React.FC = () => {
-    // Get the router instance
-    const router = useRouter(); 
-    
-    // Function to handle all button presses
-    const handleButtonPress = (route?: string) => {
-        if (route && route.length > 0) {
-            // expo-router has strict route types; cast to any for dynamic routes
-            router.push(route as unknown as any);
-        } else {
-            console.log(`Button for route ${route} pressed! (No navigation defined)`);
-        }
-    };
+  const router = useRouter();
 
-    // Data for the main buttons
-    const mainButtons: ButtonData[] = [
-      // Placeholder route for the new screen
-      { id: 1, label: 'Find an Event', route: '/events' },
-      { id: 2, label: 'Campus Map', route: '' },          
-      { id: 3, label: 'Join a group', route: '/groups' }, 
-      { id: 4, label: 'Reserve a study room', route: '/studyrooms' },
-    ];
+  const handleButtonPress = (route?: string) => {
+    if (route && route.length > 0) {
+      router.push(route as any);
+    } else {
+      console.log(`Button pressed for route: ${route}`);
+    }
+  };
 
+  const mainButtons: ButtonData[] = [
+    { id: 1, label: 'Find an Event', route: '/events' },
+    { id: 2, label: 'Campus Map', route: '' },
+    { id: 3, label: 'Join a group', route: '/groups' },
+    { id: 4, label: 'Reserve a study room', route: '/studyrooms' },
+  ];
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header Section */}
+      
+      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.welcomeText}>Welcome</Text>
-        <Text style={styles.tagline}>
-          Your campus. Your guide. Your Pulse.
-        </Text>
+        <Text style={styles.tagline}>Your campus. Your guide. Your Pulse.</Text>
       </View>
 
-      {/* Button Grid Section */}
+      {/* Button Grid */}
       <View style={styles.buttonGrid}>
         {mainButtons.map(button => (
-          <HomeButton 
-            key={button.id} 
-            {...button} 
-            onPress={handleButtonPress} // Pass the navigation handler
-          />
+          <HomeButton key={button.id} {...button} onPress={handleButtonPress} />
         ))}
       </View>
 
-      {/* Today's Events Box */}
+      {/* Events Box */}
       <View style={styles.eventsBox}>
         <Text style={styles.eventsHeaderText}>Today's events:</Text>
-        {/* Placeholder for event list items */}
-        <Text style={styles.eventListItem}>• No major events scheduled.</Text> 
+
+        <Text style={styles.eventListItem}>• Fraternity Meeting</Text>
+        <Text style={styles.eventTime}>6:00 PM</Text>
+
+        <Text style={styles.eventListItem}>• CS 101 Study Group</Text>
+        <Text style={styles.eventTime}>2:00 PM</Text>
       </View>
-      
-      {/* THE REDUNDANT BOTTOM NAVIGATION BAR CODE WAS REMOVED FROM HERE */}
     </SafeAreaView>
   );
 };
 
-// --- Stylesheet (Cleaned up) ---
 const styles = StyleSheet.create({
-  // General layout
+  // main container
   container: {
     flex: 1,
-    backgroundColor: '#D9F2D9', // Light green background from the image
+    backgroundColor: '#FFFFFF',
     paddingHorizontal: SPACING,
   },
-  
-  // Header styles
+
+  // centered header
   header: {
     alignItems: 'center',
-    paddingTop: 40, // Increased top padding for better spacing
+    justifyContent: 'center',
+    paddingTop: 40,
     marginBottom: 30,
   },
+
   welcomeText: {
-    fontSize: 48, // Larger font size for the "Welcome" text
-    fontFamily: 'serif', // Placeholder for a custom font like the image
-    color: '#000',
+    fontSize: 40,
+    fontFamily: 'Lora',
+    color: '#1E1E1E',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
+
   tagline: {
     fontSize: 14,
     color: '#555',
     marginTop: 5,
+    fontFamily: 'Lora',
+    textAlign: 'center',
   },
 
-  // Button Grid styles (2x2 layout)
+  // button grid
   buttonGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     marginBottom: 30,
   },
+
   button: {
-    width: (width - SPACING * 3) / 2, // Calculate width for 2 buttons with space
+    width: (width - SPACING * 3) / 2,
     height: 100,
-    backgroundColor: '#A8DDEB', // Light blue background
+    backgroundColor: '#CCF5FF',
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: SPACING,
     padding: 10,
-    // Basic shadow for depth (iOS and Android different properties)
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 3, 
-  },
-  buttonText: {
-    fontSize: 18,
-    textAlign: 'center',
-    fontFamily: 'serif', // Placeholder for custom font
-    color: '#1a1a1a',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
 
-  // Events Box styles
+  buttonText: {
+    fontSize: 16,
+    fontFamily: 'Lora',
+    textAlign: 'center',
+    color: '#1E1E1E',
+    fontWeight: '600',
+  },
+
+  // events box
   eventsBox: {
-    flex: 1, // Takes up remaining vertical space
-    backgroundColor: '#A8DDEB', // Light blue background
+    backgroundColor: '#FFFFFF',
     borderRadius: 10,
     padding: SPACING,
+    borderWidth: 1,
+    borderColor: '#DDF8FF',
+    shadowColor: '#B9F1FF',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 5,
   },
+
   eventsHeaderText: {
     fontSize: 18,
-    fontFamily: 'serif',
-    marginBottom: 5,
-    color: '#1a1a1a',
+    fontFamily: 'Lora',
+    marginBottom: 10,
+    color: '#1E1E1E',
+    fontWeight: 'bold',
   },
+
   eventListItem: {
-      fontSize: 16,
-      color: '#333',
+    fontSize: 16,
+    color: '#1E1E1E',
+    fontWeight: '600',
+    fontFamily: 'Lora',
+    marginBottom: 0,
+  },
+
+  eventTime: {
+    fontSize: 14,
+    color: '#555',
+    marginLeft: 15,
+    marginBottom: 10,
+    fontFamily: 'Lora',
   },
 });
 

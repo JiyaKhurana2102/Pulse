@@ -10,7 +10,7 @@ import GlobalText from '@/components/GlobalText';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
 // Define the custom light green color from the wireframe
-const HEADER_COLOR = '#d9f2d9'; 
+const HEADER_COLOR = '#FFFFFF'; 
 
 export default function RootLayout() {
   const [fontsLoaded, setFontsLoaded] = useState(false);

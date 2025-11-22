@@ -18,11 +18,11 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 // --- STYLING CONSTANTS ---
-const BACKGROUND_COLOR = '#E0F2F1'; // Light mint/teal background
-const ACCENT_COLOR_LIGHT = '#B2DFDB'; // Lighter teal for buttons
-const ACCENT_COLOR_DARK = '#4DB6AC'; // Darker teal for borders/accents
+const BACKGROUND_COLOR = '#c6fbf8ff'; // Light mint/teal background
+const ACCENT_COLOR_LIGHT = '#73fff3ff'; // Lighter teal for buttons
+const ACCENT_COLOR_DARK = '#a1fff6ff'; // Darker teal for borders/accents
 const TEXT_COLOR_DARK = '#303030'; // Dark gray for primary text
-const TEXT_COLOR_MINT = '#26A69A'; // Mint color for selected date
+const TEXT_COLOR_MINT = '#71a09aff'; // Mint color for selected date
 const TEXT_COLOR_WHITE = '#FFFFFF';
 
 // --- SCREENS ---
