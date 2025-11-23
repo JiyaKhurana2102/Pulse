@@ -1,183 +1,258 @@
+// app/index.tsx
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React from 'react';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 import GlobalText from '@/components/GlobalText';
-import {
-  Dimensions,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
 
-const { width } = Dimensions.get('window');
-const SPACING = 15;
-
-interface ButtonData {
-  id: number;
-  label: string;
-  route?: string;
-}
-
-interface HomeButtonProps extends ButtonData {
-  onPress: (route?: string) => void;
-}
-
-const HomeButton: React.FC<HomeButtonProps> = ({ label, route, onPress }) => (
-  <TouchableOpacity style={styles.button} onPress={() => onPress(route)}>
-    <Text style={styles.buttonText}>{label}</Text>
-  </TouchableOpacity>
-);
-
-const HomeScreen: React.FC = () => {
-  const router = useRouter();
-
-  const handleButtonPress = (route?: string) => {
-    if (route && route.length > 0) {
-      router.push(route as any);
-    } else {
-      console.log(`Button pressed for route: ${route}`);
-    }
-  };
-
-  const mainButtons: ButtonData[] = [
-    { id: 1, label: 'Find an Event', route: '/events' },
-    { id: 2, label: 'Campus Map', route: '/campus-map' },
-    { id: 3, label: 'Join a group', route: '/groups' },
-    { id: 4, label: 'Reserve a study room', route: '/studyrooms' },
-  ];
-
-  return (
-    <SafeAreaView style={styles.container}>
-      
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.welcomeText}>Welcome</Text>
-        <Text style={styles.tagline}>Your campus. Your guide. Your Pulse.</Text>
-      </View>
-
-      {/* Button Grid */}
-      <View style={styles.buttonGrid}>
-        {mainButtons.map(button => (
-          <HomeButton key={button.id} {...button} onPress={handleButtonPress} />
-        ))}
-      </View>
-
-      {/* Events Box */}
-      <View style={styles.eventsBox}>
-        <Text style={styles.eventsHeaderText}>Today's events:</Text>
-
-        <Text style={styles.eventListItem}>• Fraternity Meeting</Text>
-        <Text style={styles.eventTime}>6:00 PM</Text>
-
-        <Text style={styles.eventListItem}>• CS 101 Study Group</Text>
-        <Text style={styles.eventTime}>2:00 PM</Text>
-      </View>
-    </SafeAreaView>
-  );
+export const options = {
+  headerShown: false,
 };
 
+export default function HomeScreen() {
+  const router = useRouter();
+
+  return (
+    <LinearGradient
+      colors={['#99F6E4', '#D8B4FE', '#6EE7B7']} // background gradient
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={styles.gradient}
+    >
+      <SafeAreaView style={styles.safe}>
+        <ScrollView
+          contentContainerStyle={styles.content}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Header */}
+          <View style={styles.header}>
+            <GlobalText style={styles.welcomeTitle}>Welcome</GlobalText>
+            <GlobalText style={styles.subtitle}>
+              Your campus. Your guide. Your Pulse.
+            </GlobalText>
+          </View>
+
+          {/* Action cards grid */}
+          <View style={styles.cardRow}>
+            {/* Find an Event */}
+            <Pressable
+              style={({ pressed }) => [
+                styles.cardWrapper,
+                pressed && styles.cardPressed,
+              ]}
+              onPress={() => router.push('/events')}
+            >
+              <BlurView intensity={40} tint="light" style={styles.cardBlur}>
+                <LinearGradient
+                  colors={['#a5f3fc', '#eef2ff', '#f5d0fe']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.cardInner}
+                >
+                  <GlobalText style={styles.cardText}>Find an Event</GlobalText>
+                </LinearGradient>
+              </BlurView>
+            </Pressable>
+
+            {/* Campus Map */}
+            <Pressable
+              style={({ pressed }) => [
+                styles.cardWrapper,
+                pressed && styles.cardPressed,
+              ]}
+              onPress={() => router.push('/campus-map')}
+            >
+              <BlurView intensity={40} tint="light" style={styles.cardBlur}>
+                <LinearGradient
+                  colors={['#6ee7b7', '#a5f3fc', '#e9d5ff']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.cardInner}
+                >
+                  <GlobalText style={styles.cardText}>Campus Map</GlobalText>
+                </LinearGradient>
+              </BlurView>
+            </Pressable>
+          </View>
+
+          <View style={styles.cardRow}>
+            {/* Join a group */}
+            <Pressable
+              style={({ pressed }) => [
+                styles.cardWrapper,
+                pressed && styles.cardPressed,
+              ]}
+              onPress={() => router.push('/groups')}
+            >
+              <BlurView intensity={40} tint="light" style={styles.cardBlur}>
+                <LinearGradient
+                  colors={['#bfdbfe', '#e9d5ff', '#fee2e2']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.cardInner}
+                >
+                  <GlobalText style={styles.cardText}>Join a group</GlobalText>
+                </LinearGradient>
+              </BlurView>
+            </Pressable>
+
+            {/* Reserve a study room */}
+            <Pressable
+              style={({ pressed }) => [
+                styles.cardWrapper,
+                pressed && styles.cardPressed,
+              ]}
+              onPress={() => router.push('/studyrooms')}
+            >
+              <BlurView intensity={40} tint="light" style={styles.cardBlur}>
+                <LinearGradient
+                  colors={['#e5e7eb', '#a5f3fc', '#7dd3fc']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.cardInner}
+                >
+                  <GlobalText style={styles.cardText}>
+                    Reserve a study room
+                  </GlobalText>
+                </LinearGradient>
+              </BlurView>
+            </Pressable>
+          </View>
+
+          {/* Today's events – also glassy */}
+          <BlurView intensity={40} tint="light" style={styles.todayBlur}>
+            <View style={styles.todayCard}>
+              <GlobalText style={styles.todayTitle}>Today's events:</GlobalText>
+
+              <View style={styles.eventItem}>
+                <View style={styles.eventBullet} />
+                <View style={styles.eventTextBlock}>
+                  <GlobalText style={styles.eventTitle}>
+                    Fraternity Meeting
+                  </GlobalText>
+                  <GlobalText style={styles.eventTime}>6:00 PM</GlobalText>
+                </View>
+              </View>
+
+              <View style={styles.eventItem}>
+                <View style={styles.eventBullet} />
+                <View style={styles.eventTextBlock}>
+                  <GlobalText style={styles.eventTitle}>
+                    CS 101 Study Group
+                  </GlobalText>
+                  <GlobalText style={styles.eventTime}>2:00 PM</GlobalText>
+                </View>
+              </View>
+            </View>
+          </BlurView>
+        </ScrollView>
+      </SafeAreaView>
+    </LinearGradient>
+  );
+}
+
 const styles = StyleSheet.create({
-  // main container
-  container: {
+  gradient: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: SPACING,
+  },
+  safe: {
+    flex: 1,
+  },
+  content: {
+    paddingHorizontal: 24,
+    paddingTop: 32,
+    paddingBottom: 24,
   },
 
-  // centered header
   header: {
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 40,
-    marginBottom: 30,
+    marginBottom: 32,
   },
-
-  welcomeText: {
-    fontSize: 40,
-    fontFamily: 'Lora',
-    color: '#1E1E1E',
-    fontWeight: 'bold',
-    textAlign: 'center',
+  welcomeTitle: {
+    fontSize: 22,
+    color: '#111827',
+    marginBottom: 4,
   },
-
-  tagline: {
+  subtitle: {
     fontSize: 14,
-    color: '#555',
-    marginTop: 5,
-    fontFamily: 'Lora',
-    textAlign: 'center',
+    color: '#1F2933',
   },
 
-  // button grid
-  buttonGrid: {
+  cardRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     justifyContent: 'space-between',
-    marginBottom: 30,
+    gap: 16,
+    marginBottom: 16,
   },
-
-  button: {
-    width: (width - SPACING * 3) / 2,
-    height: 100,
-    backgroundColor: '#CCF5FF',
-    borderRadius: 10,
+  cardWrapper: {
+    flex: 1,
+    height: 130,
+    borderRadius: 32,
+    overflow: 'hidden', // important so blur/gradient stay rounded
+  },
+  cardBlur: {
+    flex: 1,
+  },
+  cardInner: {
+    flex: 1,
+    borderRadius: 32,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: SPACING,
-    padding: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-
-  buttonText: {
-    fontSize: 16,
-    fontFamily: 'Lora',
-    textAlign: 'center',
-    color: '#1E1E1E',
-    fontWeight: '600',
-  },
-
-  // events box
-  eventsBox: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 10,
-    padding: SPACING,
     borderWidth: 1,
-    borderColor: '#DDF8FF',
-    shadowColor: '#B9F1FF',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 5,
+    borderColor: 'rgba(255,255,255,0.8)',
   },
-
-  eventsHeaderText: {
-    fontSize: 18,
-    fontFamily: 'Lora',
-    marginBottom: 10,
-    color: '#1E1E1E',
-    fontWeight: 'bold',
+  cardPressed: {
+    transform: [{ scale: 0.97 }],
   },
-
-  eventListItem: {
-    fontSize: 16,
-    color: '#1E1E1E',
-    fontWeight: '600',
-    fontFamily: 'Lora',
-    marginBottom: 0,
-  },
-
-  eventTime: {
+  cardText: {
     fontSize: 14,
-    color: '#555',
-    marginLeft: 15,
-    marginBottom: 10,
-    fontFamily: 'Lora',
+    color: '#111827',
+    textAlign: 'center',
+  },
+
+  todayBlur: {
+    marginTop: 24,
+    borderRadius: 32,
+    overflow: 'hidden',
+  },
+  todayCard: {
+    padding: 20,
+    borderRadius: 32,
+    backgroundColor: 'rgba(255,255,255,0.4)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.85)',
+  },
+  todayTitle: {
+    fontSize: 16,
+    color: '#111827',
+    marginBottom: 16,
+  },
+  eventItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+  },
+  eventBullet: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginTop: 6,
+    marginRight: 8,
+    backgroundColor: '#0F766E',
+  },
+  eventTextBlock: {
+    flex: 1,
+  },
+  eventTitle: {
+    fontSize: 14,
+    color: '#111827',
+  },
+  eventTime: {
+    fontSize: 12,
+    color: '#4B5563',
+    marginTop: 2,
   },
 });
-
-export default HomeScreen;

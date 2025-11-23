@@ -1,53 +1,55 @@
 // app/_layout.tsx
-import React, { useState, useEffect } from 'react';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import * as Font from 'expo-font';
+import React, { useState } from 'react';
+import 'react-native-reanimated';
 
 import LoadingScreen from '@/components/LoadingScreen';
-import GlobalText from '@/components/GlobalText';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
-// Define the custom light green color from the wireframe
-const HEADER_COLOR = '#FFFFFF'; 
+const HEADER_COLOR = '#FFFFFF';
+
+export const unstable_settings = {
+  anchor: '(tabs)',
+};
 
 export default function RootLayout() {
-  const [fontsLoaded, setFontsLoaded] = useState(false);
   const colorScheme = useColorScheme();
-  
-  // Choose the theme object based on the color scheme
-  const theme = colorScheme === 'dark' ? DarkTheme : DefaultTheme;
+  const [splashDismissed, setSplashDismissed] = useState(false);
 
-  useEffect(() => {
-    async function loadFonts() {
-      // Final, clean path: Now that the folder is correctly structured as app/assets/fonts/
-      await Font.loadAsync({
-        Lora: require('./assets/fonts/myfont.ttf'),
-      });
-      setFontsLoaded(true);
-    }
-    loadFonts();
-  }, []);
-
-  if (!fontsLoaded) {
-    return <LoadingScreen />;
+  // Show ONLY the splash until user taps it
+  if (!splashDismissed) {
+    return (
+      <>
+        <StatusBar style="light" />
+        <LoadingScreen onFinish={() => setSplashDismissed(true)} />
+      </>
+    );
   }
 
+  const theme = colorScheme === 'dark' ? DarkTheme : DefaultTheme;
+
   return (
-    // Use the ThemeProvider with the 'value' prop for the theme object
-    <ThemeProvider value={theme}> 
+    <ThemeProvider value={theme}>
       <Stack
         screenOptions={{
-          // Set header background to the pale mint green
-          headerStyle: { backgroundColor: HEADER_COLOR }, 
-          // Set text and icon color in the header to dark for contrast against the light background
-          headerTintColor: '#000000', 
-          headerTitle: () => <GlobalText style={{ fontSize: 20, color: '#36ddddff' }}>Pulse</GlobalText>,
+          // make header transparent so the white bar is not visible
+          headerStyle: { backgroundColor: 'transparent', elevation: 0, shadowOpacity: 0 },
+          headerTransparent: true,
+          headerTintColor: '#000000',
+          headerTitle: '',
+          headerShadowVisible: false,
           contentStyle: { backgroundColor: theme.colors.background },
         }}
-      />
-      {/* Set status bar style to dark since the header background is light */}
+      >
+        {/* (tabs) group has your fancy bottom bar */}
+        <Stack.Screen name="(tabs)" options={{ headerShown: true }} />
+        <Stack.Screen
+          name="modal"
+          options={{ presentation: 'modal', title: 'Modal' }}
+        />
+      </Stack>
       <StatusBar style="dark" />
     </ThemeProvider>
   );
