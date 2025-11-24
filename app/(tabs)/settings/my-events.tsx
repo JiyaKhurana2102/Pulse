@@ -2,11 +2,11 @@ import React, { useMemo, useState } from 'react';
 // IMPORT REACT NATIVE COMPONENTS
 import { LinearGradient } from 'expo-linear-gradient';
 import {
-    Platform, // Used for buttons
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Platform, // Used for buttons
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 // --- Color Palette (Based on third image: Soft Mint/Teal) ---
@@ -184,13 +184,17 @@ const styles = StyleSheet.create({
     safeArea: {
       flex: 1, // Use flex to take up the screen
       backgroundColor: 'transparent',
-      // No need for fontFamily, display, justify/align, etc. on the root view
+        // Center content on the page with padding so it appears as a centered card
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 24,
     },
     container: {
       width: '100%',
       maxWidth: 400, // Simulate a mobile screen width
       padding: 20,
-      alignSelf: 'center', // Center the container on larger screens
+      alignSelf: 'center',
+       // Center the container on larger screens
     },
     header: {
       flexDirection: 'row',

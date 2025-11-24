@@ -203,12 +203,7 @@ export default function AppearanceScreen() {
             </View>
 
             {/* BACK BUTTON */}
-            <TouchableOpacity
-              onPress={() => Alert.alert('Navigation', 'Back button pressed')}
-              style={styles.floatingBackButton}
-            >
-              <Ionicons name="arrow-back-outline" size={30} color="white" />
-            </TouchableOpacity>
+            
           </View>
         </Animated.View>
 

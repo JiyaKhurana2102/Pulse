@@ -1,36 +1,35 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 
 // --- Color Palette ---
 const colors = {
-  softMintBackground: '#D4EDE7', 
-  darkTealAccent: '#008080', 
-  mediumAccentGreen: '#66B2B2', 
+  softMintBackground: '#D4EDE7',
+  darkTealAccent: '#008080',
+  mediumAccentGreen: '#66B2B2',
   white: '#FFFFFF',
   lightGray: '#A0AEC0',
   darkText: '#1F2937',
-  offWhite: '#F7FCFA', 
+  offWhite: '#F7FCFA',
   toggleActive: '#008080',
 };
 
-// --- SVG Icon Components ---
-const ChevronLeftIcon = ({ size = 24, color = colors.darkTealAccent }: { size?: number; color?: string }) => (
-  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-    <Path d="M15 18L9 12L15 6" />
-  </Svg>
-);
-
-const UserIcon = ({ size = 24, color = colors.darkTealAccent }: { size?: number; color?: string }) => (
-  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-    <Path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-    <Circle cx={12} cy={7} r={4} />
-  </Svg>
-);
-
 // --- Toggle Switch Component ---
-const ToggleSwitch = ({ isActive, onToggle }: { isActive: boolean; onToggle: () => void }) => (
+const ToggleSwitch = ({
+  isActive,
+  onToggle,
+}: {
+  isActive: boolean;
+  onToggle: () => void;
+}) => (
   <TouchableOpacity
     onPress={onToggle}
     style={[
@@ -78,29 +77,43 @@ const NotificationSettings: React.FC = () => {
       end={{ x: 0.5, y: 1 }}
       style={{ flex: 1 }}
     >
-      <ScrollView style={styles.safeArea} contentContainerStyle={styles.container}>
-      {/* Top Navigation Header */}
-      <View style={styles.navHeader}>
-        <TouchableOpacity onPress={() => console.log('Go back')} style={styles.backButton}>
-          <ChevronLeftIcon />
-        </TouchableOpacity>
-        <Text style={styles.navTitle}>Notifications</Text>
-        <UserIcon />
-      </View>
+      <ScrollView
+        style={styles.safeArea}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.mainBlock}>
+          {/* Title only (no back/profile icons) */}
+          <View style={styles.navHeader}>
+            <Text style={styles.navTitle}>Notifications</Text>
+          </View>
 
-      {/* Manage Alerts Bar */}
-      <View style={styles.alertsBar}>
-        <ChevronLeftIcon size={18} />
-        <Text style={styles.alertsText}>Manage how you receive alerts</Text>
-      </View>
-
-      {/* Settings List */}
-      <View style={styles.settingsList}>
-        <SettingRow label="Push Notifications" isActive={pushEnabled} onToggle={() => setPushEnabled(!pushEnabled)} />
-        <SettingRow label="Email Updates" isActive={emailEnabled} onToggle={() => setEmailEnabled(!emailEnabled)} />
-        <SettingRow label="Event Reminders" isActive={eventRemindersEnabled} onToggle={() => setEventRemindersEnabled(!eventRemindersEnabled)} />
-        <SettingRow label="Sounds/Vibrations" isActive={soundsEnabled} onToggle={() => setSoundsEnabled(!soundsEnabled)} />
-      </View>
+          {/* Settings List */}
+          <View style={styles.settingsList}>
+            <SettingRow
+              label="Push Notifications"
+              isActive={pushEnabled}
+              onToggle={() => setPushEnabled(!pushEnabled)}
+            />
+            <SettingRow
+              label="Email Updates"
+              isActive={emailEnabled}
+              onToggle={() => setEmailEnabled(!emailEnabled)}
+            />
+            <SettingRow
+              label="Event Reminders"
+              isActive={eventRemindersEnabled}
+              onToggle={() =>
+                setEventRemindersEnabled(!eventRemindersEnabled)
+              }
+            />
+            <SettingRow
+              label="Sounds/Vibrations"
+              isActive={soundsEnabled}
+              onToggle={() => setSoundsEnabled(!soundsEnabled)}
+            />
+          </View>
+        </View>
       </ScrollView>
     </LinearGradient>
   );
@@ -114,46 +127,28 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'transparent',
   },
-  container: {
-    alignItems: 'center',
-    paddingTop: 40,
+  content: {
+    flexGrow: 1,
     paddingHorizontal: 20,
+    paddingTop: 40,
+    paddingBottom: 200,
+    alignItems: 'center',
+    justifyContent: 'center', // centers the whole block vertically
+  },
+  mainBlock: {
+    width: '100%',
+    alignItems: 'center',
   },
   navHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 30,
     width: '100%',
+    alignItems: 'center',
+    marginBottom: 24,
   },
   navTitle: {
     fontSize: 20,
     fontWeight: '600',
     color: colors.darkTealAccent,
-  },
-  backButton: {
-    padding: 5,
-  },
-  alertsBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.offWhite,
-    borderRadius: 12,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    marginBottom: 30,
-    width: '100%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
-  },
-  alertsText: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: colors.darkTealAccent,
-    marginLeft: 10,
+    fontFamily: Platform.OS === 'ios' ? 'serif' : 'serif', // match settings font
   },
   settingsList: {
     width: '100%',
@@ -179,6 +174,7 @@ const styles = StyleSheet.create({
     color: colors.darkText,
     fontWeight: '400',
     flex: 1,
+    fontFamily: Platform.OS === 'ios' ? 'serif' : 'serif', // match settings font
   },
   toggleTrack: {
     width: 50,
