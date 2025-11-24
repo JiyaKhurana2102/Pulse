@@ -11,7 +11,12 @@ import LoadingScreen from '@/components/LoadingScreen';
 import { PreferencesProvider } from '@/hooks/PreferencesContext';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
-const HEADER_COLOR = '#FFFFFF';
+// ✅ Import Lora fonts
+import {
+  useFonts,
+  Lora_400Regular,
+  Lora_700Bold,
+} from '@expo-google-fonts/lora';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -21,8 +26,18 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [splashDismissed, setSplashDismissed] = useState(false);
 
-  // Show ONLY the splash until user taps it
+  // ✅ Load fonts BEFORE ANY UI shows
+  const [fontsLoaded] = useFonts({
+    Lora_400Regular,
+    Lora_700Bold,
+  });
 
+  // 🚨 Prevent rendering UNTIL fonts load (important!)
+  if (!fontsLoaded) {
+    return null;
+  }
+
+  // Show ONLY your custom loading screen until user taps it
   if (!splashDismissed) {
     return (
       <>
@@ -39,7 +54,6 @@ export default function RootLayout() {
       <ThemeProvider value={theme}>
         <GlobalEffects>
           <LinearGradient
-            // settings multi-stop warm gradient (applies app-wide)
             colors={[
               '#FFFFFF',
               '#FFF7ED',
@@ -55,21 +69,20 @@ export default function RootLayout() {
           >
             <Stack
               screenOptions={{
-                // make header transparent so the white bar is not visible
-                headerStyle: { backgroundColor: 'transparent', elevation: 0, shadowOpacity: 0 },
+                headerStyle: { 
+                backgroundColor: 'transparent',
+              },
+                headerShadowVisible: false,
+
                 headerTransparent: true,
                 headerTintColor: '#000000',
                 headerTitle: '',
-                headerShadowVisible: false,
+                
                 contentStyle: { backgroundColor: 'transparent' },
               }}
             >
-              {/* (tabs) group has your fancy bottom bar */}
               <Stack.Screen name="(tabs)" options={{ headerShown: true }} />
-              <Stack.Screen
-                name="modal"
-                options={{ presentation: 'modal', title: 'Modal' }}
-              />
+              <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
             </Stack>
             <StatusBar style="dark" />
           </LinearGradient>
