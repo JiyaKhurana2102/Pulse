@@ -1,6 +1,6 @@
 // components/LoadingScreen.tsx
-import { LinearGradient } from 'expo-linear-gradient';
-import React, { useEffect, useRef } from 'react';
+import { Brand } from '@/constants/theme';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Animated,
   Easing,
@@ -10,69 +10,58 @@ import {
   View,
 } from 'react-native';
 
-const PULSE_COLOR = '#00A79D';
+const PULSE_COLOR = '#ec2828d5';
 
 type LoadingScreenProps = {
   onFinish?: () => void;
 };
 
 export default function LoadingScreen({ onFinish }: LoadingScreenProps) {
-  // three uniform waves
-  const wave1Scale = useRef(new Animated.Value(1)).current;
-  const wave1Opacity = useRef(new Animated.Value(0.4)).current;
-
+  // persistent rings state: each ring has an Animated.Value for scale
+  const [rings, setRings] = useState<Array<{ id: number; scale: Animated.Value }>>([]);
+  // inner rings remain static
   const wave2Scale = useRef(new Animated.Value(1)).current;
-  const wave2Opacity = useRef(new Animated.Value(0.35)).current;
-
+  const wave2Opacity = useRef(new Animated.Value(1)).current;
   const wave3Scale = useRef(new Animated.Value(1)).current;
-  const wave3Opacity = useRef(new Animated.Value(0.3)).current;
+  const wave3Opacity = useRef(new Animated.Value(1)).current;
+  const nextRingId = useRef(1);
 
   useEffect(() => {
-    // Single sequential loop: wave1 -> wave2 -> wave3, then repeat.
-    const toScale = 3.0;
-    const duration = 2000; // slow pulse (ms)
-    const gap = 450; // delay between waves (ms)
+    // Spawn a new persistent outer ring every interval. Each ring animates out to finalScale and stays.
+    const finalScale = 3.0;
+    const duration = 2000; // ms
+    const gap = 3000; // ms between spawns
+    const maxRings = 6; // cap to avoid unbounded growth
 
-    const waveAnim = Animated.sequence([
-      // wave 1
-      Animated.parallel([
-        Animated.timing(wave1Scale, { toValue: toScale, duration, easing: Easing.out(Easing.quad), useNativeDriver: true }),
-        Animated.timing(wave1Opacity, { toValue: 0, duration, easing: Easing.out(Easing.quad), useNativeDriver: true }),
-      ]),
-      Animated.parallel([
-        Animated.timing(wave1Scale, { toValue: 1, duration: 0, useNativeDriver: true }),
-        Animated.timing(wave1Opacity, { toValue: 0.5, duration: 0, useNativeDriver: true }),
-      ]),
-      Animated.delay(gap),
+    let mounted = true;
 
-      // wave 2
-      Animated.parallel([
-        Animated.timing(wave2Scale, { toValue: toScale, duration, easing: Easing.out(Easing.quad), useNativeDriver: true }),
-        Animated.timing(wave2Opacity, { toValue: 0, duration, easing: Easing.out(Easing.quad), useNativeDriver: true }),
-      ]),
-      Animated.parallel([
-        Animated.timing(wave2Scale, { toValue: 1, duration: 0, useNativeDriver: true }),
-        Animated.timing(wave2Opacity, { toValue: 0.4, duration: 0, useNativeDriver: true }),
-      ]),
-      Animated.delay(gap),
+    const spawnRing = () => {
+      const id = nextRingId.current++;
+      const scale = new Animated.Value(1);
 
-      // wave 3
-      Animated.parallel([
-        Animated.timing(wave3Scale, { toValue: toScale, duration, easing: Easing.out(Easing.quad), useNativeDriver: true }),
-        Animated.timing(wave3Opacity, { toValue: 0, duration, easing: Easing.out(Easing.quad), useNativeDriver: true }),
-      ]),
-      Animated.parallel([
-        Animated.timing(wave3Scale, { toValue: 1, duration: 0, useNativeDriver: true }),
-        Animated.timing(wave3Opacity, { toValue: 0.3, duration: 0, useNativeDriver: true }),
-      ]),
-      Animated.delay(gap),
-    ]);
+      // add ring to state
+      setRings(prev => {
+        const next = [...prev, { id, scale }];
+        if (next.length > maxRings) next.shift();
+        return next;
+      });
 
-    const loop = Animated.loop(waveAnim);
-    loop.start();
+      // animate to final size and leave it
+      Animated.timing(scale, { toValue: finalScale, duration, easing: Easing.out(Easing.quad), useNativeDriver: true }).start();
+    };
 
-    return () => loop.stop();
-  }, [wave1Scale, wave1Opacity, wave2Scale, wave2Opacity, wave3Scale, wave3Opacity]);
+    // initial spawn
+    spawnRing();
+    const interval = setInterval(() => {
+      if (!mounted) return;
+      spawnRing();
+    }, gap);
+
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
+  }, [wave2Scale, wave2Opacity, wave3Scale, wave3Opacity]);
 
   // tap handler to dismiss the loading screen
   const handlePress = () => {
@@ -82,30 +71,24 @@ export default function LoadingScreen({ onFinish }: LoadingScreenProps) {
   return (
     <TouchableWithoutFeedback onPress={handlePress}>
       <View style={styles.container}>
+        {/* persistent outer rings (spawned each pulse) */}
+        {rings.map(r => (
+          <Animated.View key={r.id} style={[styles.waveWrapper, { transform: [{ scale: r.scale }], opacity: 0.75 }]}>
+            <Animated.View style={[styles.ring, styles.ringLarge, { borderColor: Brand.orange }]} />
+          </Animated.View>
+        ))}
 
-        {/* uniform, slow waves: animate wrapper Views (supported on iOS) and put static LinearGradient inside */}
-        <Animated.View style={[styles.waveWrapper, { transform: [{ scale: wave1Scale }], opacity: wave1Opacity }]}> 
-          <LinearGradient colors={["#99F6E4", "#D8B4FE", "#6EE7B7"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={[styles.waveBase, styles.waveSize]} />
-        </Animated.View>
+        {/* static middle and inner rings */}
+        <View style={styles.waveWrapper} pointerEvents="none">
+          <View style={[styles.ring, styles.ringMid, { borderColor: '#ff753eff' }]} />
+        </View>
 
-        <Animated.View style={[styles.waveWrapper, { transform: [{ scale: wave2Scale }], opacity: wave2Opacity }]}> 
-          <LinearGradient colors={["#99F6E4", "#D8B4FE", "#6EE7B7"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={[styles.waveBase, styles.waveSize]} />
-        </Animated.View>
+        <View style={styles.waveWrapper} pointerEvents="none">
+          <View style={[styles.ring, styles.ringSmall, { borderColor: '#ec2828d5' }]} />
+        </View>
 
-        <Animated.View style={[styles.waveWrapper, { transform: [{ scale: wave3Scale }], opacity: wave3Opacity }]}> 
-          <LinearGradient colors={["#99F6E4", "#D8B4FE", "#6EE7B7"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={[styles.waveBase, styles.waveSize]} />
-        </Animated.View>
-
-        {/* soft halo (gradient) */}
-        <LinearGradient
-          colors={["rgba(153,246,228,0.28)", "rgba(216,180,254,0.16)"]}
-          style={styles.middleRing}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-        />
-
-        {/* logo circle (solid white) — only the outer halo is gradient */}
-        <View style={styles.innerCircle}>
+        {/* inner filled circle (lightest orange) */}
+        <View style={[styles.innerCircle, { borderColor: '#000000ff' }]}>
           <Text style={styles.logoText}>PULSE</Text>
         </View>
       </View>
@@ -117,7 +100,7 @@ const styles = StyleSheet.create({
   // full-screen splash
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#cdebd0ff',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -144,20 +127,34 @@ const styles = StyleSheet.create({
     height: 220,
   },
 
-  middleRing: {
+  /* rings */
+  ring: {
     position: 'absolute',
-    width: 150,
-    height: 150,
-    borderRadius: 75,
+    borderRadius: 9999,
     backgroundColor: 'transparent',
-    zIndex: 1,
+    zIndex: 0,
+  },
+  ringLarge: {
+    width: 420,
+    height: 420,
+    borderWidth: 28,
+  },
+  ringMid: {
+    width: 364,
+    height: 364,
+    borderWidth: 24,
+  },
+  ringSmall: {
+    width: 316,
+    height: 316,
+    borderWidth: 20,
   },
 
   innerCircle: {
-    width: 150,
-    height: 160,
-    borderRadius: 80,
-    backgroundColor: '#b3faffff',
+    width: 276,
+    height: 276,
+    borderRadius: 138,
+    backgroundColor: '#FFF3E6',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
@@ -171,9 +168,10 @@ const styles = StyleSheet.create({
   },
 
   logoText: {
-    fontSize: 30,
-    fontWeight: '800',
-    letterSpacing: 2,
-    color: '#000000ff',
+    fontSize: 50,
+    justifyContent: 'center',
+    fontWeight: '900',
+    letterSpacing: 3,
+    color: '#0d440bff',
   },
 });

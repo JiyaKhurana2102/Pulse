@@ -1,10 +1,12 @@
+import { usePreferences } from '@/hooks/PreferencesContext';
 import { Ionicons } from '@expo/vector-icons';
-import React, { useState } from 'react';
+import { LinearGradient } from 'expo-linear-gradient';
+import React from 'react';
 import {
   Alert,
   Animated,
+  LayoutChangeEvent,
   StyleSheet,
-  Switch,
   Text,
   TouchableOpacity,
   View,
@@ -14,124 +16,215 @@ import {
 const ACCENT_COLOR = '#4DB6AC';
 const TRACK_COLOR = '#B2DFDB';
 const TEXT_COLOR = '#1A1A1A';
-const BACKGROUND_COLOR = '#F0FFF0';
+
+// limits so it never becomes pure black or pure white
+const BRIGHTNESS_MIN = 0.25;
+const BRIGHTNESS_MAX = 0.9;
+
+// zoom limits so it never goes too tiny or huge
+const ZOOM_MIN = 0.85;
+const ZOOM_MAX = 1.15;
+
+const THUMB_SIZE = 22;
+
+const clamp = (v: number, min: number, max: number) =>
+  Math.min(max, Math.max(min, v));
+
 
 export default function AppearanceScreen() {
-  const [brightness, setBrightness] = useState(1);      // 0 = darkest, 1 = normal
-  const [zoom, setZoom] = useState(1);                  // 1 = normal scale
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const { brightness, setBrightness, zoom, setZoom } = usePreferences();
+  const [brightnessSliderWidth, setBrightnessSliderWidth] = React.useState(0);
+  const [zoomSliderWidth, setZoomSliderWidth] = React.useState(0);
 
-  const scaleAnim = new Animated.Value(zoom);
+  // map brightness [MIN, MAX] -> [0, 1]
+  const brightnessNormalized = clamp(
+    (clamp(brightness, BRIGHTNESS_MIN, BRIGHTNESS_MAX) - BRIGHTNESS_MIN) /
+      (BRIGHTNESS_MAX - BRIGHTNESS_MIN),
+    0,
+    1
+  );
+  const zoomNormalized = clamp(
+    (clamp(zoom, ZOOM_MIN, ZOOM_MAX) - ZOOM_MIN) / (ZOOM_MAX - ZOOM_MIN),
+    0,
+    1
+  );
 
-  const toggleDarkMode = (value: boolean) => {
-    setIsDarkMode(value);
-    Alert.alert('Theme Change', `Dark Mode is now ${value ? 'ON' : 'OFF'}`);
+  const knobOffset = (width: number, normalized: number) => {
+    if (width <= 0) return 0;
+    const travel = width - THUMB_SIZE;
+    return normalized * travel;
+  };
+
+  const handleBrightnessLayout = (e: LayoutChangeEvent) => {
+    setBrightnessSliderWidth(e.nativeEvent.layout.width);
+  };
+
+  const handleZoomLayout = (e: LayoutChangeEvent) => {
+    setZoomSliderWidth(e.nativeEvent.layout.width);
+  };
+
+  const updateBrightnessFromX = (x: number) => {
+    if (brightnessSliderWidth <= 0) return;
+    const ratio = clamp(x / brightnessSliderWidth, 0, 1);
+    const value =
+      BRIGHTNESS_MIN + ratio * (BRIGHTNESS_MAX - BRIGHTNESS_MIN);
+    setBrightness(value);
+  };
+
+  const updateZoomFromX = (x: number) => {
+    if (zoomSliderWidth <= 0) return;
+    const ratio = clamp(x / zoomSliderWidth, 0, 1);
+    const value = ZOOM_MIN + ratio * (ZOOM_MAX - ZOOM_MIN);
+    setZoom(value);
   };
 
   return (
-    // ⭐ IMPORTANT FIX — enables overlay brightness effect  
-    <View style={{ flex: 1, position: 'relative' }}>
-      <Animated.View style={{ flex: 1, transform: [{ scale: zoom }] }}>
-        <View style={styles.container}>
+    <LinearGradient
+      colors={['#FFFFFF', '#FFF7ED', '#FED7AA', '#D1FAE5', '#ECFEFF', '#FFFFFF']}
+      locations={[0, 0.2, 0.4, 0.6, 0.8, 1]}
+      start={{ x: 0.5, y: 0 }}
+      end={{ x: 0.5, y: 1 }}
+      style={{ flex: 1 }}
+    >
+      {/* wrapper so brightness overlay can sit on top */}
+      <View style={{ flex: 1, position: 'relative' }}>
+        <Animated.View style={{ flex: 1, transform: [{ scale: zoom }] }}>
+          <View style={styles.container}>
+            {/* BRIGHTNESS SECTION */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Brightness</Text>
 
-          {/* BRIGHTNESS SECTION */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Brightness</Text>
+              <View style={styles.sliderContainer}>
+                {/* tap moon to go darker */}
+                <TouchableOpacity
+                  onPress={() =>
+                    setBrightness(clamp(brightness - 0.05, BRIGHTNESS_MIN, BRIGHTNESS_MAX))
+                  }
+                >
+                  <Ionicons name="moon-outline" size={24} color={TEXT_COLOR} />
+                </TouchableOpacity>
 
-            <View style={styles.sliderContainer}>
-              <Ionicons name="moon-outline" size={24} color={TEXT_COLOR} />
+                <View
+                  style={styles.slider}
+                  onLayout={handleBrightnessLayout}
+                  onStartShouldSetResponder={() => true}
+                  onResponderGrant={e =>
+                    updateBrightnessFromX(e.nativeEvent.locationX)
+                  }
+                  onResponderMove={e =>
+                    updateBrightnessFromX(e.nativeEvent.locationX)
+                  }
+                >
+                  <Ionicons
+                    name="ellipse"
+                    size={THUMB_SIZE}
+                    color={ACCENT_COLOR}
+                    style={[
+                      styles.sliderThumb,
+                      {
+                        left: knobOffset(
+                          brightnessSliderWidth,
+                          brightnessNormalized
+                        ),
+                      },
+                    ]}
+                  />
+                </View>
 
-              <View style={styles.slider}>
-                <Ionicons
-                  name="ellipse"
-                  size={22}
-                  color={ACCENT_COLOR}
-                  style={{ left: brightness * 110 }}
-                />
+                {/* tap sun to go brighter */}
+                <TouchableOpacity
+                  onPress={() =>
+                    setBrightness(clamp(brightness + 0.05, BRIGHTNESS_MIN, BRIGHTNESS_MAX))
+                  }
+                >
+                  <Ionicons name="sunny-outline" size={24} color={TEXT_COLOR} />
+                </TouchableOpacity>
               </View>
-
-              <Ionicons name="sunny-outline" size={24} color={TEXT_COLOR} />
             </View>
 
-            <View style={styles.buttonRow}>
-              <TouchableOpacity onPress={() => setBrightness(Math.max(0, brightness - 0.1))}>
-                <Text style={styles.sliderButton}>-</Text>
-              </TouchableOpacity>
+            {/* ZOOM SECTION */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Zoom</Text>
 
-              <TouchableOpacity onPress={() => setBrightness(Math.min(1, brightness + 0.1))}>
-                <Text style={styles.sliderButton}>+</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+              <View style={styles.sliderContainer}>
+                {/* tap to zoom out */}
+                <TouchableOpacity
+                  onPress={() =>
+                    setZoom(clamp(zoom - 0.05, ZOOM_MIN, ZOOM_MAX))
+                  }
+                >
+                  <Ionicons
+                    name="remove-circle-outline"
+                    size={24}
+                    color={TEXT_COLOR}
+                  />
+                </TouchableOpacity>
 
-          {/* ZOOM SECTION */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Zoom</Text>
+                <View
+                  style={styles.slider}
+                  onLayout={handleZoomLayout}
+                  onStartShouldSetResponder={() => true}
+                  onResponderGrant={e =>
+                    updateZoomFromX(e.nativeEvent.locationX)
+                  }
+                  onResponderMove={e =>
+                    updateZoomFromX(e.nativeEvent.locationX)
+                  }
+                >
+                  <Ionicons
+                    name="ellipse"
+                    size={THUMB_SIZE}
+                    color={ACCENT_COLOR}
+                    style={[
+                      styles.sliderThumb,
+                      {
+                        left: knobOffset(
+                          zoomSliderWidth,
+                          zoomNormalized
+                        ),
+                      },
+                    ]}
+                  />
+                </View>
 
-            <View style={styles.sliderContainer}>
-              <Ionicons name="remove-circle-outline" size={24} color={TEXT_COLOR} />
-
-              <View style={styles.slider}>
-                <Ionicons
-                  name="ellipse"
-                  size={22}
-                  color={ACCENT_COLOR}
-                  style={{ left: (zoom - 0.5) * 200 }}
-                />
+                {/* tap to zoom in */}
+                <TouchableOpacity
+                  onPress={() =>
+                    setZoom(clamp(zoom + 0.05, ZOOM_MIN, ZOOM_MAX))
+                  }
+                >
+                  <Ionicons
+                    name="add-circle-outline"
+                    size={24}
+                    color={TEXT_COLOR}
+                  />
+                </TouchableOpacity>
               </View>
-
-              <Ionicons name="add-circle-outline" size={24} color={TEXT_COLOR} />
             </View>
 
-            <View style={styles.buttonRow}>
-              <TouchableOpacity onPress={() => setZoom(Math.max(0.5, zoom - 0.1))}>
-                <Text style={styles.sliderButton}>-</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity onPress={() => setZoom(Math.min(2, zoom + 0.1))}>
-                <Text style={styles.sliderButton}>+</Text>
-              </TouchableOpacity>
-            </View>
+            {/* BACK BUTTON */}
+            <TouchableOpacity
+              onPress={() => Alert.alert('Navigation', 'Back button pressed')}
+              style={styles.floatingBackButton}
+            >
+              <Ionicons name="arrow-back-outline" size={30} color="white" />
+            </TouchableOpacity>
           </View>
+        </Animated.View>
 
-          {/* DARK MODE */}
-          <View style={styles.toggleSection}>
-            <Text style={styles.toggleText}>Dark Mode</Text>
-            <Switch
-              trackColor={{ false: TRACK_COLOR, true: ACCENT_COLOR }}
-              thumbColor={BACKGROUND_COLOR}
-              onValueChange={toggleDarkMode}
-              value={isDarkMode}
-            />
-          </View>
-
-          {/* BACK BUTTON */}
-          <TouchableOpacity
-            onPress={() => Alert.alert('Navigation', 'Back button pressed')}
-            style={styles.floatingBackButton}
-          >
-            <Ionicons name="arrow-back-outline" size={30} color="white" />
-          </TouchableOpacity>
-        </View>
-      </Animated.View>
-
-      {/* ⭐ Brightness Overlay — NOW WORKS */}
-      <View
-        pointerEvents="none"
-        style={{
-          ...StyleSheet.absoluteFillObject,
-          backgroundColor: 'black',
-          opacity: 1 - brightness,
-        }}
-      />
-    </View>
+        {/* Brightness overlay removed: now handled globally for consistency */}
+      </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: BACKGROUND_COLOR,
+    backgroundColor: 'transparent',
+    paddingBottom: 200, // your chosen padding
+    alignItems: 'center',
+    justifyContent: 'center',
     paddingHorizontal: 20,
   },
   section: {
@@ -158,31 +251,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#E0F2F1',
     borderRadius: 20,
+    position: 'relative',
   },
-  buttonRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 5,
-  },
-  sliderButton: {
-    fontSize: 22,
-    color: ACCENT_COLOR,
-    fontWeight: '700',
-  },
-  toggleSection: {
-    marginTop: 50,
-    paddingVertical: 15,
-    paddingHorizontal: 10,
-    borderRadius: 15,
-    backgroundColor: TRACK_COLOR,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  toggleText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: TEXT_COLOR,
+  sliderThumb: {
+    position: 'absolute',
+    top: 9, // roughly center vertically in 40px track
   },
   floatingBackButton: {
     position: 'absolute',

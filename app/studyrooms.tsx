@@ -279,7 +279,7 @@ const StudyRoomsScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={{ ...styles.safe, backgroundColor: 'transparent' }}>
       <ScrollView contentContainerStyle={styles.content}>
         {/* Back button */}
         <TouchableOpacity
@@ -509,7 +509,7 @@ const StudyRoomsScreen: React.FC = () => {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: '#D4E9DB',
+    backgroundColor: 'transparent',
   },
   content: {
     padding: 16,

@@ -1,6 +1,5 @@
 import { Stack } from 'expo-router';
 import React from 'react';
-import GlobalText from '@/components/GlobalText';
 
 const BACKGROUND_COLOR = '#ffffffff';
 const TEXT_COLOR = '#1A1A1A';
@@ -9,27 +8,13 @@ export default function SettingsLayout() {
   return (
     <Stack
       screenOptions={{
-        headerStyle: {
-          backgroundColor: BACKGROUND_COLOR,
-        },
+        headerShown: false,
         contentStyle: {
-          backgroundColor: BACKGROUND_COLOR,
-        },
-        headerTintColor: TEXT_COLOR,
-        headerTitleStyle: {
-          fontFamily: 'Lora',      // ← added
-          fontSize: 32,
-          fontWeight: '600',       // looks best with Lora, can remove if needed
-          color: TEXT_COLOR,
+          backgroundColor: 'transparent',
         },
       }}
     >
-      <Stack.Screen 
-        name="index" 
-        options={{
-          title: 'Your Settings',
-        }} 
-      />
+      <Stack.Screen name="index" />
 
       <Stack.Screen 
         name="appearance" 

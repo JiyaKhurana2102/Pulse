@@ -1,6 +1,7 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
-import Svg, { Path, Circle } from 'react-native-svg';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Svg, { Circle, Path } from 'react-native-svg';
 
 // --- Color Palette ---
 const colors = {
@@ -70,7 +71,14 @@ const NotificationSettings: React.FC = () => {
   const [soundsEnabled, setSoundsEnabled] = useState(true);
 
   return (
-    <ScrollView style={styles.safeArea} contentContainerStyle={styles.container}>
+    <LinearGradient
+      colors={['#FFFFFF', '#FFF7ED', '#FED7AA', '#D1FAE5', '#ECFEFF', '#FFFFFF']}
+      locations={[0, 0.2, 0.4, 0.6, 0.8, 1]}
+      start={{ x: 0.5, y: 0 }}
+      end={{ x: 0.5, y: 1 }}
+      style={{ flex: 1 }}
+    >
+      <ScrollView style={styles.safeArea} contentContainerStyle={styles.container}>
       {/* Top Navigation Header */}
       <View style={styles.navHeader}>
         <TouchableOpacity onPress={() => console.log('Go back')} style={styles.backButton}>
@@ -93,7 +101,8 @@ const NotificationSettings: React.FC = () => {
         <SettingRow label="Event Reminders" isActive={eventRemindersEnabled} onToggle={() => setEventRemindersEnabled(!eventRemindersEnabled)} />
         <SettingRow label="Sounds/Vibrations" isActive={soundsEnabled} onToggle={() => setSoundsEnabled(!soundsEnabled)} />
       </View>
-    </ScrollView>
+      </ScrollView>
+    </LinearGradient>
   );
 };
 
@@ -103,7 +112,7 @@ export default NotificationSettings;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: colors.softMintBackground,
+    backgroundColor: 'transparent',
   },
   container: {
     alignItems: 'center',

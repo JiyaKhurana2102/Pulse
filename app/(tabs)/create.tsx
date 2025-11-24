@@ -1,3 +1,6 @@
+import { Brand } from '@/constants/theme';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
 import {
   Dimensions,
@@ -12,7 +15,6 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import DateTimePicker from '@react-native-community/datetimepicker';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -249,10 +251,16 @@ export default function App() {
   };
 
   return (
-    <View style={[styles.appRoot, { backgroundColor: BACKGROUND_COLOR }]}>
-      <View style={styles.mobileFrame}>{renderScreen()}</View>
+    <LinearGradient
+      colors={['#FFFFFF', '#FFF7ED', '#FED7AA', '#D1FAE5', '#ECFEFF', '#FFFFFF']}
+      locations={[0, 0.2, 0.4, 0.6, 0.8, 1]}
+      start={{ x: 0.5, y: 0 }}
+      end={{ x: 0.5, y: 1 }}
+      style={styles.appRoot}
+    >
+      <View style={[styles.mobileFrame, { backgroundColor: 'rgba(255,255,255,0.75)' }]}>{renderScreen()}</View>
       <Text style={styles.footerNote}>Pulse</Text>
-    </View>
+    </LinearGradient>
   );
 }
 
@@ -345,12 +353,12 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: ACCENT_COLOR_LIGHT,
-    borderWidth: 2,
-    borderColor: ACCENT_COLOR_DARK + '80',
+    backgroundColor: 'rgba(255,255,255,0.75)',
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.05)',
     elevation: 2,
   },
-  mobileButtonText: { fontSize: 18, fontWeight: '700', color: TEXT_COLOR_DARK, fontFamily: 'Lora' },
+  mobileButtonText: { fontSize: 18, fontWeight: '700', color: Brand.orange, fontFamily: 'Lora' },
   buttonDisabled: { opacity: 0.5 },
   buttonPressed: { transform: [{ scale: 0.995 }] },
 
@@ -360,11 +368,11 @@ const styles = StyleSheet.create({
 
   calendarCard: {
     marginTop: 18,
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(255,255,255,0.75)',
     borderRadius: 18,
     padding: 16,
     borderWidth: 1,
-    borderColor: ACCENT_COLOR_DARK + '20',
+    borderColor: 'rgba(0,0,0,0.06)',
     elevation: 2,
     alignItems: 'center',
   },
@@ -374,9 +382,9 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingVertical: 12,
     paddingHorizontal: 20,
-    backgroundColor: ACCENT_COLOR_DARK,
+    backgroundColor: 'rgba(255,255,255,0.75)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  timeText: { color: TEXT_COLOR_WHITE, fontWeight: '700', fontSize: 18, fontFamily: 'Lora' },
+  timeText: { color: Brand.orange, fontWeight: '700', fontSize: 18, fontFamily: 'Lora' },
 });

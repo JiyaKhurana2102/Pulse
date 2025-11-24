@@ -17,9 +17,11 @@ export default function HomeScreen() {
 
   return (
     <LinearGradient
-      colors={['#99F6E4', '#D8B4FE', '#6EE7B7']} // background gradient
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
+      // match settings screen: soft multi-stop warm gradient
+      colors={['#FFFFFF', '#FFF7ED', '#FED7AA', '#D1FAE5', '#ECFEFF', '#FFFFFF']}
+      locations={[0, 0.2, 0.4, 0.6, 0.8, 1]}
+      start={{ x: 0.5, y: 0 }}
+      end={{ x: 0.5, y: 1 }}
       style={styles.gradient}
     >
       <SafeAreaView style={styles.safe}>
@@ -29,7 +31,7 @@ export default function HomeScreen() {
         >
           {/* Header */}
           <View style={styles.header}>
-            <GlobalText style={styles.welcomeTitle}>Welcome</GlobalText>
+            <GlobalText style={styles.welcomeTitle}>Pulse</GlobalText>
             <GlobalText style={styles.subtitle}>
               Your campus. Your guide. Your Pulse.
             </GlobalText>
@@ -46,14 +48,9 @@ export default function HomeScreen() {
               onPress={() => router.push('/events')}
             >
               <BlurView intensity={40} tint="light" style={styles.cardBlur}>
-                <LinearGradient
-                  colors={['#a5f3fc', '#eef2ff', '#f5d0fe']}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={styles.cardInner}
-                >
+                <View style={styles.cardInnerGlass}>
                   <GlobalText style={styles.cardText}>Find an Event</GlobalText>
-                </LinearGradient>
+                </View>
               </BlurView>
             </Pressable>
 
@@ -66,14 +63,9 @@ export default function HomeScreen() {
               onPress={() => router.push('/campus-map')}
             >
               <BlurView intensity={40} tint="light" style={styles.cardBlur}>
-                <LinearGradient
-                  colors={['#6ee7b7', '#a5f3fc', '#e9d5ff']}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={styles.cardInner}
-                >
+                <View style={styles.cardInnerGlass}>
                   <GlobalText style={styles.cardText}>Campus Map</GlobalText>
-                </LinearGradient>
+                </View>
               </BlurView>
             </Pressable>
           </View>
@@ -88,14 +80,9 @@ export default function HomeScreen() {
               onPress={() => router.push('/groups')}
             >
               <BlurView intensity={40} tint="light" style={styles.cardBlur}>
-                <LinearGradient
-                  colors={['#bfdbfe', '#e9d5ff', '#fee2e2']}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={styles.cardInner}
-                >
+                <View style={styles.cardInnerGlass}>
                   <GlobalText style={styles.cardText}>Join a group</GlobalText>
-                </LinearGradient>
+                </View>
               </BlurView>
             </Pressable>
 
@@ -108,16 +95,11 @@ export default function HomeScreen() {
               onPress={() => router.push('/studyrooms')}
             >
               <BlurView intensity={40} tint="light" style={styles.cardBlur}>
-                <LinearGradient
-                  colors={['#e5e7eb', '#a5f3fc', '#7dd3fc']}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={styles.cardInner}
-                >
+                <View style={styles.cardInnerGlass}>
                   <GlobalText style={styles.cardText}>
                     Reserve a study room
                   </GlobalText>
-                </LinearGradient>
+                </View>
               </BlurView>
             </Pressable>
           </View>
@@ -172,12 +154,13 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   welcomeTitle: {
-    fontSize: 22,
+    fontSize: 26,
+    fontWeight: '700',
     color: '#111827',
     marginBottom: 4,
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: 18,
     color: '#1F2933',
   },
 
@@ -202,13 +185,26 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.8)',
+    borderColor: 'rgba(255, 255, 255, 0.75)',
+    position: 'relative',
+    overflow: 'hidden',
+    paddingTop: 12,
   },
+  cardAccent: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    height: 12,
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
+  },
+  
   cardPressed: {
     transform: [{ scale: 0.97 }],
   },
   cardText: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#111827',
     textAlign: 'center',
   },
@@ -226,7 +222,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.85)',
   },
   todayTitle: {
-    fontSize: 16,
+    fontSize: 18,
     color: '#111827',
     marginBottom: 16,
   },
@@ -251,8 +247,24 @@ const styles = StyleSheet.create({
     color: '#111827',
   },
   eventTime: {
-    fontSize: 12,
+    fontSize: 15,
     color: '#4B5563',
     marginTop: 2,
+  },
+  cardInnerGlass: {
+    flex: 1,
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.75)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.85)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+    overflow: 'hidden',
+    padding: 0,
   },
 });

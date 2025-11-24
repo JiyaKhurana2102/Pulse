@@ -51,3 +51,16 @@ export const Fonts = Platform.select({
     mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
   },
 });
+
+// Brand colors (UT Dallas approximations from provided RGB values)
+export const Brand = {
+  orange: '#E87500', // rgb(232,117,0)
+  green: '#053D2C', // rgb(5,61,44)
+  silverleaf: '#50BE9C', // rgb(80,190,156)
+  gradient: ['#E87500', '#50BE9C', '#053D2C'],
+  // lighter variants for UI accents (buttons, tab bar)
+  lightOrange: '#FF9A3C',
+  lightGreen: '#2E8C6E',
+  lightSilverleaf: '#8DE0C9',
+  lightGradient: ['#FF9A3C', '#8DE0C9', '#2E8C6E'],
+};

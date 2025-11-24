@@ -16,7 +16,7 @@ const EventsScreen: React.FC = () => {
   const router = useRouter();
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={{ ...styles.safe, backgroundColor: 'transparent' }}>
       <ScrollView contentContainerStyle={styles.content}>
         {/* Back button */}
         <TouchableOpacity
@@ -85,7 +85,7 @@ const EventsScreen: React.FC = () => {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: '#D4E9DB', // light background only
+    backgroundColor: 'transparent',
   },
   content: {
     padding: 16,
