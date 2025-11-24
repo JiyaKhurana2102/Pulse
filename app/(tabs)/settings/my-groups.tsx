@@ -1,13 +1,21 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 // --- STYLES & CONSTANTS ---
-const BACKGROUND_COLOR = '#F0FFF0';
+const BACKGROUND_COLOR = 'transparent';
 
 // --- MAIN COMPONENT ---
 export default function MyGroupsScreen() {
   return (
-    <View style={styles.container}>
+    <LinearGradient
+      colors={['#FFFFFF', '#FFF7ED', '#FED7AA', '#D1FAE5', '#ECFEFF', '#FFFFFF']}
+      locations={[0, 0.2, 0.4, 0.6, 0.8, 1]}
+      start={{ x: 0.5, y: 0 }}
+      end={{ x: 0.5, y: 1 }}
+      style={{ flex: 1 }}
+    >
+      <View style={styles.container}>
       <Text style={styles.title}>Your Groups</Text>
       
       <View style={styles.contentContainer}>
@@ -21,7 +29,8 @@ export default function MyGroupsScreen() {
           TODO: Implement Firebase fetching logic to display groups here.
         </Text>
       </View>
-    </View>
+      </View>
+    </LinearGradient>
   );
 }
 
@@ -29,7 +38,7 @@ export default function MyGroupsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: BACKGROUND_COLOR,
+    backgroundColor: 'transparent',
     padding: 20,
   },
   title: {

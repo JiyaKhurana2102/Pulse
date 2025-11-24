@@ -1,5 +1,6 @@
+import { Brand } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
 import { Tabs } from 'expo-router';
 import React from 'react';
 import { Text as RNText, StyleSheet, View } from 'react-native';
@@ -7,7 +8,7 @@ import { Text as RNText, StyleSheet, View } from 'react-native';
 // --- Constants ---
 const ACCENT_COLOR = '#0F766E';
 const TAB_ICON_SIZE = 26;
-const TAB_GRADIENT = ['#99EAEA', '#D8B4FE', '#2DD4BF'] as const;
+const TAB_GRADIENT = [Brand.lightOrange, Brand.lightSilverleaf, Brand.lightGreen] as const;
 const TAB_ACTIVE_COLOR = '#FFFFFF';
 const TAB_INACTIVE_COLOR = 'rgba(255,255,255,0.75)';
 
@@ -42,14 +43,9 @@ export default function TabLayout() {
         },
 
         tabBarBackground: () => (
-          <LinearGradient
-            colors={TAB_GRADIENT}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={[StyleSheet.absoluteFill, { borderRadius: 24 }]}
-          >
+          <BlurView intensity={50} tint="light" style={[StyleSheet.absoluteFill, { borderRadius: 24 }]}> 
             <View style={styles.pillOverlay} pointerEvents="none" />
-          </LinearGradient>
+          </BlurView>
         ),
 
         tabBarIcon: ({ focused }) => {
@@ -112,9 +108,9 @@ const styles = StyleSheet.create({
   pillOverlay: {
     ...StyleSheet.absoluteFillObject,
     borderRadius: 24,
-    borderWidth: 1.25,
-    borderColor: 'rgba(255,255,255,0.45)',
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.85)',
+    backgroundColor: 'rgba(255,255,255,0.42)',
     bottom: 0,
   },
   iconContainer: {

@@ -1,17 +1,18 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
+import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
 import {
-  Image,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    Image,
+    KeyboardAvoidingView,
+    Platform,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -91,7 +92,7 @@ const EditableRow = ({
 };
 
 // ---- MAIN SCREEN ----
-const BACKGROUND_COLOR = '#E0F2F1';
+const BACKGROUND_COLOR = 'transparent';
 const ACCENT_COLOR = '#B2DFDB';
 const ICON_COLOR = '#4DB6AC';
 const TEXT_COLOR_DARK = '#303030';
@@ -131,7 +132,14 @@ export default function SettingsScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <LinearGradient
+      colors={['#FFFFFF', '#FFF7ED', '#FED7AA', '#D1FAE5', '#ECFEFF', '#FFFFFF']}
+      locations={[0, 0.2, 0.4, 0.6, 0.8, 1]}
+      start={{ x: 0.5, y: 0 }}
+      end={{ x: 0.5, y: 1 }}
+      style={{ flex: 1 }}
+    >
+      <SafeAreaView style={{ ...styles.safeArea, backgroundColor: 'transparent' }}>
       <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
           
@@ -206,13 +214,14 @@ export default function SettingsScreen() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+      </SafeAreaView>
+    </LinearGradient>
   );
 }
 
 // ---- STYLES ----
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: BACKGROUND_COLOR },
+  safeArea: { flex: 1, backgroundColor: 'transparent' },
   flex: { flex: 1 },
   scrollContainer: { paddingHorizontal: 20, paddingTop: 10, alignItems: 'center' },
 

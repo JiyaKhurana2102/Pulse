@@ -1,11 +1,12 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 // IMPORT REACT NATIVE COMPONENTS
+import { LinearGradient } from 'expo-linear-gradient';
 import {
-  View,
-  Text,
-  TouchableOpacity, // Used for buttons
-  StyleSheet, // Used for optimized styling
-  Platform, // Used to handle web-specific styles
+    Platform, // Used for buttons
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 
 // --- Color Palette (Based on third image: Soft Mint/Teal) ---
@@ -182,7 +183,7 @@ const getCalendarWeeks = (month: number, year: number): (Date | null)[][] => {
 const styles = StyleSheet.create({
     safeArea: {
       flex: 1, // Use flex to take up the screen
-      backgroundColor: colors.softMintBackground,
+      backgroundColor: 'transparent',
       // No need for fontFamily, display, justify/align, etc. on the root view
     },
     container: {
@@ -447,9 +448,15 @@ const MyEventsScreen: React.FC = () => {
   );
 
   return (
-    // Replaced <div> with <View>
-    <View style={styles.safeArea}>
-      <View style={styles.container}>
+    <LinearGradient
+      colors={['#FFFFFF', '#FFF7ED', '#FED7AA', '#D1FAE5', '#ECFEFF', '#FFFFFF']}
+      locations={[0, 0.2, 0.4, 0.6, 0.8, 1]}
+      start={{ x: 0.5, y: 0 }}
+      end={{ x: 0.5, y: 1 }}
+      style={{ flex: 1 }}
+    >
+      <View style={{ ...styles.safeArea, backgroundColor: 'transparent' }}>
+        <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
           {/* Replaced <h1> with <Text> */}
@@ -610,6 +617,7 @@ const MyEventsScreen: React.FC = () => {
         </TouchableOpacity>
       )}
     </View>
+    </LinearGradient>
   );
 };
 

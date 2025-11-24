@@ -1,16 +1,16 @@
-import React from 'react';
-import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { WebView } from 'react-native-webview';
 import { useRouter } from 'expo-router';
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { WebView } from 'react-native-webview';
 
 export default function CampusMapScreen() {
   const router = useRouter();
 
   return (
-    <View style={{ flex: 1 }}>
-      
+    <SafeAreaView style={{ flex: 1, backgroundColor: 'transparent' }}>
       {/* Top header with back button */}
-      <View style={styles.header}>
+      <View style={{ ...styles.header, backgroundColor: 'transparent' }}>
         <TouchableOpacity onPress={() => router.back()}>
           <Text style={styles.backButton}>← Back</Text>
         </TouchableOpacity>
@@ -23,7 +23,7 @@ export default function CampusMapScreen() {
         source={{ uri: 'https://map.utdallas.edu/' }} 
         style={{ flex: 1 }} 
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
