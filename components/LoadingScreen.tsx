@@ -10,16 +10,14 @@ import {
   View,
 } from 'react-native';
 
-const PULSE_COLOR = '#ec2828d5';
+const PULSE_COLOR = '#FED7AA';
 
 type LoadingScreenProps = {
   onFinish?: () => void;
 };
 
 export default function LoadingScreen({ onFinish }: LoadingScreenProps) {
-  // persistent rings state: each ring has an Animated.Value for scale
   const [rings, setRings] = useState<Array<{ id: number; scale: Animated.Value }>>([]);
-  // inner rings remain static
   const wave2Scale = useRef(new Animated.Value(1)).current;
   const wave2Opacity = useRef(new Animated.Value(1)).current;
   const wave3Scale = useRef(new Animated.Value(1)).current;
@@ -27,30 +25,30 @@ export default function LoadingScreen({ onFinish }: LoadingScreenProps) {
   const nextRingId = useRef(1);
 
   useEffect(() => {
-    // Spawn a new persistent outer ring every interval. Each ring animates out to finalScale and stays.
     const finalScale = 3.0;
-    const duration = 2000; // ms
-    const gap = 3000; // ms between spawns
-    const maxRings = 6; // cap to avoid unbounded growth
-
+    const duration = 2000;
+    const gap = 3000;
+    const maxRings = 6;
     let mounted = true;
 
     const spawnRing = () => {
       const id = nextRingId.current++;
       const scale = new Animated.Value(1);
 
-      // add ring to state
       setRings(prev => {
         const next = [...prev, { id, scale }];
         if (next.length > maxRings) next.shift();
         return next;
       });
 
-      // animate to final size and leave it
-      Animated.timing(scale, { toValue: finalScale, duration, easing: Easing.out(Easing.quad), useNativeDriver: true }).start();
+      Animated.timing(scale, {
+        toValue: finalScale,
+        duration,
+        easing: Easing.out(Easing.quad),
+        useNativeDriver: true,
+      }).start();
     };
 
-    // initial spawn
     spawnRing();
     const interval = setInterval(() => {
       if (!mounted) return;
@@ -61,9 +59,8 @@ export default function LoadingScreen({ onFinish }: LoadingScreenProps) {
       mounted = false;
       clearInterval(interval);
     };
-  }, [wave2Scale, wave2Opacity, wave3Scale, wave3Opacity]);
+  }, []);
 
-  // tap handler to dismiss the loading screen
   const handlePress = () => {
     onFinish?.();
   };
@@ -71,24 +68,51 @@ export default function LoadingScreen({ onFinish }: LoadingScreenProps) {
   return (
     <TouchableWithoutFeedback onPress={handlePress}>
       <View style={styles.container}>
-        {/* persistent outer rings (spawned each pulse) */}
         {rings.map(r => (
-          <Animated.View key={r.id} style={[styles.waveWrapper, { transform: [{ scale: r.scale }], opacity: 0.75 }]}>
-            <Animated.View style={[styles.ring, styles.ringLarge, { borderColor: Brand.orange }]} />
+          <Animated.View
+            key={r.id}
+            style={[
+              styles.waveWrapper,
+              { transform: [{ scale: r.scale }], opacity: 0.75 },
+            ]}>
+            <Animated.View
+              style={[
+                styles.ring,
+                styles.ringLarge,
+                { borderColor: '#FED7AA' }, // peach outer ring
+              ]}
+            />
           </Animated.View>
         ))}
 
-        {/* static middle and inner rings */}
+        {/* middle ring */}
         <View style={styles.waveWrapper} pointerEvents="none">
-          <View style={[styles.ring, styles.ringMid, { borderColor: '#ff753eff' }]} />
+          <View
+            style={[
+              styles.ring,
+              styles.ringMid,
+              { borderColor: '#ECFEFF' }, // icy blue
+            ]}
+          />
         </View>
 
+        {/* inner small ring */}
         <View style={styles.waveWrapper} pointerEvents="none">
-          <View style={[styles.ring, styles.ringSmall, { borderColor: '#ec2828d5' }]} />
+          <View
+            style={[
+              styles.ring,
+              styles.ringSmall,
+              { borderColor: '#FFF7ED' }, // warm cream
+            ]}
+          />
         </View>
 
-        {/* inner filled circle (lightest orange) */}
-        <View style={[styles.innerCircle, { borderColor: '#000000ff' }]}>
+        {/* inner filled circle */}
+        <View
+          style={[
+            styles.innerCircle,
+            { backgroundColor: '#FFFFFF', borderColor: '#FFF7ED' },
+          ]}>
           <Text style={styles.logoText}>PULSE</Text>
         </View>
       </View>
@@ -97,43 +121,27 @@ export default function LoadingScreen({ onFinish }: LoadingScreenProps) {
 }
 
 const styles = StyleSheet.create({
-  // full-screen splash
   container: {
     flex: 1,
-    backgroundColor: '#cdebd0ff',
+    backgroundColor: '#D1FAE5', // mint green
     justifyContent: 'center',
     alignItems: 'center',
   },
 
-    background: {
-      ...StyleSheet.absoluteFillObject,
-    },
-
-    waveWrapper: {
-      ...StyleSheet.absoluteFillObject,
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 0,
-    },
-
-  waveBase: {
-    position: 'absolute',
-    borderRadius: 9999,
-    backgroundColor: 'transparent',
+  waveWrapper: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    justifyContent: 'center',
     zIndex: 0,
   },
-  waveSize: {
-    width: 220,
-    height: 220,
-  },
 
-  /* rings */
   ring: {
     position: 'absolute',
     borderRadius: 9999,
     backgroundColor: 'transparent',
     zIndex: 0,
   },
+
   ringLarge: {
     width: 420,
     height: 420,
@@ -154,11 +162,9 @@ const styles = StyleSheet.create({
     width: 276,
     height: 276,
     borderRadius: 138,
-    backgroundColor: '#FFF3E6',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.06)',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.06,
@@ -167,11 +173,15 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
 
-  logoText: {
-    fontSize: 50,
-    justifyContent: 'center',
-    fontWeight: '900',
-    letterSpacing: 3,
-    color: '#0d440bff',
-  },
+  // components/LoadingScreen.tsx
+
+logoText: {
+  fontSize: 50,
+  justifyContent: 'center',
+  fontWeight: '900',
+  letterSpacing: 3,
+  color: '#064E3B',
+  fontFamily: 'Lora_700Bold',   // ← NEW FONT
+},
+
 });
