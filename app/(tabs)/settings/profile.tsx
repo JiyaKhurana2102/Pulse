@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
 
   title: {
     fontSize: 34,
-    fontFamily: 'serif',
+    fontFamily: 'Lora_400Regular',
     fontWeight: '300',
     color: TEXT_COLOR_DARK,
     flex: 1,
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     color: TEXT_COLOR_DARK,
-    fontFamily: 'serif',
+    fontFamily: 'Lora_400Regular',
   },
 
   imageContainer: {

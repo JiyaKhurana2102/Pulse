@@ -13,7 +13,7 @@ const TAB_ACTIVE_COLOR = '#FFFFFF';
 const TAB_INACTIVE_COLOR = 'rgba(255,255,255,0.75)';
 
 
-const CustomText = (props: any) => <RNText {...props} style={[{ fontFamily: 'Lora' }, props.style]} />;
+const CustomText = (props: any) => <RNText {...props} style={[{ fontFamily: 'Lora_400Regular' }, props.style]} />;
 
 export default function TabLayout() {
 

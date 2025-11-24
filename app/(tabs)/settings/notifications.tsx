@@ -1,14 +1,12 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
 import {
-  Platform,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
-import Svg, { Circle, Path } from 'react-native-svg';
 
 // --- Color Palette ---
 const colors = {
@@ -148,7 +146,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '600',
     color: colors.darkTealAccent,
-    fontFamily: Platform.OS === 'ios' ? 'serif' : 'serif', // match settings font
+    fontFamily: 'Lora_400Regular', // match settings font
   },
   settingsList: {
     width: '100%',
@@ -174,7 +172,7 @@ const styles = StyleSheet.create({
     color: colors.darkText,
     fontWeight: '400',
     flex: 1,
-    fontFamily: Platform.OS === 'ios' ? 'serif' : 'serif', // match settings font
+    fontFamily: 'Lora_400Regular', // match settings font
   },
   toggleTrack: {
     width: 50,

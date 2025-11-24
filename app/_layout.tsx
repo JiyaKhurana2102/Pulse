@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
+import { Text, TextInput } from 'react-native';
 import 'react-native-reanimated';
 
 import { GlobalEffects } from '@/components/GlobalEffects';
@@ -13,9 +14,9 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 
 // ✅ Import Lora fonts
 import {
-  useFonts,
   Lora_400Regular,
   Lora_700Bold,
+  useFonts,
 } from '@expo-google-fonts/lora';
 
 export const unstable_settings = {
@@ -36,6 +37,20 @@ export default function RootLayout() {
   if (!fontsLoaded) {
     return null;
   }
+
+  // Apply Lora as the default font for all Text/TextInput across the app
+  // use `any` to avoid TypeScript complaints about defaultProps types
+  (Text as any).defaultProps = (Text as any).defaultProps || {};
+  (Text as any).defaultProps.style = [
+    (Text as any).defaultProps.style,
+    { fontFamily: 'Lora_400Regular' },
+  ];
+
+  (TextInput as any).defaultProps = (TextInput as any).defaultProps || {};
+  (TextInput as any).defaultProps.style = [
+    (TextInput as any).defaultProps.style,
+    { fontFamily: 'Lora_400Regular' },
+  ];
 
   // Show ONLY your custom loading screen until user taps it
   if (!splashDismissed) {

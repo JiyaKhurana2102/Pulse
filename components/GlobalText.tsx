@@ -2,7 +2,8 @@
 import { Text, TextProps } from 'react-native';
 
 // Define the custom font family name used when loading the font in _layout.tsx
-const CUSTOM_FONT = 'Lora';
+// Use the exact font key registered by useFonts
+const CUSTOM_FONT = 'Lora_400Regular';
 
 /**
  * Custom Text component that applies the Lora font family.

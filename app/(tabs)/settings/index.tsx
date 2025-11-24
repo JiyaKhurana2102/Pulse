@@ -1,10 +1,9 @@
 // app/settings/index.tsx
-import { Brand } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Link } from 'expo-router';
 import React from 'react';
-import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const ACCENT_COLOR = '#46e0e0ff';
 const BACKGROUND_COLOR = '#ffffffff';
@@ -109,6 +108,6 @@ const styles = StyleSheet.create({
     color: '#111827',
     fontSize: 18,
     fontWeight: '600',
-    fontFamily: Platform.OS === 'ios' ? 'serif' : 'serif',
+    fontFamily: 'Lora_400Regular',
   },
 });

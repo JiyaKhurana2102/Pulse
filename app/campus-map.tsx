@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
 
@@ -9,12 +9,8 @@ export default function CampusMapScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: 'transparent' }}>
-      {/* Top header with back button */}
+      {/* Top header (back button removed - was a fake control) */}
       <View style={{ ...styles.header, backgroundColor: 'transparent' }}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Text style={styles.backButton}>← Back</Text>
-        </TouchableOpacity>
-
         <Text style={styles.headerTitle}>Campus Map</Text>
       </View>
 
@@ -34,19 +30,20 @@ const styles = StyleSheet.create({
     backgroundColor: '#CCF5FF', // matches your light blue blocks
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     paddingHorizontal: 15,
     paddingTop: 10,
     gap: 10,
   },
   backButton: {
     fontSize: 18,
-    fontFamily: 'Lora',
+    fontFamily: 'Lora_400Regular',
     color: '#1E1E1E',
     fontWeight: '600',
   },
   headerTitle: {
     fontSize: 22,
-    fontFamily: 'Lora',
+    fontFamily: 'Lora_700Bold',
     color: '#1E1E1E',
     fontWeight: '700',
   },

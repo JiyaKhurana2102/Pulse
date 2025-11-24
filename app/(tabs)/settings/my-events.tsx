@@ -39,8 +39,8 @@ const Icon = ({ name, size = 24, color = colors.darkTealAccent }: { name: string
     };
     
     switch (name) {
-        case 'Calendar':
-            return <Text style={{ fontSize: size, color }}>📅</Text>; // Placeholder
+        //case 'Calendar':
+           // return <Text style={{ fontSize: size, color }}>📅</Text>; // Placeholder
         case 'ChevronLeft':
             return <Text style={{ fontSize: size, color }}>{'<'}</Text>;
         case 'ChevronRight':
@@ -184,10 +184,12 @@ const styles = StyleSheet.create({
     safeArea: {
       flex: 1, // Use flex to take up the screen
       backgroundColor: 'transparent',
-        // Center content on the page with padding so it appears as a centered card
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 24,
+      // Push content slightly up from center so the calendar sits higher on the page
+      justifyContent: 'flex-start',
+      alignItems: 'center',
+      paddingTop: 130,
+      paddingHorizontal: 24,
+      paddingBottom: 24,
     },
     container: {
       width: '100%',
@@ -205,7 +207,8 @@ const styles = StyleSheet.create({
     },
     title: {
       fontSize: 28,
-      fontWeight: 'bold',
+      fontWeight: '700',
+      fontFamily: 'Lora_700Bold',
       color: colors.darkTealAccent,
     },
     calendarHeader: {
@@ -231,7 +234,7 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
       justifyContent: 'space-between',
       textAlign: 'center', // Text alignment is done on the Text component
-      paddingBottom: 8,
+      paddingBottom: 4,
       borderBottomWidth: 1,
       borderBottomColor: colors.lightGray,
       marginBottom: 5,
@@ -285,7 +288,8 @@ const styles = StyleSheet.create({
         color: colors.white,
     },
     dateTextToday: {
-      fontWeight: 'bold',
+      fontWeight: '700',
+      fontFamily: 'Lora_700Bold',
     },
     eventDotsContainer: {
       position: 'absolute',
@@ -323,19 +327,21 @@ const styles = StyleSheet.create({
       })
     },
     modalContent: {
-      backgroundColor: colors.white,
-      borderTopLeftRadius: 25,
-      borderTopRightRadius: 25,
-      padding: 25,
-      maxHeight: '70%',
-      width: '100%',
-      maxWidth: 400, 
-      alignSelf: 'center',
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: -5 },
-      shadowOpacity: 0.1,
-      shadowRadius: 10,
-      elevation: 20, // Android shadow
+     backgroundColor: colors.white,
+     borderTopLeftRadius: 25,
+     borderTopRightRadius: 25,
+     padding: 25,
+     paddingBottom: 50,   // ⬅ extra inner bottom padding
+     marginBottom: 24,    // ⬅ lifts the whole sheet a bit above the tabs
+     maxHeight: '70%',
+     width: '100%',
+     maxWidth: 400,
+     alignSelf: 'center',
+     shadowColor: '#000',
+     shadowOffset: { width: 0, height: -5 },
+     shadowOpacity: 0.1,
+     shadowRadius: 10,
+     elevation: 20,
     },
     modalHeader: {
       marginBottom: 15,
@@ -343,7 +349,8 @@ const styles = StyleSheet.create({
     },
     modalTitle: {
       fontSize: 22,
-      fontWeight: 'bold',
+      fontWeight: '700',
+      fontFamily: 'Lora_700Bold',
       color: colors.darkText,
     },
     modalSubtitle: {
@@ -400,6 +407,7 @@ const styles = StyleSheet.create({
       color: colors.white,
       fontSize: 16,
       fontWeight: '700',
+      fontFamily: 'Lora_700Bold',
       textAlign: 'center',
     },
 });

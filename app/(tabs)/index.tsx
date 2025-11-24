@@ -156,6 +156,7 @@ const styles = StyleSheet.create({
   welcomeTitle: {
     fontSize: 26,
     fontWeight: '700',
+    fontFamily: 'Lora_700Bold',
     color: '#111827',
     marginBottom: 4,
   },
