@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
       // Push content slightly up from center so the calendar sits higher on the page
       justifyContent: 'flex-start',
       alignItems: 'center',
-      paddingTop: 130,
+      paddingTop: 100,
       paddingHorizontal: 24,
       paddingBottom: 24,
     },

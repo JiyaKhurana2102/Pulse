@@ -17,7 +17,7 @@ const colors = {
   lightGray: '#A0AEC0',
   darkText: '#1F2937',
   offWhite: '#F7FCFA',
-  toggleActive: '#008080',
+  toggleActive: '#008080ff',
 };
 
 // --- Toggle Switch Component ---
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
   content: {
     flexGrow: 1,
     paddingHorizontal: 20,
-    paddingTop: 40,
+    paddingTop: 100,
     paddingBottom: 200,
     alignItems: 'center',
     justifyContent: 'center', // centers the whole block vertically

@@ -1,18 +1,17 @@
-import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
 import {
-    Image,
-    KeyboardAvoidingView,
-    Platform,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -93,30 +92,27 @@ const EditableRow = ({
 
 // ---- MAIN SCREEN ----
 const BACKGROUND_COLOR = 'transparent';
-const ACCENT_COLOR = '#B2DFDB';
+const ACCENT_COLOR = '#008080ff';
 const ICON_COLOR = '#4DB6AC';
-const TEXT_COLOR_DARK = '#303030';
+const TEXT_COLOR_DARK = '#ffffffff';
 
 export default function SettingsScreen() {
   const [name, setName] = useState('Jiya Khurana');
-  const [dateOfBirth, setDateOfBirth] = useState(new Date(2000, 0, 1));
-  const [phoneNumber, setPhoneNumber] = useState('012-345-6789');
+  const [email, setEmail] = useState('test@email');
   const [password, setPassword] = useState('********');
   const [profileImageUri, setProfileImageUri] = useState<string | null>(null);
 
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  // const handleDateChange = (event: any, selectedDate?: Date) => {
+  //  // const currentDate = selectedDate || dateOfBirth;
+  //   setShowDatePicker(Platform.OS === 'ios');
+  //   setDateOfBirth(currentDate);
+  // };
 
-  const handleDateChange = (event: any, selectedDate?: Date) => {
-    const currentDate = selectedDate || dateOfBirth;
-    setShowDatePicker(Platform.OS === 'ios');
-    setDateOfBirth(currentDate);
-  };
-
-  const formattedDate = dateOfBirth.toLocaleDateString('en-US', {
-    month: '2-digit',
-    day: '2-digit',
-    year: 'numeric',
-  });
+  // const formattedDate = dateOfBirth.toLocaleDateString('en-US', {
+  //   month: '2-digit',
+  //   day: '2-digit',
+  //   year: 'numeric',
+  // });
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -143,12 +139,12 @@ export default function SettingsScreen() {
       <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
           
-          {/* Header */}
+          {/* Header
           <View style={styles.header}>
             <SafeIcon name="arrow-back" library="ion" size={28} color={ICON_COLOR} />
             <Text style={styles.title}>Settings</Text>
             <View style={{ width: 28 }} />
-          </View>
+          </View> */}
 
           {/* Profile Button */}
           <Pressable style={styles.profileButton}>
@@ -176,31 +172,13 @@ export default function SettingsScreen() {
               iconName="account-outline"
               library="mci"
             />
-
             <EditableRow
-              label="MM/DD/YYYY"
-              value={formattedDate}
-              onPress={() => setShowDatePicker(true)}
-              iconName="calendar-outline"
-              library="ion"
-            />
-
-            {showDatePicker && (
-              <DateTimePicker
-                value={dateOfBirth}
-                mode="date"
-                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                onChange={handleDateChange}
-              />
-            )}
-
-            <EditableRow
-              label="Phone Number"
-              value={phoneNumber}
-              onChangeText={setPhoneNumber}
-              iconName="phone-outline"
+              label="Email"
+              value={email}
+              onChangeText={setEmail}
+              iconName="email-outline"
               library="mci"
-              keyboardType="phone-pad"
+              keyboardType="default"
             />
 
             <EditableRow
@@ -223,7 +201,7 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: 'transparent' },
   flex: { flex: 1 },
-  scrollContainer: { paddingHorizontal: 20, paddingTop: 10, alignItems: 'center' },
+  scrollContainer: { paddingHorizontal: 20, paddingTop: 100, alignItems: 'center' },
 
   header: {
     width: '100%',

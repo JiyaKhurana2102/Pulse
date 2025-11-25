@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'transparent',
-    paddingTop: 0,
+    paddingTop: 100,
     paddingHorizontal: 20,
     paddingBottom: 150,   // your chosen vertical offset
     alignItems: 'center',

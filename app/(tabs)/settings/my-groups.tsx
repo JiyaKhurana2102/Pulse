@@ -39,6 +39,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'transparent',
+    justifyContent: 'flex-start',
+    paddingTop: 100,
     padding: 20,
   },
   title: {
@@ -46,6 +48,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontFamily: 'Inter_700Bold',
     color: '#1A1A1A',
+    
     marginBottom: 20,
   },
   contentContainer: {

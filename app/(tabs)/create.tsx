@@ -1,4 +1,5 @@
 import { Brand } from '@/constants/theme';
+import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
@@ -9,10 +10,9 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
-  Switch,
   Text,
   TextInput,
-  View,
+  View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -26,14 +26,17 @@ const TEXT_COLOR_DARK = '#000000ff'; // Dark gray for primary text
 const TEXT_COLOR_MINT = '#bbe8e2ff'; // Mint color for selected date
 const TEXT_COLOR_WHITE = '#FFFFFF';
 
+// match Settings accent color
+const SETTINGS_ACCENT_COLOR = '#46e0e0ff';
+
 // --- SCREENS ---
 const SCREENS = {
   SELECTION: 'selection',
   NEW_GROUP: 'new_group',
   NEW_EVENT: 'new_event',
-};
+} as const;
 
-/* --- Buttons --- */
+/* --- Primary button used in forms (bottom action) --- */
 const MobileButton = ({ children, onPress, disabled = false, style }: any) => {
   return (
     <Pressable
@@ -46,16 +49,13 @@ const MobileButton = ({ children, onPress, disabled = false, style }: any) => {
         style,
       ]}
     >
-      <Text style={styles.mobileButtonText}>{children}</Text>
+      <View style={styles.buttonContent}>
+        <Text style={styles.mobileButtonText}>{children}</Text>
+        <Ionicons name="chevron-forward-outline" size={24} color="#111827" />
+      </View>
     </Pressable>
   );
 };
-
-const BackButton = ({ onPress }: { onPress: () => void }) => (
-  <Pressable onPress={onPress} style={styles.backButton}>
-    <Text style={styles.backButtonText}>{'‹'}</Text>
-  </Pressable>
-);
 
 /* --- New Group Form --- */
 const NewGroupForm = ({ onBack }: { onBack: () => void }) => {
@@ -79,7 +79,10 @@ const NewGroupForm = ({ onBack }: { onBack: () => void }) => {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <View style={styles.innerContainer}>
-          <BackButton onPress={onBack} />
+          {/* Back Button */}
+          <Pressable onPress={onBack} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={28} color={SETTINGS_ACCENT_COLOR} />
+          </Pressable>
 
           {message && (
             <View style={styles.messageOverlay}>
@@ -111,19 +114,11 @@ const NewGroupForm = ({ onBack }: { onBack: () => void }) => {
               style={styles.textArea}
               textAlignVertical="top"
             />
-
-            <View style={styles.toggleRow}>
-              <Text style={styles.toggleLabel}>Invite needed</Text>
-              <Switch
-                value={inviteNeeded}
-                onValueChange={setInviteNeeded}
-                trackColor={{ false: '#9CA3AF', true: ACCENT_COLOR_DARK }}
-                thumbColor={inviteNeeded ? '#ffffff' : '#ffffff'}
-              />
-            </View>
           </ScrollView>
 
-          <MobileButton onPress={handleCreateGroup} disabled={!!message} />
+          <MobileButton onPress={handleCreateGroup} disabled={!!message}>
+            Create Group
+          </MobileButton>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -153,9 +148,15 @@ const NewEventForm = ({ onBack }: { onBack: () => void }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
         <View style={styles.innerContainer}>
-          <BackButton onPress={onBack} />
+          {/* Back Button */}
+          <Pressable onPress={onBack} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={28} color={SETTINGS_ACCENT_COLOR} />
+          </Pressable>
 
           {message && (
             <View style={styles.messageOverlay}>
@@ -163,7 +164,10 @@ const NewEventForm = ({ onBack }: { onBack: () => void }) => {
             </View>
           )}
 
-          <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+          >
             <TextInput
               value={eventName}
               onChangeText={setEventName}
@@ -189,12 +193,10 @@ const NewEventForm = ({ onBack }: { onBack: () => void }) => {
             <View style={styles.calendarCard}>
               <Text style={styles.calendarMonth}>Select Date & Time</Text>
 
-              <Pressable
-                onPress={() => setShowPicker(true)}
-                style={styles.timeBubble}
-              >
+              <Pressable onPress={() => setShowPicker(true)} style={styles.timeBubble}>
                 <Text style={[styles.timeText, { fontSize: 16 }]}>
-                  {date.toDateString()} {date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  {date.toDateString()}{' '}
+                  {date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </Text>
               </Pressable>
 
@@ -219,23 +221,60 @@ const NewEventForm = ({ onBack }: { onBack: () => void }) => {
   );
 };
 
+/* --- Settings-style card reused on Create screen --- */
+interface CreateCardProps {
+  iconName: keyof typeof Ionicons.glyphMap;
+  label: string;
+  onPress: () => void;
+}
+
+const CreateCard: React.FC<CreateCardProps> = ({ iconName, label, onPress }) => (
+  <Pressable
+    onPress={onPress}
+    style={({ pressed }) => [
+      styles.settingsCardContainer,
+      pressed && { transform: [{ scale: 0.98 }] },
+    ]}
+  >
+    <Ionicons
+      name={iconName}
+      size={28}
+      color={SETTINGS_ACCENT_COLOR}
+      style={styles.settingsCardIcon}
+    />
+    <View style={styles.settingsCardTextWrapper}>
+      <Text style={styles.settingsCardText}>{label}</Text>
+    </View>
+    <Ionicons name="chevron-forward-outline" size={24} color="black" />
+  </Pressable>
+);
+
 /* --- Selection Screen --- */
-const SelectionScreen = ({ navigate }: { navigate: (screen: string) => void }) => (
+const SelectionScreen = ({ navigate }: { navigate: (screen: (typeof SCREENS)[keyof typeof SCREENS]) => void }) => (
   <View style={styles.selectionContainer}>
-    <Text style={styles.pageTitle}>Create New</Text>
-    <Text style={styles.pageSubtitle}>Choose one of the following:</Text>
+    <Text style={styles.pageTitle}>Bring your campus to life</Text>
+    <Text style={styles.pageSubtitle}>Pick what you want to create</Text>
 
-    <MobileButton onPress={() => navigate(SCREENS.NEW_GROUP)} style={{ marginBottom: 12 }}>
-      New group
-    </MobileButton>
-
-    <MobileButton onPress={() => navigate(SCREENS.NEW_EVENT)}>New event</MobileButton>
+    <View style={styles.selectionList}>
+      <CreateCard
+        iconName="people-outline"
+        label="New group"
+        onPress={() => navigate(SCREENS.NEW_GROUP)}
+      />
+      <CreateCard
+        iconName="calendar-outline"
+        label="New event"
+        onPress={() => navigate(SCREENS.NEW_EVENT)}
+      />
+    </View>
   </View>
 );
 
-/* --- MAIN APP --- */
+/* --- MAIN SCREEN (Create tab) --- */
 export default function App() {
-  const [currentScreen, setCurrentScreen] = useState(SCREENS.SELECTION);
+  const [currentScreen, setCurrentScreen] = useState<(typeof SCREENS)[keyof typeof SCREENS]>(
+    SCREENS.SELECTION,
+  );
 
   const renderScreen = () => {
     switch (currentScreen) {
@@ -256,31 +295,20 @@ export default function App() {
       locations={[0, 0.2, 0.4, 0.6, 0.8, 1]}
       start={{ x: 0.5, y: 0 }}
       end={{ x: 0.5, y: 1 }}
-      style={styles.appRoot}
+      style={{ flex: 1 }}
     >
-      <View style={[styles.mobileFrame, { backgroundColor: 'rgba(255,255,255,0.75)' }]}>{renderScreen()}</View>
-      <Text style={styles.footerNote}>Pulse</Text>
+      <SafeAreaView style={styles.fullScreenSafeArea}>{renderScreen()}</SafeAreaView>
     </LinearGradient>
   );
 }
 
 /* --- STYLES --- */
 const styles = StyleSheet.create({
-  appRoot: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 8 },
-  mobileFrame: {
-    width: '100%',
-    maxWidth: 420,
-    backgroundColor: '#ffffff',
-    borderRadius: 28,
-    overflow: 'hidden',
-    height: '90%',
-    elevation: 6,
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 20,
-    shadowOffset: { width: 0, height: 10 },
+  fullScreenSafeArea: {
+    flex: 1,
+    paddingHorizontal: 20,
+    paddingVertical: 20,
   },
-  footerNote: { marginTop: 8, fontSize: 12, color: '#6B7280', fontFamily: 'Inter_400Regular' },
 
   container: { flex: 1, backgroundColor: 'transparent' },
   flex: { flex: 1 },
@@ -288,18 +316,11 @@ const styles = StyleSheet.create({
 
   backButton: {
     position: 'absolute',
-    top: 16,
-    left: 16,
+    top: 1,
+    left: 20,
     zIndex: 10,
-    backgroundColor: ACCENT_COLOR_DARK,
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 3,
+    padding: 8,
   },
-  backButtonText: { color: TEXT_COLOR_WHITE, fontSize: 22, fontWeight: '600', fontFamily: 'Inter_400Regular' },
 
   messageOverlay: {
     position: 'absolute',
@@ -313,9 +334,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  messageText: { color: '#fff', fontSize: 16, fontWeight: '600', fontFamily: 'Inter_400Regular' },
+  messageText: {
+    color: '#fefefeff',
+    fontSize: 16,
+    fontWeight: '600',
+    fontFamily: 'Inter_400Regular',
+  },
 
-  scrollContent: { paddingTop: 48, paddingBottom: 12 },
+  // Forms content - aligned at consistent height
+  scrollContent: {
+    flexGrow: 1,
+    paddingTop: 60,
+    paddingBottom: 24,
+  },
 
   titleInput: {
     width: '100%',
@@ -326,9 +357,21 @@ const styles = StyleSheet.create({
     marginBottom: 6,
     fontFamily: 'Inter_400Regular',
   },
-  titleDivider: { height: 1, width: '75%', alignSelf: 'center', marginBottom: 18, backgroundColor: ACCENT_COLOR_DARK + '80' },
+  titleDivider: {
+    height: 1,
+    width: '75%',
+    alignSelf: 'center',
+    marginBottom: 18,
+    backgroundColor: ACCENT_COLOR_DARK + '80',
+  },
 
-  label: { fontSize: 20, fontWeight: '300', marginBottom: 8, color: TEXT_COLOR_DARK, fontFamily: 'Inter_400Regular' },
+  label: {
+    fontSize: 20,
+    fontWeight: '300',
+    marginBottom: 8,
+    color: TEXT_COLOR_DARK,
+    fontFamily: 'Inter_400Regular',
+  },
 
   textArea: {
     width: '100%',
@@ -342,29 +385,84 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter_400Regular',
   },
 
-  toggleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10, marginTop: 8, borderRadius: 999, backgroundColor: ACCENT_COLOR_LIGHT, borderWidth: 1, borderColor: ACCENT_COLOR_DARK + '40' },
-  toggleLabel: { fontSize: 16, fontWeight: '600', color: TEXT_COLOR_DARK, fontFamily: 'Inter_400Regular' },
+  toggleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 10,
+    marginTop: 8,
+    borderRadius: 999,
+    backgroundColor: ACCENT_COLOR_LIGHT,
+    borderWidth: 1,
+    borderColor: ACCENT_COLOR_DARK + '40',
+  },
+  toggleLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: TEXT_COLOR_DARK,
+    fontFamily: 'Inter_400Regular',
+  },
 
   mobileButton: {
-    width: '100%',
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    marginVertical: 8,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
+    width: '90%',
+    marginVertical: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
     backgroundColor: 'rgba(255,255,255,0.75)',
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.05)',
-    elevation: 2,
+    borderRadius: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+    minHeight: 52,
+    justifyContent: 'center',
+    alignSelf: 'center',
   },
-  mobileButtonText: { fontSize: 18, fontWeight: '700', color: Brand.orange, fontFamily: 'Inter_700Bold' },
+  buttonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  mobileButtonText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#111827',
+    fontFamily: 'Inter_400Regular',
+    flex: 1,
+  },
   buttonDisabled: { opacity: 0.5 },
   buttonPressed: { transform: [{ scale: 0.995 }] },
 
-  selectionContainer: { flex: 1, alignItems: 'center', paddingTop: 28, paddingHorizontal: 22 },
-  pageTitle: { fontSize: 40, fontWeight: '300', marginTop: 36, marginBottom: 12, color: TEXT_COLOR_DARK, fontFamily: 'Inter_400Regular' },
-  pageSubtitle: { fontSize: 18, fontWeight: '300', marginBottom: 20, color: TEXT_COLOR_DARK, fontFamily: 'Inter_400Regular' },
+  selectionContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    paddingTop: 60,
+    paddingBottom: 80,
+    paddingHorizontal: 22,
+  },
+  selectionList: {
+    width: '100%',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  pageTitle: {
+    fontSize: 26,
+    fontWeight: '300',
+    marginTop: 8,
+    marginBottom: 12,
+    color: TEXT_COLOR_DARK,
+    fontFamily: 'Inter_400Regular',
+  },
+  pageSubtitle: {
+    fontSize: 18,
+    fontWeight: '300',
+    marginBottom: 20,
+    color: TEXT_COLOR_DARK,
+    fontFamily: 'Inter_400Regular',
+  },
 
   calendarCard: {
     marginTop: 18,
@@ -376,7 +474,13 @@ const styles = StyleSheet.create({
     elevation: 2,
     alignItems: 'center',
   },
-  calendarMonth: { fontSize: 18, fontWeight: '700', color: TEXT_COLOR_DARK, marginBottom: 12, fontFamily: 'Inter_700Bold' },
+  calendarMonth: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: TEXT_COLOR_DARK,
+    marginBottom: 12,
+    fontFamily: 'Inter_700Bold',
+  },
 
   timeBubble: {
     borderRadius: 12,
@@ -386,5 +490,45 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  timeText: { color: Brand.orange, fontWeight: '700', fontSize: 18, fontFamily: 'Inter_700Bold' },
+  timeText: {
+    color: Brand.orange,
+    fontWeight: '700',
+    fontSize: 18,
+    fontFamily: 'Inter_700Bold',
+  },
+
+  // --- Settings-style card styles (copied from Settings screen) ---
+  settingsCardContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginVertical: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.75)',
+    borderRadius: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  settingsCardIcon: {
+    marginRight: 15,
+    backgroundColor: 'rgba(0,0,0,0.06)',
+    padding: 5,
+    borderRadius: 50,
+  },
+  settingsCardTextWrapper: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingRight: 15,
+  },
+  settingsCardText: {
+    color: '#111827',
+    fontSize: 18,
+    fontWeight: '600',
+    fontFamily: 'Inter_400Regular',
+  },
 });

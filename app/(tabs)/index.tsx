@@ -8,6 +8,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import GlobalText from '@/components/GlobalText';
 
+// Experimental trial colors for homepage action cards.
+// KEEP existing styling; these can be toggled off by setting USE_EXPERIMENTAL_CARD_COLORS = false.
+const USE_EXPERIMENTAL_CARD_COLORS = true;
+const experimentalCardColors = ['#ff9966', '#b8e6b8', '#5cc4a4', '#f6a278'];
+
 export const options = {
   headerShown: false,
 };
@@ -37,72 +42,98 @@ export default function HomeScreen() {
             </GlobalText>
           </View>
 
-          {/* Action cards grid */}
-          <View style={styles.cardRow}>
-            {/* Find an Event */}
-            <Pressable
-              style={({ pressed }) => [
-                styles.cardWrapper,
-                pressed && styles.cardPressed,
+          {/* Action cards - full width buttons */}
+          {/* Find an Event - Medium */}
+          <Pressable
+            style={({ pressed }) => [
+              styles.cardWrapperMedium,
+              pressed && styles.cardPressed,
+            ]}
+            onPress={() => router.push('/events')}
+          >
+            <View
+              style={[
+                styles.cardInnerGlass,
+                USE_EXPERIMENTAL_CARD_COLORS && {
+                  backgroundColor: experimentalCardColors[0],
+                },
               ]}
-              onPress={() => router.push('/events')}
             >
-              <BlurView intensity={40} tint="light" style={styles.cardBlur}>
-                <View style={styles.cardInnerGlass}>
-                  <GlobalText style={styles.cardText}>Find an Event</GlobalText>
-                </View>
-              </BlurView>
-            </Pressable>
+              <GlobalText style={styles.cardTitle}>Find an Event</GlobalText>
+              <GlobalText style={styles.cardDescription}>
+                Discover campus events and activities.
+              </GlobalText>
+            </View>
+          </Pressable>
 
-            {/* Campus Map */}
-            <Pressable
-              style={({ pressed }) => [
-                styles.cardWrapper,
-                pressed && styles.cardPressed,
+          {/* Campus Map - Medium */}
+          <Pressable
+            style={({ pressed }) => [
+              styles.cardWrapperMedium,
+              pressed && styles.cardPressed,
+            ]}
+            onPress={() => router.push('/campus-map')}
+          >
+            <View
+              style={[
+                styles.cardInnerGlass,
+                USE_EXPERIMENTAL_CARD_COLORS && {
+                  backgroundColor: experimentalCardColors[1],
+                },
               ]}
-              onPress={() => router.push('/campus-map')}
             >
-              <BlurView intensity={40} tint="light" style={styles.cardBlur}>
-                <View style={styles.cardInnerGlass}>
-                  <GlobalText style={styles.cardText}>Campus Map</GlobalText>
-                </View>
-              </BlurView>
-            </Pressable>
-          </View>
+              <GlobalText style={styles.cardTitle}>Campus Map</GlobalText>
+              <GlobalText style={styles.cardDescription}>
+                Navigate buildings and facilities.
+              </GlobalText>
+            </View>
+          </Pressable>
 
-          <View style={styles.cardRow}>
-            {/* Join a group */}
-            <Pressable
-              style={({ pressed }) => [
-                styles.cardWrapper,
-                pressed && styles.cardPressed,
+          {/* Join a group - Medium */}
+          <Pressable
+            style={({ pressed }) => [
+              styles.cardWrapperMedium,
+              pressed && styles.cardPressed,
+            ]}
+            onPress={() => router.push('/groups')}
+          >
+            <View
+              style={[
+                styles.cardInnerGlass,
+                USE_EXPERIMENTAL_CARD_COLORS && {
+                  backgroundColor: experimentalCardColors[2],
+                },
               ]}
-              onPress={() => router.push('/groups')}
             >
-              <BlurView intensity={40} tint="light" style={styles.cardBlur}>
-                <View style={styles.cardInnerGlass}>
-                  <GlobalText style={styles.cardText}>Join a group</GlobalText>
-                </View>
-              </BlurView>
-            </Pressable>
+              <GlobalText style={styles.cardTitle}>Join a Group</GlobalText>
+              <GlobalText style={styles.cardDescription}>
+                Connect with student organizations.
+              </GlobalText>
+            </View>
+          </Pressable>
 
-            {/* Reserve a study room */}
-            <Pressable
-              style={({ pressed }) => [
-                styles.cardWrapper,
-                pressed && styles.cardPressed,
+          {/* Reserve a study room - Medium */}
+          <Pressable
+            style={({ pressed }) => [
+              styles.cardWrapperMedium,
+              pressed && styles.cardPressed,
+            ]}
+            onPress={() => router.push('/studyrooms')}
+          >
+            <View
+              style={[
+                styles.cardInnerGlass,
+                USE_EXPERIMENTAL_CARD_COLORS && {
+                  backgroundColor: experimentalCardColors[3],
+                },
               ]}
-              onPress={() => router.push('/studyrooms')}
             >
-              <BlurView intensity={40} tint="light" style={styles.cardBlur}>
-                <View style={styles.cardInnerGlass}>
-                  <GlobalText style={styles.cardText}>
-                    Reserve a study room
-                  </GlobalText>
-                </View>
-              </BlurView>
-            </Pressable>
-          </View>
+              <GlobalText style={styles.cardTitle}>Study Rooms</GlobalText>
+              <GlobalText style={styles.cardDescription}>
+                Reserve spaces for studying.
+              </GlobalText>
+            </View>
+          </Pressable>
 
           {/* Today's events – also glassy */}
           <BlurView intensity={40} tint="light" style={styles.todayBlur}>
@@ -177,6 +208,27 @@ const styles = StyleSheet.create({
     borderRadius: 32,
     overflow: 'hidden', // important so blur/gradient stay rounded
   },
+  cardWrapperFull: {
+    width: '100%',
+    height: 120,
+    borderRadius: 32,
+    overflow: 'hidden',
+    marginBottom: 16,
+  },
+  cardWrapperMedium: {
+    width: '100%',
+    height: 100,
+    borderRadius: 32,
+    overflow: 'hidden',
+    marginBottom: 16,
+  },
+  cardWrapperShort: {
+    width: '100%',
+    height: 60,
+    borderRadius: 32,
+    overflow: 'hidden',
+    marginBottom: 16,
+  },
   cardBlur: {
     flex: 1,
   },
@@ -208,6 +260,25 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#111827',
     textAlign: 'center',
+  },
+  cardTextWhite: {
+    fontSize: 18,
+    fontWeight: '900',
+    color: '#000000ff',
+    textAlign: 'center',
+  },
+  cardTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    fontFamily: 'Inter_700Bold',
+    color: '#FFFFFF',
+    marginBottom: 4,
+  },
+  cardDescription: {
+    fontSize: 15,
+    fontWeight: '400',
+    color: '#FFFFFF',
+    opacity: 0.9,
   },
 
   todayBlur: {
@@ -254,18 +325,29 @@ const styles = StyleSheet.create({
   },
   cardInnerGlass: {
     flex: 1,
-    borderRadius: 15,
+    borderRadius: 32,
     justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.75)',
+    alignItems: 'flex-start',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.85)',
+    borderColor: 'rgba(255,255,255,0.3)',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 5,
     elevation: 3,
     overflow: 'hidden',
-    padding: 0,
+    paddingHorizontal: 24,
+    paddingVertical: 16,
+  },
+  // Temporary experimental accent strip for trial colors
+  cardAccentTrial: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 14,
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15,
+    opacity: 0.9,
   },
 });

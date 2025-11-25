@@ -12,7 +12,7 @@ import LoadingScreen from '@/components/LoadingScreen';
 import { PreferencesProvider } from '@/hooks/PreferencesContext';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
-// ✅ Import Lora fonts
+
 import {
   Inter_400Regular,
   Inter_700Bold,

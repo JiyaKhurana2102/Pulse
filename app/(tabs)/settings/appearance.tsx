@@ -3,13 +3,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import {
-  Alert,
   Animated,
   LayoutChangeEvent,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 
 // --- COLORS ---
@@ -217,6 +216,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'transparent',
+    paddingTop: 100,
     paddingBottom: 200, // your chosen padding
     alignItems: 'center',
     justifyContent: 'center',
