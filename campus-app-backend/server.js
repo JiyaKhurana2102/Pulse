@@ -9,6 +9,8 @@ require('dotenv').config(); // Load .env variables
 const authRoutes = require('./routes/auth');
 const groupRoutes = require('./routes/groups');
 const eventRoutes = require('./routes/events');
+const chatRoutes = require('./routes/chat');
+
 
 const app = express();
 
