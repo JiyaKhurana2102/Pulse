@@ -55,3 +55,7 @@ React Native specific
 
 /temp
 /build
+
+# .gitignore
+serviceAccountKey1.json
+.env
