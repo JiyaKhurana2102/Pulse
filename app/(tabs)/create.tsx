@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
     shadowRadius: 20,
     shadowOffset: { width: 0, height: 10 },
   },
-  footerNote: { marginTop: 8, fontSize: 12, color: '#6B7280', fontFamily: 'Lora_400Regular' },
+  footerNote: { marginTop: 8, fontSize: 12, color: '#6B7280', fontFamily: 'Inter_400Regular' },
 
   container: { flex: 1, backgroundColor: 'transparent' },
   flex: { flex: 1 },
@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     elevation: 3,
   },
-  backButtonText: { color: TEXT_COLOR_WHITE, fontSize: 22, fontWeight: '600', fontFamily: 'Lora_400Regular' },
+  backButtonText: { color: TEXT_COLOR_WHITE, fontSize: 22, fontWeight: '600', fontFamily: 'Inter_400Regular' },
 
   messageOverlay: {
     position: 'absolute',
@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  messageText: { color: '#fff', fontSize: 16, fontWeight: '600', fontFamily: 'Lora_400Regular' },
+  messageText: { color: '#fff', fontSize: 16, fontWeight: '600', fontFamily: 'Inter_400Regular' },
 
   scrollContent: { paddingTop: 48, paddingBottom: 12 },
 
@@ -324,11 +324,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: TEXT_COLOR_DARK,
     marginBottom: 6,
-    fontFamily: 'Lora_400Regular',
+    fontFamily: 'Inter_400Regular',
   },
   titleDivider: { height: 1, width: '75%', alignSelf: 'center', marginBottom: 18, backgroundColor: ACCENT_COLOR_DARK + '80' },
 
-  label: { fontSize: 20, fontWeight: '300', marginBottom: 8, color: TEXT_COLOR_DARK, fontFamily: 'Lora_400Regular' },
+  label: { fontSize: 20, fontWeight: '300', marginBottom: 8, color: TEXT_COLOR_DARK, fontFamily: 'Inter_400Regular' },
 
   textArea: {
     width: '100%',
@@ -339,11 +339,11 @@ const styles = StyleSheet.create({
     borderColor: ACCENT_COLOR_DARK + '40',
     backgroundColor: ACCENT_COLOR_LIGHT + '60',
     marginBottom: 12,
-    fontFamily: 'Lora_400Regular',
+    fontFamily: 'Inter_400Regular',
   },
 
   toggleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10, marginTop: 8, borderRadius: 999, backgroundColor: ACCENT_COLOR_LIGHT, borderWidth: 1, borderColor: ACCENT_COLOR_DARK + '40' },
-  toggleLabel: { fontSize: 16, fontWeight: '600', color: TEXT_COLOR_DARK, fontFamily: 'Lora_400Regular' },
+  toggleLabel: { fontSize: 16, fontWeight: '600', color: TEXT_COLOR_DARK, fontFamily: 'Inter_400Regular' },
 
   mobileButton: {
     width: '100%',
@@ -358,13 +358,13 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(0,0,0,0.05)',
     elevation: 2,
   },
-  mobileButtonText: { fontSize: 18, fontWeight: '700', color: Brand.orange, fontFamily: 'Lora_700Bold' },
+  mobileButtonText: { fontSize: 18, fontWeight: '700', color: Brand.orange, fontFamily: 'Inter_700Bold' },
   buttonDisabled: { opacity: 0.5 },
   buttonPressed: { transform: [{ scale: 0.995 }] },
 
   selectionContainer: { flex: 1, alignItems: 'center', paddingTop: 28, paddingHorizontal: 22 },
-  pageTitle: { fontSize: 40, fontWeight: '300', marginTop: 36, marginBottom: 12, color: TEXT_COLOR_DARK, fontFamily: 'Lora_400Regular' },
-  pageSubtitle: { fontSize: 18, fontWeight: '300', marginBottom: 20, color: TEXT_COLOR_DARK, fontFamily: 'Lora_400Regular' },
+  pageTitle: { fontSize: 40, fontWeight: '300', marginTop: 36, marginBottom: 12, color: TEXT_COLOR_DARK, fontFamily: 'Inter_400Regular' },
+  pageSubtitle: { fontSize: 18, fontWeight: '300', marginBottom: 20, color: TEXT_COLOR_DARK, fontFamily: 'Inter_400Regular' },
 
   calendarCard: {
     marginTop: 18,
@@ -376,7 +376,7 @@ const styles = StyleSheet.create({
     elevation: 2,
     alignItems: 'center',
   },
-  calendarMonth: { fontSize: 18, fontWeight: '700', color: TEXT_COLOR_DARK, marginBottom: 12, fontFamily: 'Lora_700Bold' },
+  calendarMonth: { fontSize: 18, fontWeight: '700', color: TEXT_COLOR_DARK, marginBottom: 12, fontFamily: 'Inter_700Bold' },
 
   timeBubble: {
     borderRadius: 12,
@@ -386,5 +386,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  timeText: { color: Brand.orange, fontWeight: '700', fontSize: 18, fontFamily: 'Lora_700Bold' },
+  timeText: { color: Brand.orange, fontWeight: '700', fontSize: 18, fontFamily: 'Inter_700Bold' },
 });

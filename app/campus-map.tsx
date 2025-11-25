@@ -37,13 +37,13 @@ const styles = StyleSheet.create({
   },
   backButton: {
     fontSize: 18,
-    fontFamily: 'Lora_400Regular',
+    fontFamily: 'Inter_400Regular',
     color: '#1E1E1E',
     fontWeight: '600',
   },
   headerTitle: {
     fontSize: 22,
-    fontFamily: 'Lora_700Bold',
+    fontFamily: 'Inter_700Bold',
     color: '#1E1E1E',
     fontWeight: '700',
   },

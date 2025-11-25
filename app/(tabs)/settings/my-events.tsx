@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
     title: {
       fontSize: 28,
       fontWeight: '700',
-      fontFamily: 'Lora_700Bold',
+      fontFamily: 'Inter_700Bold',
       color: colors.darkTealAccent,
     },
     calendarHeader: {
@@ -289,7 +289,7 @@ const styles = StyleSheet.create({
     },
     dateTextToday: {
       fontWeight: '700',
-      fontFamily: 'Lora_700Bold',
+      fontFamily: 'Inter_700Bold',
     },
     eventDotsContainer: {
       position: 'absolute',
@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
     modalTitle: {
       fontSize: 22,
       fontWeight: '700',
-      fontFamily: 'Lora_700Bold',
+      fontFamily: 'Inter_700Bold',
       color: colors.darkText,
     },
     modalSubtitle: {
@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
       color: colors.white,
       fontSize: 16,
       fontWeight: '700',
-      fontFamily: 'Lora_700Bold',
+      fontFamily: 'Inter_700Bold',
       textAlign: 'center',
     },
 });

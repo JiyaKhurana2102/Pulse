@@ -31,7 +31,7 @@ export default function HomeScreen() {
         >
           {/* Header */}
           <View style={styles.header}>
-            <GlobalText style={styles.welcomeTitle}>Pulse</GlobalText>
+            <GlobalText style={styles.welcomeTitle}>Welcome</GlobalText>
             <GlobalText style={styles.subtitle}>
               Your campus. Your guide. Your Pulse.
             </GlobalText>
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
   welcomeTitle: {
     fontSize: 26,
     fontWeight: '700',
-    fontFamily: 'Lora_700Bold',
+    fontFamily: 'Inter_700Bold',
     color: '#111827',
     marginBottom: 4,
   },

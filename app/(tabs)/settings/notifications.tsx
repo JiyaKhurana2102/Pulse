@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '600',
     color: colors.darkTealAccent,
-    fontFamily: 'Lora_400Regular', // match settings font
+    fontFamily: 'Inter_400Regular', // match settings font
   },
   settingsList: {
     width: '100%',
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     color: colors.darkText,
     fontWeight: '400',
     flex: 1,
-    fontFamily: 'Lora_400Regular', // match settings font
+    fontFamily: 'Inter_400Regular', // match settings font
   },
   toggleTrack: {
     width: 50,

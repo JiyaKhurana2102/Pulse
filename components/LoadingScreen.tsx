@@ -1,5 +1,4 @@
 // components/LoadingScreen.tsx
-import { Brand } from '@/constants/theme';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Animated,
@@ -181,7 +180,7 @@ logoText: {
   fontWeight: '900',
   letterSpacing: 3,
   color: '#064E3B',
-  fontFamily: 'Lora_700Bold',   // ← NEW FONT
+  fontFamily: 'Inter_700Bold',   // switched to Inter
 },
 
 });

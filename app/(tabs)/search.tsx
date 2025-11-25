@@ -26,6 +26,6 @@ const styles = StyleSheet.create({
     text: {
         fontSize: 24,
       fontWeight: '700',
-      fontFamily: 'Lora_700Bold',
+      fontFamily: 'Inter_700Bold',
     },
 });

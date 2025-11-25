@@ -14,10 +14,10 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 
 // ✅ Import Lora fonts
 import {
-  Lora_400Regular,
-  Lora_700Bold,
+  Inter_400Regular,
+  Inter_700Bold,
   useFonts,
-} from '@expo-google-fonts/lora';
+} from '@expo-google-fonts/inter';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -29,8 +29,8 @@ export default function RootLayout() {
 
   // ✅ Load fonts BEFORE ANY UI shows
   const [fontsLoaded] = useFonts({
-    Lora_400Regular,
-    Lora_700Bold,
+    Inter_400Regular,
+    Inter_700Bold,
   });
 
   // 🚨 Prevent rendering UNTIL fonts load (important!)
@@ -43,13 +43,13 @@ export default function RootLayout() {
   (Text as any).defaultProps = (Text as any).defaultProps || {};
   (Text as any).defaultProps.style = [
     (Text as any).defaultProps.style,
-    { fontFamily: 'Lora_400Regular' },
+    { fontFamily: 'Inter_400Regular' },
   ];
 
   (TextInput as any).defaultProps = (TextInput as any).defaultProps || {};
   (TextInput as any).defaultProps.style = [
     (TextInput as any).defaultProps.style,
-    { fontFamily: 'Lora_400Regular' },
+    { fontFamily: 'Inter_400Regular' },
   ];
 
   // Show ONLY your custom loading screen until user taps it

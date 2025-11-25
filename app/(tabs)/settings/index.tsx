@@ -108,6 +108,6 @@ const styles = StyleSheet.create({
     color: '#111827',
     fontSize: 18,
     fontWeight: '600',
-    fontFamily: 'Lora_400Regular',
+    fontFamily: 'Inter_400Regular',
   },
 });

@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: '700',
-    fontFamily: 'Lora_700Bold',
+    fontFamily: 'Inter_700Bold',
     color: '#1A1A1A',
     marginBottom: 20,
   },
