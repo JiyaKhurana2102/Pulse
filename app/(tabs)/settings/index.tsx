@@ -14,8 +14,6 @@ const iconColors = ['#ff9966', '#b8e6b8', '#5cc4a4', '#f6a278'];
 const SettingsRoutes = {
   APPEARANCE: '/settings/appearance',
   NOTIFICATIONS: '/settings/notifications',
-  MY_EVENTS: '/settings/my-events',
-  MY_GROUPS: '/settings/my-groups',
   PROFILE: '/settings/profile',
 } as const;
 
@@ -78,8 +76,6 @@ export default function SettingsScreen() {
     >
       <SettingsButton iconName="sunny" label="Appearance" href={SettingsRoutes.APPEARANCE} iconColor={iconColors[0]} />
       <SettingsButton iconName="notifications" label="Notifications" href={SettingsRoutes.NOTIFICATIONS} iconColor={iconColors[1]} />
-      <SettingsButton iconName="calendar" label="My Events" href={SettingsRoutes.MY_EVENTS} iconColor={iconColors[2]} />
-      <SettingsButton iconName="people" label="My Groups" href={SettingsRoutes.MY_GROUPS} iconColor={iconColors[3]} />
       <SettingsButton iconName="person" label="Profile" href={SettingsRoutes.PROFILE} iconColor={iconColors[0]} />
       
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
