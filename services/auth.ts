@@ -1,29 +1,22 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_BASE } from '../constants/api';
 
 export interface User {
-  id: string;
+  uid: string;
   name: string;
   email: string;
-  password: string;
-  createdAt: string;
+  createdAt?: string;
 }
 
-const USERS_KEY = '@pulse_users';
+interface AuthResponse {
+  user: User;
+  idToken: string;
+  refreshToken: string;
+}
+
 const CURRENT_USER_KEY = '@pulse_current_user';
-
-async function loadUsers(): Promise<User[]> {
-  try {
-    const raw = await AsyncStorage.getItem(USERS_KEY);
-    if (!raw) return [];
-    return JSON.parse(raw);
-  } catch {
-    return [];
-  }
-}
-
-async function saveUsers(users: User[]): Promise<void> {
-  await AsyncStorage.setItem(USERS_KEY, JSON.stringify(users));
-}
+const AUTH_TOKEN_KEY = '@pulse_auth_token';
+const REFRESH_TOKEN_KEY = '@pulse_refresh_token';
 
 export async function getCurrentUser(): Promise<User | null> {
   try {
@@ -35,55 +28,72 @@ export async function getCurrentUser(): Promise<User | null> {
   }
 }
 
-export async function setCurrentUser(user: User | null): Promise<void> {
-  if (user) {
-    await AsyncStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
-  } else {
-    await AsyncStorage.removeItem(CURRENT_USER_KEY);
-  }
+export async function getAuthToken(): Promise<string | null> {
+  return await AsyncStorage.getItem(AUTH_TOKEN_KEY);
+}
+
+async function setAuthData(user: User, idToken: string, refreshToken: string): Promise<void> {
+  await AsyncStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+  await AsyncStorage.setItem(AUTH_TOKEN_KEY, idToken);
+  await AsyncStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+  await AsyncStorage.setItem('@pulse_user_id', user.uid);
+}
+
+async function clearAuthData(): Promise<void> {
+  await AsyncStorage.removeItem(CURRENT_USER_KEY);
+  await AsyncStorage.removeItem(AUTH_TOKEN_KEY);
+  await AsyncStorage.removeItem(REFRESH_TOKEN_KEY);
+  await AsyncStorage.removeItem('@pulse_user_id');
 }
 
 export async function login(email: string, password: string): Promise<User | null> {
-  const users = await loadUsers();
-  const user = users.find(u => u.email === email && u.password === password);
-  if (user) {
-    await setCurrentUser(user);
-    // Set the user ID for other services
-    await AsyncStorage.setItem('@pulse_user_id', user.id);
-    return user;
+  try {
+    const response = await fetch(`${API_BASE}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const data: AuthResponse = await response.json();
+    await setAuthData(data.user, data.idToken, data.refreshToken);
+    return data.user;
+  } catch (error) {
+    console.error('Login error:', error);
+    return null;
   }
-  return null;
 }
 
 export async function signup(name: string, email: string, password: string): Promise<User | null> {
-  const users = await loadUsers();
-  
-  // Check if email already exists
-  if (users.find(u => u.email === email)) {
+  try {
+    const response = await fetch(`${API_BASE}/auth/signup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, name }),
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const data: AuthResponse = await response.json();
+    await setAuthData(data.user, data.idToken, data.refreshToken);
+    
+    // Set profile name
+    await AsyncStorage.setItem('@pulse_profile', JSON.stringify({ name }));
+    
+    return data.user;
+  } catch (error) {
+    console.error('Signup error:', error);
     return null;
   }
-  
-  const newUser: User = {
-    id: `user_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
-    name,
-    email,
-    password,
-    createdAt: new Date().toISOString(),
-  };
-  
-  users.push(newUser);
-  await saveUsers(users);
-  await setCurrentUser(newUser);
-  await AsyncStorage.setItem('@pulse_user_id', newUser.id);
-  
-  // Set profile name
-  await AsyncStorage.setItem('@pulse_profile', JSON.stringify({ name }));
-  
-  return newUser;
 }
 
 export async function logout(): Promise<void> {
-  await setCurrentUser(null);
+  await clearAuthData();
 }
 
 export async function isLoggedIn(): Promise<boolean> {
@@ -91,18 +101,7 @@ export async function isLoggedIn(): Promise<boolean> {
   return user !== null;
 }
 
-// Seed the default test user if no users exist
+// No longer needed with backend
 export async function seedDefaultUser(): Promise<void> {
-  const users = await loadUsers();
-  if (users.length === 0) {
-    const testUser: User = {
-      id: 'user_test_default',
-      name: 'Student',
-      email: 'test@email.com',
-      password: 'Om123',
-      createdAt: new Date().toISOString(),
-    };
-    users.push(testUser);
-    await saveUsers(users);
-  }
+  // Backend handles user creation
 }

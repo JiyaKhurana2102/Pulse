@@ -59,7 +59,8 @@ const EventsScreen: React.FC = () => {
   };
 
   const handleToggleSave = async (event: EventRecord) => {
-    const isSaved = event.savedBy.includes(userId);
+    const savedByArray = event.savedBy || event.attendees || [];
+    const isSaved = savedByArray.includes(userId);
     if (isSaved) {
       Alert.alert('Unsave Event', `Remove "${event.name}" from My Events?`, [
         { text: 'Cancel', style: 'cancel' },
@@ -113,7 +114,8 @@ const EventsScreen: React.FC = () => {
 
           {!loading &&
             filteredEvents.map(event => {
-              const isSaved = event.savedBy.includes(userId);
+              const savedByArray = event.savedBy || event.attendees || [];
+              const isSaved = savedByArray.includes(userId);
               const eventDate = new Date(event.date);
               return (
                 <View key={event.id} style={styles.eventCard}>
@@ -159,7 +161,7 @@ const EventsScreen: React.FC = () => {
                   <View style={styles.eventMeta}>
                     <Ionicons name="person-outline" size={14} color="#7A9A8A" />
                     <Text style={styles.eventMetaText}>
-                      {event.savedBy.length} saved
+                      {savedByArray.length} saved
                     </Text>
                   </View>
                 </View>

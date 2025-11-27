@@ -11,7 +11,7 @@ import { GlobalEffects } from '@/components/GlobalEffects';
 import LoadingScreen from '@/components/LoadingScreen';
 import { PreferencesProvider } from '@/hooks/PreferencesContext';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { isLoggedIn, seedDefaultUser } from '@/services/auth';
+import { isLoggedIn } from '@/services/auth';
 
 
 import {
@@ -42,9 +42,6 @@ export default function RootLayout() {
     if (!splashDismissed || !fontsLoaded) return;
 
     const checkAuth = async () => {
-      // Seed the default test user
-      await seedDefaultUser();
-      
       const loggedIn = await isLoggedIn();
       setAuthChecked(true);
 

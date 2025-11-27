@@ -9,7 +9,7 @@ require('dotenv').config(); // Load .env variables
 const authRoutes = require('./routes/auth');
 const groupRoutes = require('./routes/groups');
 const eventRoutes = require('./routes/events');
-const chatRoutes = require('./routes/chat');
+// const chatRoutes = require('./routes/chat'); // Not needed for basic functionality
 
 
 const app = express();
@@ -130,4 +130,7 @@ app.post('/groups', async (req, res) => {
 // Start server
 // -------------------
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Access from device: Run 'ipconfig' to find your IP, then use http://YOUR_IP:${PORT}`);
+});

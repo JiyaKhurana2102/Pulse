@@ -1,0 +1,3 @@
+// Copy this file to api.local.ts and add your IP address
+// api.local.ts is git-ignored so your IP won't be committed
+export const API_BASE = 'http://YOUR_IP_HERE:8080';

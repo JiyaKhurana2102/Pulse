@@ -4,14 +4,14 @@ const admin = require('firebase-admin');
 const createEvent = async (req, res) => {
   try {
     const db = req.app.locals.db;
-    const { title, description, group, date } = req.body;
+    const { name, description, group, date, time, location, category, userId } = req.body;
 
     // Validate fields
     if (!group || typeof group !== 'string' || group.trim() === "") {
       return res.status(400).json({ error: "Missing or invalid group ID" });
     }
 
-    if (!title || !description || !date) {
+    if (!name || !description || !date) {
       return res.status(400).json({ error: "Missing required event fields" });
     }
 
@@ -21,13 +21,28 @@ const createEvent = async (req, res) => {
       return res.status(404).json({ error: 'Group not found' });
     }
 
-    // Add event
+    // Auto-join user to group if they're not already a member (so they can RSVP)
+    if (userId) {
+      const groupData = groupDoc.data();
+      if (!groupData.members.includes(userId)) {
+        await db.collection('groups').doc(group).update({
+          members: admin.firestore.FieldValue.arrayUnion(userId)
+        });
+      }
+    }
+
+    // Add event with all fields
     const newEventRef = await db.collection('events').add({
-      title,
+      name,
       description,
       group,
       date,
-      attendees: []
+      time: time || '',
+      location: location || '',
+      category: category || 'Other',
+      attendees: [],
+      createdBy: userId || '',
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
     // Add event to group's event list

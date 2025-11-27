@@ -1,9 +1,9 @@
 import { createEvent } from '@/services/events';
-import { createGroup, getUserId, joinGroup } from '@/services/groups';
+import { createGroup, getUserId, GroupRecord, joinGroup, listGroups } from '@/services/groups';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Dimensions,
   KeyboardAvoidingView,
@@ -171,6 +171,25 @@ const NewEventForm = ({ onBack }: { onBack: () => void }) => {
   const [message, setMessage] = useState<string | null>(null);
   const [date, setDate] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
+  const [groups, setGroups] = useState<GroupRecord[]>([]);
+  const [selectedGroup, setSelectedGroup] = useState<GroupRecord | null>(null);
+  const [showGroupPicker, setShowGroupPicker] = useState(false);
+
+  useEffect(() => {
+    loadGroups();
+  }, []);
+
+  const loadGroups = async () => {
+    try {
+      const allGroups = await listGroups();
+      setGroups(allGroups);
+      if (allGroups.length > 0 && !selectedGroup) {
+        setSelectedGroup(allGroups[0]);
+      }
+    } catch (error) {
+      console.error('Failed to load groups:', error);
+    }
+  };
 
   const handleScheduleEvent = async () => {
     try {
@@ -179,11 +198,17 @@ const NewEventForm = ({ onBack }: { onBack: () => void }) => {
         setTimeout(() => setMessage(null), 1500);
         return;
       }
+      if (!selectedGroup) {
+        setMessage('Please select a group');
+        setTimeout(() => setMessage(null), 1500);
+        return;
+      }
       await createEvent(
         eventName.trim(),
         description.trim(),
         date,
-        undefined, // groupName
+        selectedGroup.id, // groupId (required for backend)
+        selectedGroup.name, // groupName for display
         location.trim() || undefined,
         undefined  // category
       );
@@ -237,6 +262,17 @@ const NewEventForm = ({ onBack }: { onBack: () => void }) => {
                 style={styles.cardInput}
               />
             </View>
+            
+            <TouchableOpacity
+              onPress={() => setShowGroupPicker(true)}
+              style={[styles.cardContainerThin, { backgroundColor: '#9b87f5' }]}
+            >
+              <Ionicons name="people" size={28} color="#fff" style={styles.cardIcon} />
+              <Text style={styles.cardDateText}>
+                {selectedGroup ? selectedGroup.name : 'Select Group'}
+              </Text>
+            </TouchableOpacity>
+
             <View style={[styles.cardContainerThin, { backgroundColor: '#b8e6b8' }]}>
               <Ionicons name="location" size={28} color="#fff" style={styles.cardIcon} />
               <TextInput
@@ -295,6 +331,34 @@ const NewEventForm = ({ onBack }: { onBack: () => void }) => {
                 />
               </View>
               <Pressable onPress={() => setShowPicker(false)} style={styles.datePickerDone}>
+                <Text style={styles.datePickerDoneText}>Done</Text>
+              </Pressable>
+            </View>
+          )}
+
+          {showGroupPicker && (
+            <View style={styles.datePickerOverlay}>
+              <View style={styles.datePickerInner}>
+                <Text style={styles.pickerTitle}>Select Group</Text>
+                <ScrollView style={styles.groupPickerScroll}>
+                  {groups.map((group) => (
+                    <TouchableOpacity
+                      key={group.id}
+                      onPress={() => {
+                        setSelectedGroup(group);
+                        setShowGroupPicker(false);
+                      }}
+                      style={[
+                        styles.groupPickerItem,
+                        selectedGroup?.id === group.id && styles.groupPickerItemSelected,
+                      ]}
+                    >
+                      <Text style={styles.groupPickerItemText}>{group.name}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+              <Pressable onPress={() => setShowGroupPicker(false)} style={styles.datePickerDone}>
                 <Text style={styles.datePickerDoneText}>Done</Text>
               </Pressable>
             </View>
@@ -825,5 +889,31 @@ const styles = StyleSheet.create({
   },
   categoryChipTextSelected: {
     fontFamily: 'Inter_700Bold',
+  },
+  pickerTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#111827',
+    marginBottom: 16,
+    fontFamily: 'Inter_700Bold',
+    textAlign: 'center',
+  },
+  groupPickerScroll: {
+    maxHeight: 300,
+    width: '100%',
+  },
+  groupPickerItem: {
+    padding: 16,
+    borderRadius: 12,
+    backgroundColor: '#F3F4F6',
+    marginBottom: 8,
+  },
+  groupPickerItemSelected: {
+    backgroundColor: '#9b87f5',
+  },
+  groupPickerItemText: {
+    fontSize: 16,
+    fontFamily: 'Inter_600SemiBold',
+    color: '#111827',
   },
 });

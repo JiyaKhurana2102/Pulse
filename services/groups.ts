@@ -1,8 +1,9 @@
 import { API_BASE } from '@/constants/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getAuthToken } from './auth';
 
-// Set to true to use purely local AsyncStorage persistence (no backend required)
-const LOCAL_MODE = true;
+// Set to false to use backend
+const LOCAL_MODE = false;
 
 export interface GroupRecord {
   id: string;
@@ -13,26 +14,30 @@ export interface GroupRecord {
   category?: string;
 }
 
-const USER_ID_KEY = 'userId';
-
 export async function getUserId(): Promise<string> {
-  let id = await AsyncStorage.getItem(USER_ID_KEY);
-  if (!id) {
-    id = 'u_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
-    await AsyncStorage.setItem(USER_ID_KEY, id);
-  }
+  const id = await AsyncStorage.getItem('@pulse_user_id');
+  if (!id) throw new Error('User not authenticated');
   return id;
+}
+
+async function getAuthHeaders(): Promise<HeadersInit> {
+  const token = await getAuthToken();
+  return {
+    'Content-Type': 'application/json',
+    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+  };
 }
 
 export async function listGroups(): Promise<GroupRecord[]> {
   if (!LOCAL_MODE) {
-    const res = await fetch(`${API_BASE}/groups`);
+    const res = await fetch(`${API_BASE}/groups`, {
+      headers: await getAuthHeaders(),
+    });
     if (!res.ok) throw new Error('Failed to list groups');
     return res.json();
   }
   const raw = await AsyncStorage.getItem('groups');
   const list: GroupRecord[] = raw ? JSON.parse(raw) : [];
-  // migrate missing category to 'Other'
   const migrated = list.map(g => ({ ...g, category: g.category || 'Other' }));
   if (JSON.stringify(list) !== JSON.stringify(migrated)) {
     await AsyncStorage.setItem('groups', JSON.stringify(migrated));
@@ -44,7 +49,7 @@ export async function createGroup(name: string, description: string, category: s
   if (!LOCAL_MODE) {
     const res = await fetch(`${API_BASE}/groups`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: await getAuthHeaders(),
       body: JSON.stringify({ name, description, category }),
     });
     if (!res.ok) throw new Error('Failed to create group');
@@ -63,7 +68,7 @@ export async function joinGroup(groupId: string, userId: string): Promise<void> 
   if (!LOCAL_MODE) {
     const res = await fetch(`${API_BASE}/groups/${groupId}/join`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: await getAuthHeaders(),
       body: JSON.stringify({ userId }),
     });
     if (!res.ok) throw new Error('Failed to join group');
@@ -79,7 +84,6 @@ export async function joinGroup(groupId: string, userId: string): Promise<void> 
   await AsyncStorage.setItem('groups', JSON.stringify(updated));
 }
 
-// Utility to get only groups the user has joined (local mode helper)
 export async function listUserGroups(userId: string): Promise<GroupRecord[]> {
   const groups = await listGroups();
   return groups.filter(g => g.members.includes(userId));
@@ -87,9 +91,8 @@ export async function listUserGroups(userId: string): Promise<GroupRecord[]> {
 
 export async function leaveGroup(groupId: string, userId: string): Promise<void> {
   if (!LOCAL_MODE) {
-    // For future backend mode, implement DELETE or POST /leave
+    // Backend doesn't have leave endpoint yet, filter locally after fetch
     const groups = await listGroups();
-    // no-op server call placeholder
     return;
   }
   const groups = await listGroups();

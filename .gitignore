@@ -51,11 +51,17 @@ generated native folders
 /ios
 /android
 
-React Native specific
+# React Native specific
 
 /temp
 /build
 
-# .gitignore
-serviceAccountKey1.json
+# Backend credentials and secrets
+campus-app-backend/serviceAccountKey1.json
+campus-app-backend/.env
+*.json.key
+serviceAccountKey*.json
 .env
+
+# Local API configuration (each developer sets their own IP)
+constants/api.local.ts
