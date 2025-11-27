@@ -36,7 +36,7 @@ export async function setProfile(p: Profile): Promise<void> {
     const usersRaw = await AsyncStorage.getItem('@pulse_users');
     if (usersRaw) {
       const users = JSON.parse(usersRaw);
-      const index = users.findIndex((u: any) => u.id === user.id);
+      const index = users.findIndex((u: any) => u.uid === user.uid);
       if (index >= 0) {
         users[index] = user;
         await AsyncStorage.setItem('@pulse_users', JSON.stringify(users));
