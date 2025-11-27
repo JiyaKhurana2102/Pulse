@@ -28,11 +28,11 @@ export default function TabLayout() {
 
         tabBarStyle: {
           position: 'absolute',
-          left: 5,
-          right: 5,
-          bottom: 30,
-          height: 40,
-          borderRadius: 24,
+          left: 20,
+          right: 20,
+          bottom: 0,
+          height: 60,
+          borderRadius: 30,
           borderTopWidth: 0,
           backgroundColor: 'transparent',
           elevation: 12,
@@ -43,7 +43,7 @@ export default function TabLayout() {
         },
 
         tabBarBackground: () => (
-          <BlurView intensity={50} tint="light" style={[StyleSheet.absoluteFill, { borderRadius: 24 }]}> 
+          <BlurView intensity={50} tint="light" style={[StyleSheet.absoluteFill, { borderRadius: 30 }]}> 
             <View style={styles.pillOverlay} pointerEvents="none" />
           </BlurView>
         ),
@@ -90,10 +90,10 @@ export default function TabLayout() {
       })}
     >
       <Tabs.Screen name="index" options={{ title: 'Home' }} />
-      <Tabs.Screen name="settings" options={{ title: 'Settings' }} />
       <Tabs.Screen name="create" options={{ title: 'Add' }} />
       <Tabs.Screen name="search" options={{ title: 'Search' }} />
       <Tabs.Screen name="messages" options={{ title: 'Chatbox' }} />
+      <Tabs.Screen name="settings" options={{ title: 'Settings' }} />
       {/* modal is provided by root Stack at app/_layout.tsx; remove from tabs to avoid duplicate route warnings */}
     </Tabs>
   );
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
   },
   pillOverlay: {
     ...StyleSheet.absoluteFillObject,
-    borderRadius: 24,
+    borderRadius: 30,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.85)',
     backgroundColor: 'rgba(255,255,255,0.42)',

@@ -24,7 +24,7 @@ export default function HomeScreen() {
     <LinearGradient
       // match settings screen: soft multi-stop warm gradient
       colors={['#FFFFFF', '#FFF7ED', '#FED7AA', '#D1FAE5', '#ECFEFF', '#FFFFFF']}
-      locations={[0, 0.2, 0.4, 0.6, 0.8, 1]}
+      locations={[0, 0.1, 0.35, 0.55, 0.75, 1]}
       start={{ x: 0.5, y: 0 }}
       end={{ x: 0.5, y: 1 }}
       style={styles.gradient}
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: 24,
-    paddingTop: 32,
+    paddingTop: 25,
     paddingBottom: 24,
   },
 
@@ -277,25 +277,27 @@ const styles = StyleSheet.create({
   cardDescription: {
     fontSize: 15,
     fontWeight: '400',
-    color: '#FFFFFF',
+    color: '#ffffffff',
     opacity: 0.9,
   },
 
   todayBlur: {
-    marginTop: 24,
+    marginTop: 2,
     borderRadius: 32,
     overflow: 'hidden',
   },
   todayCard: {
     padding: 20,
     borderRadius: 32,
-    backgroundColor: 'rgba(255,255,255,0.4)',
+    backgroundColor: 'rgba(84, 169, 32, 0.54)',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.85)',
   },
   todayTitle: {
-    fontSize: 18,
-    color: '#111827',
+    fontSize: 22,
+    fontWeight: '700',
+    fontFamily: 'Inter_700Bold',
+    color: '#ffffffff',
     marginBottom: 16,
   },
   eventItem: {
@@ -309,18 +311,18 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     marginTop: 6,
     marginRight: 8,
-    backgroundColor: '#0F766E',
+    backgroundColor: '#af7a4eff',
   },
   eventTextBlock: {
     flex: 1,
   },
   eventTitle: {
     fontSize: 14,
-    color: '#111827',
+    color: '#ffffffff',
   },
   eventTime: {
     fontSize: 15,
-    color: '#4B5563',
+    color: '#ffffffff',
     marginTop: 2,
   },
   cardInnerGlass: {

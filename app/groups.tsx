@@ -44,15 +44,8 @@ const GroupsScreen: React.FC = () => {
   return (
     <SafeAreaView style={{ ...styles.safe, backgroundColor: 'transparent' }}>
       <ScrollView contentContainerStyle={styles.content}>
-        {/* Header + back button */}
+        {/* Header */}
         <View style={styles.headerRow}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => router.back()}
-            activeOpacity={0.7}
-          >
-            <Ionicons name="chevron-back" size={24} color="#5A9A7A" />
-          </TouchableOpacity>
           <Text style={styles.headerTitle}>Join a Group</Text>
         </View>
 
@@ -151,31 +144,23 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   headerRow: {
-    flexDirection: 'row',
+    marginBottom: 32,
     alignItems: 'center',
-    marginBottom: 16,
-  },
-  backButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 16,
-    backgroundColor: '#9BD9C3',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#2D4A3A',
+    fontSize: 26,
+    fontFamily: 'Inter_700Bold',
+    fontWeight: '700',
+    color: '#111827',
+    marginBottom: 4,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#B5D4C5',
+    backgroundColor: '#b8e6b8',
     borderRadius: 999,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
     marginBottom: 24,
   },
   searchIcon: {
@@ -185,45 +170,47 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 4,
     fontSize: 16,
-    color: '#2D4A3A',
+    color: '#1F2937',
+    fontFamily: 'Inter_400Regular',
   },
   section: {
     marginBottom: 24,
   },
   sectionTitle: {
-    fontSize: 16,
-    color: '#2D4A3A',
+    fontSize: 18,
+    color: '#111827',
     marginBottom: 12,
-    fontWeight: '600',
+    fontFamily: 'Inter_700Bold',
   },
   categoryRow: {
     gap: 8,
     paddingRight: 8,
   },
   categoryChip: {
-    paddingHorizontal: 14,
+    paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 999,
-    backgroundColor: '#9BD9C3',
+    backgroundColor: '#f6a278',
   },
   categoryChipSelected: {
-    backgroundColor: '#7BC87B',
+    backgroundColor: '#ff9966',
   },
   categoryText: {
     fontSize: 14,
-    color: '#2D4A3A',
+    color: '#FFFFFF',
+    fontFamily: 'Inter_400Regular',
   },
   categoryTextSelected: {
     color: '#FFFFFF',
-    fontWeight: '600',
+    fontFamily: 'Inter_700Bold',
   },
   groupsList: {
     gap: 10,
   },
   groupCard: {
-    backgroundColor: '#9BD9C3',
-    borderRadius: 18,
-    padding: 12,
+    backgroundColor: '#5cc4a4',
+    borderRadius: 24,
+    padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -234,39 +221,41 @@ const styles = StyleSheet.create({
   },
   groupName: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#2D4A3A',
+    fontFamily: 'Inter_700Bold',
+    color: '#FFFFFF',
   },
   groupMeta: {
     fontSize: 13,
-    color: '#5A9A7A',
-    marginTop: 2,
+    color: 'rgba(255,255,255,0.85)',
+    marginTop: 4,
+    fontFamily: 'Inter_400Regular',
   },
   joinButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingHorizontal: 18,
+    paddingVertical: 10,
     borderRadius: 999,
-    backgroundColor: '#7BC87B',
+    backgroundColor: '#ff9966',
   },
   joinButtonText: {
     color: '#FFFFFF',
-    fontWeight: '600',
+    fontFamily: 'Inter_700Bold',
     fontSize: 14,
   },
   emptyState: {
-    backgroundColor: '#B5D4C5',
-    borderRadius: 18,
-    padding: 16,
+    backgroundColor: '#b8e6b8',
+    borderRadius: 24,
+    padding: 20,
   },
   emptyTitle: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#2D4A3A',
-    marginBottom: 4,
+    fontSize: 16,
+    fontFamily: 'Inter_700Bold',
+    color: '#1F2937',
+    marginBottom: 6,
   },
   emptySubtitle: {
     fontSize: 13,
-    color: '#5A9A7A',
+    color: '#374151',
+    fontFamily: 'Inter_400Regular',
   },
 });
 

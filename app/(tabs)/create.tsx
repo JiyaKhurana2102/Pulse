@@ -1,4 +1,3 @@
-import { Brand } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -12,6 +11,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -28,6 +28,7 @@ const TEXT_COLOR_WHITE = '#FFFFFF';
 
 // match Settings accent color
 const SETTINGS_ACCENT_COLOR = '#46e0e0ff';
+const createCardColors = ['#ff9966', '#b8e6b8'];
 
 // --- SCREENS ---
 const SCREENS = {
@@ -81,7 +82,7 @@ const NewGroupForm = ({ onBack }: { onBack: () => void }) => {
         <View style={styles.innerContainer}>
           {/* Back Button */}
           <Pressable onPress={onBack} style={styles.backButton}>
-            <Ionicons name="arrow-back" size={28} color={SETTINGS_ACCENT_COLOR} />
+            <Ionicons name="arrow-back" size={28} color="#fff" />
           </Pressable>
 
           {message && (
@@ -94,31 +95,35 @@ const NewGroupForm = ({ onBack }: { onBack: () => void }) => {
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
           >
-            <TextInput
-              value={groupName}
-              onChangeText={setGroupName}
-              placeholder="(Group Name)"
-              placeholderTextColor="#6B7280"
-              style={styles.titleInput}
-            />
+            <View style={[styles.cardContainerThin, { backgroundColor: '#ff9966' }]}>
+              <Ionicons name="people" size={28} color="#fff" style={styles.cardIcon} />
+              <TextInput
+                value={groupName}
+                onChangeText={setGroupName}
+                placeholder="Group Name"
+                placeholderTextColor="rgba(255,255,255,0.7)"
+                style={styles.cardInput}
+              />
+            </View>
 
-            <View style={styles.titleDivider} />
+            <View style={[styles.cardContainer, { backgroundColor: '#b8e6b8' }]}>
+              <Ionicons name="document-text" size={28} color="#fff" style={styles.cardIcon} />
+              <TextInput
+                value={description}
+                onChangeText={setDescription}
+                placeholder="Group description"
+                placeholderTextColor="rgba(255,255,255,0.7)"
+                multiline
+                numberOfLines={4}
+                style={[styles.cardInput, styles.cardTextArea]}
+                textAlignVertical="top"
+              />
+            </View>
 
-            <Text style={styles.label}>Group description</Text>
-            <TextInput
-              value={description}
-              onChangeText={setDescription}
-              placeholder=""
-              multiline
-              numberOfLines={4}
-              style={styles.textArea}
-              textAlignVertical="top"
-            />
+            <MobileButton onPress={handleCreateGroup} disabled={!!message} style={styles.formActionWideSpaced}>
+              Create Group
+            </MobileButton>
           </ScrollView>
-
-          <MobileButton onPress={handleCreateGroup} disabled={!!message}>
-            Create Group
-          </MobileButton>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -127,6 +132,7 @@ const NewGroupForm = ({ onBack }: { onBack: () => void }) => {
 
 /* --- New Event Form --- */
 const NewEventForm = ({ onBack }: { onBack: () => void }) => {
+  const [groupNameEvent, setGroupNameEvent] = useState('');
   const [eventName, setEventName] = useState('');
   const [description, setDescription] = useState('');
   const [message, setMessage] = useState<string | null>(null);
@@ -142,7 +148,9 @@ const NewEventForm = ({ onBack }: { onBack: () => void }) => {
   };
 
   const onChange = (event: any, selectedDate?: Date) => {
-    setShowPicker(Platform.OS === 'ios');
+    if (Platform.OS === 'android') {
+      setShowPicker(false);
+    }
     if (selectedDate) setDate(selectedDate);
   };
 
@@ -155,7 +163,7 @@ const NewEventForm = ({ onBack }: { onBack: () => void }) => {
         <View style={styles.innerContainer}>
           {/* Back Button */}
           <Pressable onPress={onBack} style={styles.backButton}>
-            <Ionicons name="arrow-back" size={28} color={SETTINGS_ACCENT_COLOR} />
+            <Ionicons name="arrow-back" size={28} color="#fff" />
           </Pressable>
 
           {message && (
@@ -168,53 +176,79 @@ const NewEventForm = ({ onBack }: { onBack: () => void }) => {
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
           >
-            <TextInput
-              value={eventName}
-              onChangeText={setEventName}
-              placeholder="(Event Name)"
-              placeholderTextColor="#6B7280"
-              style={styles.titleInput}
-            />
+            <View style={[styles.cardContainerThin, { backgroundColor: '#ff9966' }]}>
+              <Ionicons name="calendar" size={28} color="#fff" style={styles.cardIcon} />
+              <TextInput
+                value={eventName}
+                onChangeText={setEventName}
+                placeholder="Event Name"
+                placeholderTextColor="rgba(255,255,255,0.7)"
+                style={styles.cardInput}
+              />
+            </View>
+            <View style={[styles.cardContainerThin, { backgroundColor: '#b8e6b8' }]}>
+              <Ionicons name="people" size={28} color="#fff" style={styles.cardIcon} />
+              <TextInput
+                value={groupNameEvent}
+                onChangeText={setGroupNameEvent}
+                placeholder="Group Name"
+                placeholderTextColor="rgba(255,255,255,0.7)"
+                style={styles.cardInput}
+              />
+            </View>
 
-            <View style={styles.titleDivider} />
+            <View style={[styles.cardContainer, { backgroundColor: '#f6a278' }]}>
+              <Ionicons name="document-text" size={28} color="#fff" style={styles.cardIcon} />
+              <TextInput
+                value={description}
+                onChangeText={setDescription}
+                placeholder="Event description"
+                placeholderTextColor="rgba(255,255,255,0.7)"
+                multiline
+                numberOfLines={4}
+                style={[styles.cardInput, styles.cardTextArea]}
+                textAlignVertical="top"
+              />
+            </View>
 
-            <Text style={styles.label}>Event description</Text>
-            <TextInput
-              value={description}
-              onChangeText={setDescription}
-              placeholder=""
-              multiline
-              numberOfLines={3}
-              style={styles.textArea}
-              textAlignVertical="top"
-            />
-
-            {/* --- Calendar Card --- */}
-            <View style={styles.calendarCard}>
-              <Text style={styles.calendarMonth}>Select Date & Time</Text>
-
-              <Pressable onPress={() => setShowPicker(true)} style={styles.timeBubble}>
-                <Text style={[styles.timeText, { fontSize: 16 }]}>
-                  {date.toDateString()}{' '}
+            <TouchableOpacity
+              onPress={() => setShowPicker(true)}
+                style={[styles.cardContainerThin, { backgroundColor: '#5cc4a4' }]}
+            >
+              <Ionicons name="calendar" size={28} color="#fff" style={styles.cardIcon} />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.cardDateText}>
+                  {date.toDateString()}
+                </Text>
+                <Text style={[styles.cardDateText, { fontSize: 14, opacity: 0.9 }]}>
                   {date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </Text>
-              </Pressable>
+              </View>
+            </TouchableOpacity>
+            <MobileButton onPress={handleScheduleEvent} disabled={!!message} style={styles.formActionWideSpaced}>
+              Schedule Event
+            </MobileButton>
+          </ScrollView>
 
-              {showPicker && (
+          {showPicker && (
+            <View style={styles.datePickerOverlay}>
+              <View style={styles.datePickerInner}>
                 <DateTimePicker
                   value={date}
                   mode="datetime"
                   display={Platform.OS === 'ios' ? 'spinner' : 'default'}
                   onChange={onChange}
                   minimumDate={new Date()}
+                  textColor="#000000"
+                  style={Platform.OS === 'ios' ? styles.datePickerIOS : undefined}
                 />
-              )}
+              </View>
+              <Pressable onPress={() => setShowPicker(false)} style={styles.datePickerDone}>
+                <Text style={styles.datePickerDoneText}>Done</Text>
+              </Pressable>
             </View>
-          </ScrollView>
+          )}
 
-          <MobileButton onPress={handleScheduleEvent} disabled={!!message}>
-            Schedule Event
-          </MobileButton>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -226,26 +260,27 @@ interface CreateCardProps {
   iconName: keyof typeof Ionicons.glyphMap;
   label: string;
   onPress: () => void;
+  color: string;
 }
 
-const CreateCard: React.FC<CreateCardProps> = ({ iconName, label, onPress }) => (
+const CreateCard: React.FC<CreateCardProps> = ({ iconName, label, onPress, color }) => (
   <Pressable
     onPress={onPress}
     style={({ pressed }) => [
       styles.settingsCardContainer,
+      { backgroundColor: color },
       pressed && { transform: [{ scale: 0.98 }] },
     ]}
   >
     <Ionicons
       name={iconName}
       size={28}
-      color={SETTINGS_ACCENT_COLOR}
+      color="#fff"
       style={styles.settingsCardIcon}
     />
     <View style={styles.settingsCardTextWrapper}>
       <Text style={styles.settingsCardText}>{label}</Text>
     </View>
-    <Ionicons name="chevron-forward-outline" size={24} color="black" />
   </Pressable>
 );
 
@@ -257,14 +292,16 @@ const SelectionScreen = ({ navigate }: { navigate: (screen: (typeof SCREENS)[key
 
     <View style={styles.selectionList}>
       <CreateCard
-        iconName="people-outline"
+        iconName="people"
         label="New group"
         onPress={() => navigate(SCREENS.NEW_GROUP)}
+        color={createCardColors[0]}
       />
       <CreateCard
-        iconName="calendar-outline"
+        iconName="calendar"
         label="New event"
         onPress={() => navigate(SCREENS.NEW_EVENT)}
+        color={createCardColors[1]}
       />
     </View>
   </View>
@@ -316,10 +353,12 @@ const styles = StyleSheet.create({
 
   backButton: {
     position: 'absolute',
-    top: 1,
+    top: -40,
     left: 20,
     zIndex: 10,
-    padding: 8,
+    padding: 12,
+    backgroundColor: '#5cc4a4',
+    borderRadius: 25,
   },
 
   messageOverlay: {
@@ -419,6 +458,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignSelf: 'center',
   },
+  formActionButton: {
+    marginTop: -8,
+  },
+  inlineActionButton: {
+    marginTop: -4,
+    marginVertical: 0,
+  },
+  formActionWideSpaced: {
+    width: '100%',
+    alignSelf: 'stretch',
+    marginTop: 12,
+  },
   buttonContent: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -491,7 +542,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   timeText: {
-    color: Brand.orange,
+    color: '#000000',
     fontWeight: '700',
     fontSize: 18,
     fontFamily: 'Inter_700Bold',
@@ -506,19 +557,16 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     paddingVertical: 12,
     paddingHorizontal: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.75)',
-    borderRadius: 15,
+    borderRadius: 32,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 5,
     elevation: 3,
+    height: 100,
   },
   settingsCardIcon: {
     marginRight: 15,
-    backgroundColor: 'rgba(0,0,0,0.06)',
-    padding: 5,
-    borderRadius: 50,
   },
   settingsCardTextWrapper: {
     flex: 1,
@@ -526,9 +574,182 @@ const styles = StyleSheet.create({
     paddingRight: 15,
   },
   settingsCardText: {
-    color: '#111827',
+    color: '#fff',
+    fontSize: 22,
+    fontWeight: '700',
+    fontFamily: 'Inter_700Bold',
+  },
+
+  // --- Floating Label Styles ---
+  floatingInputContainer: {
+    position: 'relative',
+    marginBottom: 28,
+    width: '100%',
+  },
+  floatingInput: {
+    width: '100%',
+    padding: 16,
     fontSize: 18,
-    fontWeight: '600',
+    borderRadius: 14,
+    borderWidth: 2,
+    borderColor: '#5cc4a4',
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    color: '#111827',
     fontFamily: 'Inter_400Regular',
+  },
+  floatingTextArea: {
+    minHeight: 120,
+    paddingTop: 28,
+  },
+  floatingLabel: {
+    position: 'absolute',
+    left: 16,
+    top: 18,
+    fontSize: 18,
+    color: '#6B7280',
+    backgroundColor: 'transparent',
+    fontFamily: 'Inter_400Regular',
+    pointerEvents: 'none',
+  },
+  floatingLabelActive: {
+    top: -10,
+    fontSize: 14,
+    color: '#5cc4a4',
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 6,
+    fontWeight: '600',
+  },
+
+  // --- Bottom Sheet Styles ---
+  topTitleInput: {
+    width: '100%',
+    fontSize: 32,
+    fontWeight: '700',
+    color: '#111827',
+    marginBottom: 24,
+    fontFamily: 'Inter_700Bold',
+    paddingHorizontal: 8,
+  },
+  bottomSheetCard: {
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
+    borderBottomLeftRadius: 32,
+    borderBottomRightRadius: 32,
+    padding: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 8,
+    marginTop: 8,
+  },
+  sheetHandle: {
+    width: 40,
+    height: 5,
+    backgroundColor: '#D1D5DB',
+    borderRadius: 3,
+    alignSelf: 'center',
+    marginBottom: 20,
+  },
+  sheetSectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#111827',
+    marginBottom: 16,
+    fontFamily: 'Inter_700Bold',
+  },
+  sheetInputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 20,
+  },
+  sheetIcon: {
+    marginRight: 12,
+    marginTop: 4,
+  },
+  sheetTextArea: {
+    flex: 1,
+    fontSize: 16,
+    color: '#374151',
+    backgroundColor: '#F9FAFB',
+    borderRadius: 12,
+    padding: 12,
+    minHeight: 100,
+    fontFamily: 'Inter_400Regular',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  cardContainer: {
+    borderRadius: 32,
+    padding: 20,
+    marginBottom: 20,
+    minHeight: 100,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  cardContainerThin: {
+    borderRadius: 32,
+    paddingVertical: 14,
+    paddingHorizontal: 18,
+    marginBottom: 16,
+    minHeight: 70,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  cardIcon: {
+    marginRight: 16,
+  },
+  cardInput: {
+    flex: 1,
+    fontFamily: 'Inter_700Bold',
+    fontSize: 16,
+    color: '#fff',
+  },
+  cardTextArea: {
+    minHeight: 80,
+    textAlignVertical: 'top',
+  },
+  cardDateText: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 16,
+    color: '#fff',
+  },
+  datePickerOverlay: {
+    position: 'absolute',
+    bottom: 100,
+    left: 20,
+    right: 20,
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  datePickerDone: {
+    backgroundColor: '#5cc4a4',
+    padding: 12,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  datePickerDoneText: {
+    color: '#fff',
+    fontSize: 16,
+    fontFamily: 'Inter_700Bold',
+  },
+  datePickerInner: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  datePickerIOS: {
+    width: '100%',
+    transform: [{ scale: 1 }],
   },
 });

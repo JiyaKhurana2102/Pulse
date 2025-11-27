@@ -92,7 +92,7 @@ const EditableRow = ({
 
 // ---- MAIN SCREEN ----
 const BACKGROUND_COLOR = 'transparent';
-const ACCENT_COLOR = '#008080ff';
+const ACCENT_COLOR = '#5cc4a4';
 const ICON_COLOR = '#4DB6AC';
 const TEXT_COLOR_DARK = '#ffffffff';
 
@@ -169,14 +169,14 @@ export default function SettingsScreen() {
               label="Name"
               value={name}
               onChangeText={setName}
-              iconName="account-outline"
+              iconName="account"
               library="mci"
             />
             <EditableRow
               label="Email"
               value={email}
               onChangeText={setEmail}
-              iconName="email-outline"
+              iconName="email"
               library="mci"
               keyboardType="default"
             />
@@ -185,7 +185,7 @@ export default function SettingsScreen() {
               label="Password"
               value={password}
               onChangeText={setPassword}
-              iconName="lock-outline"
+              iconName="lock"
               library="mci"
               isPassword
             />
