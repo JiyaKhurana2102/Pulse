@@ -1,10 +1,10 @@
 // app/settings/index.tsx
+import { logout } from '@/services/auth';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Link, useRouter } from 'expo-router';
 import React from 'react';
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { logout } from '@/services/auth';
 
 const ACCENT_COLOR = '#46e0e0ff';
 const BACKGROUND_COLOR = '#ffffffff';
