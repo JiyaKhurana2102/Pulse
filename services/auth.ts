@@ -59,7 +59,7 @@ async function refreshAuthToken(): Promise<string | null> {
       return null;
     }
 
-    const apiKey = 'AIzaSyC1boCQOzPj3UME9jmHoP-gMQGZSmYxMh0';
+   const apiKey = process.env.EXPO_PUBLIC_GOOGLE_API_KEY;
     const response = await fetch(
       `https://securetoken.googleapis.com/v1/token?key=${apiKey}`,
       {
