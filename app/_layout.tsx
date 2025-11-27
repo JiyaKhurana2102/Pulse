@@ -1,3 +1,4 @@
+import 'react-native-gesture-handler';
 // app/_layout.tsx
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';

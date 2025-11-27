@@ -140,6 +140,7 @@ export default function MessagesScreen() {
         </KeyboardAvoidingView>
       </SafeAreaView>
     </LinearGradient>
+    </GestureHandlerRootView>
   );
 }
 
