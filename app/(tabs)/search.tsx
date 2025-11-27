@@ -1,13 +1,15 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
 import React, { useState } from 'react';
 import {
-  ScrollView,
+  Alert, ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 
 // 🔧 FIX: Type for each resource item so icon names are valid
@@ -18,7 +20,25 @@ type ResourceItem = {
 };
 
 export default function SearchScreen() {
+  const router = useRouter();
   const colors = ['#ff9966', '#b8e6b8', '#5cc4a4', '#f6a278'];
+
+  const openWeb = (url: string, title: string) => {
+    if (!url) {
+      Alert.alert('Link unavailable');
+      return;
+    }
+    // Open PDFs using the system in-app browser for reliability
+    if (url.toLowerCase().endsWith('.pdf')) {
+      WebBrowser.openBrowserAsync(url).catch(() => Alert.alert('Unable to open PDF'));
+      return;
+    }
+    router.push({ pathname: '/webview', params: { url: encodeURIComponent(url), title: encodeURIComponent(title) } });
+  };
+
+  const openCalendar = () => {
+    router.push({ pathname: '/calendar' });
+  };
 
   const resources: ResourceItem[] = [
     {
@@ -40,11 +60,6 @@ export default function SearchScreen() {
       title: 'Campus Services',
       icon: 'build',
       desc: 'Access all campus support offices.',
-    },
-    {
-      title: 'Student Organisations',
-      icon: 'people',
-      desc: 'Explore clubs, teams, and groups.',
     },
     {
       title: 'Academic Calendar',
@@ -125,7 +140,49 @@ export default function SearchScreen() {
           <TouchableOpacity
             key={i}
             style={[styles.button, { backgroundColor: colors[i % colors.length] }]}
-            onPress={() => {}} // Navigation ready
+            onPress={() => {
+              // route each resource to the appropriate link or screen
+              switch (item.title) {
+                case 'Online Food Delivery':
+                  openWeb('https://boostapp.io/', item.title);
+                  break;
+                case 'Campus Dining':
+                  openWeb('https://services.utdallas.edu/dining/', item.title);
+                  break;
+                case 'Parking Map':
+                  openWeb('https://services.utdallas.edu/download/Parking_Map.pdf', item.title);
+                  break;
+                case 'Campus Services':
+                  openWeb('https://www.utdallas.edu/campus-life/student-services-support/', item.title);
+                  break;
+                case 'Academic Calendar':
+                  openCalendar();
+                  break;
+                case 'Bookstore':
+                  openWeb('https://www.bkstr.com/texasatdallasstore/home', item.title);
+                  break;
+                case 'Campus Directory':
+                  openWeb('https://www.utdallas.edu/directory/', item.title);
+                  break;
+                case 'Career Center':
+                  openWeb('https://career.utdallas.edu/', item.title);
+                  break;
+                case 'Health Services':
+                  openWeb('https://studenthealthcenter.utdallas.edu/', item.title);
+                  break;
+                case 'IT Help Desk':
+                  openWeb('https://oit.utdallas.edu/servicedesk/', item.title);
+                  break;
+                case 'Emergency Info':
+                  openWeb('https://www.utdallas.edu/emergency/', item.title);
+                  break;
+                case 'Library':
+                  openWeb('https://library.utdallas.edu/', item.title);
+                  break;
+                default:
+                  Alert.alert('Not implemented');
+              }
+            }}
           >
             <Ionicons name={item.icon} size={34} color="white" style={{ marginBottom: 8 }} />
             <Text style={styles.buttonTitle}>{item.title}</Text>

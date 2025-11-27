@@ -1,7 +1,7 @@
 // backend/routes/chat.js
 const express = require('express');
 const router = express.Router();
-const { OpenAI } = require('openai');
+const OpenAI = require('openai');
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -28,13 +28,12 @@ You are "UTD Guide" — a concise, helpful assistant for The University of Texas
     ];
 
     const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini', // You can change to another model if needed
+      model: 'gpt-4o-mini',
       messages: finalMessages,
       max_tokens: 400,
-      temperature: 0.2
+      temperature: 0.2,
     });
-
-    const reply = response.choices?.[0]?.message?.content || "Sorry, something went wrong.";
+    const reply = response.choices?.[0]?.message?.content || 'Sorry, something went wrong.';
     res.json({ reply });
   } catch (err) {
     console.error("Chatbot error:", err);

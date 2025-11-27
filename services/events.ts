@@ -63,7 +63,10 @@ async function saveEvents(events: EventRecord[]): Promise<void> {
 
 export async function getUserId(): Promise<string> {
   let uid = await AsyncStorage.getItem(USER_ID_KEY);
-  if (!uid) throw new Error('User not authenticated');
+  if (!uid) {
+    console.warn('getUserId: no user id in AsyncStorage, returning empty string');
+    return '';
+  }
   return uid;
 }
 
@@ -158,25 +161,36 @@ export async function createEvent(
   }
 }
 
-export async function saveEvent(eventId: string, userId: string): Promise<void> {
+export async function saveEvent(eventId: string, userId?: string): Promise<void> {
   if (LOCAL_MODE) {
     const events = await loadEvents();
     const event = events.find(e => e.id === eventId);
-    if (event && !event.savedBy?.includes(userId)) {
-      event.savedBy = [...(event.savedBy || []), userId];
+    const uid = userId || await getUserId();
+    if (!uid) throw new Error('User not authenticated');
+    if (event && !event.savedBy?.includes(uid)) {
+      event.savedBy = [...(event.savedBy || []), uid];
       await saveEvents(events);
     }
     return;
   }
-  
+
   // Backend: POST /events/:id/rsvp
   try {
+    const uid = userId || await getUserId();
+    if (!uid) throw new Error('User not authenticated');
+
     const res = await fetch(`${API_BASE}/events/${eventId}/rsvp`, {
       method: 'POST',
       headers: await getAuthHeaders(),
-      body: JSON.stringify({ userId }),
+      body: JSON.stringify({ userId: uid }),
     });
-    if (!res.ok) throw new Error('Failed to RSVP to event');
+
+    const body = await res.json().catch(() => null);
+    if (!res.ok) {
+      const msg = body?.error || body?.message || 'Failed to RSVP to event';
+      console.error('RSVP failed:', res.status, msg, body);
+      throw new Error(msg);
+    }
   } catch (error) {
     console.error('RSVP error:', error);
     throw error;
