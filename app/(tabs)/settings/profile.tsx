@@ -17,6 +17,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { API_BASE } from '@/constants/api';
+import { getAuthToken, getCurrentUser } from '@/services/auth';
 import { getProfile, setProfile } from '@/services/profile';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -51,6 +53,7 @@ interface EditableRowProps {
   keyboardType?: 'default' | 'number-pad' | 'phone-pad';
   showPassword?: boolean;
   onTogglePassword?: () => void;
+  editable?: boolean;
 }
 
 const EditableRow = ({
@@ -64,6 +67,7 @@ const EditableRow = ({
   keyboardType = 'default',
   showPassword = false,
   onTogglePassword,
+  editable = true,
 }: EditableRowProps) => {
   return (
     <View style={styles.row}>
@@ -83,6 +87,7 @@ const EditableRow = ({
             placeholderTextColor={TEXT_COLOR_DARK + '80'}
             secureTextEntry={isPassword && !showPassword}
             keyboardType={keyboardType}
+            editable={editable}
           />
         )}
       </Pressable>
@@ -111,16 +116,26 @@ const TEXT_COLOR_DARK = '#ffffffff';
 
 export default function SettingsScreen() {
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('test@email');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('********');
   const [profileImageUri, setProfileImageUri] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   useEffect(() => {
     (async () => {
       const p = await getProfile();
       setName(p.name);
+      
+      // Load email from logged-in user
+      const user = await getCurrentUser();
+      if (user) {
+        setEmail(user.email);
+      }
     })();
   }, []);
 
@@ -201,18 +216,97 @@ export default function SettingsScreen() {
               iconName="email"
               library="mci"
               keyboardType="default"
+              editable={false}
             />
+            
+            <Pressable
+              onPress={() => setShowChangePassword(!showChangePassword)}
+              style={styles.changePasswordButton}
+            >
+              <Text style={styles.changePasswordText}>Change Password</Text>
+            </Pressable>
 
-            <EditableRow
-              label="Password"
-              value={password}
-              onChangeText={setPassword}
-              iconName="lock"
-              library="mci"
-              isPassword
-              showPassword={showPassword}
-              onTogglePassword={() => setShowPassword(!showPassword)}
-            />
+            {showChangePassword && (
+              <View style={styles.changePasswordContainer}>
+                <EditableRow
+                  label="Current Password"
+                  value={currentPassword}
+                  onChangeText={setCurrentPassword}
+                  iconName="lock-open"
+                  library="mci"
+                  isPassword
+                />
+                <EditableRow
+                  label="New Password"
+                  value={newPassword}
+                  onChangeText={setNewPassword}
+                  iconName="lock"
+                  library="mci"
+                  isPassword
+                />
+                <EditableRow
+                  label="Confirm Password"
+                  value={confirmPassword}
+                  onChangeText={setConfirmPassword}
+                  iconName="lock-check"
+                  library="mci"
+                  isPassword
+                />
+                <Pressable
+                  onPress={async () => {
+                    if (!currentPassword || !newPassword || !confirmPassword) {
+                      Alert.alert('Error', 'Please fill all fields');
+                      return;
+                    }
+                    if (newPassword !== confirmPassword) {
+                      Alert.alert('Error', 'New passwords do not match');
+                      return;
+                    }
+                    if (newPassword.length < 6) {
+                      Alert.alert('Error', 'Password must be at least 6 characters');
+                      return;
+                    }
+                    
+                    setSaving(true);
+                    try {
+                      const response = await fetch(`${API_BASE}/auth/change-password`, {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                          'Authorization': `Bearer ${await getAuthToken()}`,
+                        },
+                        body: JSON.stringify({
+                          currentPassword,
+                          newPassword,
+                        }),
+                      });
+                      
+                      const data = await response.json();
+                      
+                      if (!response.ok) {
+                        Alert.alert('Error', data.error || 'Failed to change password');
+                        setSaving(false);
+                        return;
+                      }
+                      
+                      Alert.alert('Success', 'Password changed successfully');
+                      setShowChangePassword(false);
+                      setCurrentPassword('');
+                      setNewPassword('');
+                      setConfirmPassword('');
+                    } catch (error) {
+                      console.error('Change password error:', error);
+                      Alert.alert('Error', `Failed to change password: ${error.message || error}`);
+                    } finally {
+                      setSaving(false);
+                    }
+                  }}
+                  style={styles.updatePasswordButton}
+                >
+                  <Text style={styles.updatePasswordText}>{saving ? 'Updating...' : 'Update Password'}</Text>
+                </Pressable>
+              </View>
+            )}
           </View>
           <Pressable
             onPress={async () => {
@@ -323,4 +417,43 @@ const styles = StyleSheet.create({
   inputText: { fontSize: 17, color: TEXT_COLOR_DARK, fontWeight: '400' },
 
   editIcon: { width: 30, textAlign: 'center' },
+
+  changePasswordButton: {
+    marginTop: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: '#4DB6AC',
+    borderRadius: 12,
+    alignItems: 'center',
+    alignSelf: 'center',
+  },
+
+  changePasswordText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+
+  changePasswordContainer: {
+    width: '100%',
+    marginTop: 20,
+    padding: 15,
+    backgroundColor: 'rgba(92, 196, 164, 0.2)',
+    borderRadius: 12,
+  },
+
+  updatePasswordButton: {
+    marginTop: 15,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: '#5cc4a4',
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+
+  updatePasswordText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
 });

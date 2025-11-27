@@ -114,4 +114,52 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { signup, login };
+// CHANGE PASSWORD
+const changePassword = async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  const userId = req.user.uid; // from auth middleware
+
+  try {
+    // Get user's email from Firestore
+    const db = admin.firestore();
+    const userDoc = await db.collection('users').doc(userId).get();
+    const userData = userDoc.data();
+
+    if (!userData) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Verify current password by attempting to sign in
+    const apiKey = process.env.FIREBASE_API_KEY;
+    const verifyResponse = await fetch(
+      `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: userData.email,
+          password: currentPassword,
+          returnSecureToken: false,
+        }),
+      }
+    );
+
+    const verifyData = await verifyResponse.json();
+
+    if (verifyData.error) {
+      return res.status(400).json({ error: 'Current password is incorrect' });
+    }
+
+    // Update password
+    await admin.auth().updateUser(userId, {
+      password: newPassword,
+    });
+
+    res.json({ message: 'Password changed successfully' });
+  } catch (error) {
+    console.error('Error changing password:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports = { signup, login, changePassword };
