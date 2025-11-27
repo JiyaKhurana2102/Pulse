@@ -29,7 +29,65 @@ export async function getCurrentUser(): Promise<User | null> {
 }
 
 export async function getAuthToken(): Promise<string | null> {
-  return await AsyncStorage.getItem(AUTH_TOKEN_KEY);
+  const token = await AsyncStorage.getItem(AUTH_TOKEN_KEY);
+  if (!token) return null;
+
+  // Check if token is expired (tokens expire after 1 hour)
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const expirationTime = payload.exp * 1000; // Convert to milliseconds
+    const currentTime = Date.now();
+    
+    // If token expires in less than 5 minutes, refresh it
+    if (expirationTime - currentTime < 5 * 60 * 1000) {
+      console.log('Token expiring soon, refreshing...');
+      const refreshed = await refreshAuthToken();
+      if (refreshed) return refreshed;
+    }
+  } catch (error) {
+    console.log('Token check error, will try to use existing token:', error);
+  }
+
+  return token;
+}
+
+async function refreshAuthToken(): Promise<string | null> {
+  try {
+    const refreshToken = await AsyncStorage.getItem(REFRESH_TOKEN_KEY);
+    if (!refreshToken) {
+      console.log('No refresh token available');
+      return null;
+    }
+
+    const apiKey = 'AIzaSyC1boCQOzPj3UME9jmHoP-gMQGZSmYxMh0';
+    const response = await fetch(
+      `https://securetoken.googleapis.com/v1/token?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          grant_type: 'refresh_token',
+          refresh_token: refreshToken,
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Token refresh failed:', errorData);
+      return null;
+    }
+
+    const data = await response.json();
+    await AsyncStorage.setItem(AUTH_TOKEN_KEY, data.id_token);
+    await AsyncStorage.setItem(REFRESH_TOKEN_KEY, data.refresh_token);
+    
+    console.log('Token refreshed successfully');
+    return data.id_token;
+  } catch (error) {
+    console.error('Token refresh error:', error);
+    return null;
+  }
 }
 
 async function setAuthData(user: User, idToken: string, refreshToken: string): Promise<void> {

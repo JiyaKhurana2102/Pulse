@@ -8,6 +8,7 @@ require('dotenv').config(); // Load .env variables
 // Routes
 const authRoutes = require('./routes/auth');
 const groupRoutes = require('./routes/groups');
+const chatbotRoutes = require('./routes/chatbot');
 const eventRoutes = require('./routes/events');
 // const chatRoutes = require('./routes/chat'); // Not needed for basic functionality
 
@@ -41,6 +42,7 @@ app.locals.db = admin.firestore();
 app.use('/auth', authRoutes);
 app.use('/groups', groupRoutes);
 app.use('/events', eventRoutes);
+app.use('/chatbot', chatbotRoutes);
 
 // -------------------
 // Test route (optional)
