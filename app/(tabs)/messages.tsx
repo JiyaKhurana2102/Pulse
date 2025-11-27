@@ -77,6 +77,69 @@ export default function MessagesScreen() {
   };
 
   return (
+    <LinearGradient colors={['#FFFFFF','#FFF7ED','#FED7AA','#D1FAE5','#ECFEFF','#FFFFFF']} locations={[0,0.2,0.4,0.6,0.8,1]} start={{x:0.5,y:0}} end={{x:0.5,y:1}} style={{flex:1}}>
+      <SafeAreaView style={styles.safe}>
+        <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS==='ios' ? 'padding' : undefined}>
+          {loading && <ActivityIndicator size="small" color="#0b84ff" style={styles.loading} />}
+          <View style={styles.chatWrapper}>
+            <ScrollView
+              ref={scrollRef}
+              contentContainerStyle={[styles.chatContent, styles.chatContentBottom]}
+              onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: false })}
+            >
+              {messages.map(m => (
+                <View key={m.id} style={[styles.bubble, m.from==='user'? styles.bubbleMine: styles.bubbleOther]}>
+                  <Text style={styles.senderText}>{m.from === 'user' ? 'You' : 'UTD Guide'}</Text>
+                  <Text style={styles.bubbleText}>{m.text}</Text>
+                  <Text style={styles.timeText}>{new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
+                </View>
+              ))}
+              {botTyping && (
+                <View style={[styles.bubble, styles.typingBubble]}>
+                  <Text style={styles.senderText}>UTD Guide</Text>
+                  <Text style={styles.bubbleText}>Typing...</Text>
+                </View>
+              )}
+            </ScrollView>
+          </View>
+          {suggestions.length > 0 && (
+            <View style={styles.suggestionRow}>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.suggestionContent}>
+                {suggestions.map(s => (
+                  <Pressable key={s} style={styles.suggestionChip} onPress={() => {
+                    setInput(s);
+                    handleSend();
+                  }}>
+                    <Text style={styles.suggestionText}>{s}</Text>
+                  </Pressable>
+                ))}
+              </ScrollView>
+            </View>
+          )}
+          <View style={[styles.inputRow, Platform.OS==='ios' && !keyboardVisible ? { paddingBottom: insets.bottom } : null ]}>
+            <TextInput
+              style={styles.input}
+              value={input}
+              onChangeText={setInput}
+              placeholder="Type your message here..."
+              placeholderTextColor="#11182799"
+              onSubmitEditing={handleSend}
+              returnKeyType="send"
+            />
+            <Pressable onPress={handleSend} style={styles.sendButton} disabled={loading}>
+              <Text style={styles.sendText}>{loading ? '...' : 'Send'}</Text>
+            </Pressable>
+            <Pressable onPress={async () => {
+              await AsyncStorage.removeItem('@chatbot_history');
+              setMessages([{ id: 'welcome', text: 'Hi! I am UTD Guide. Ask me about parking, dining, events, groups, study rooms, or the campus map.', from: 'bot', createdAt: Date.now() }]);
+              setSuggestions(['events today','parking','dining','help']);
+            }} style={styles.clearButton}>
+              <Text style={styles.clearText}>Clear</Text>
+            </Pressable>
+          </View>
+=========
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
     <LinearGradient
       colors={['#FFFFFF', '#FFF7ED', '#FED7AA', '#D1FAE5', '#ECFEFF', '#FFFFFF']}
       locations={[0, 0.2, 0.4, 0.6, 0.8, 1]}
@@ -94,43 +157,47 @@ export default function MessagesScreen() {
       )}
 
       <SafeAreaView style={{ flex: 1 }}>
-        <GiftedChat
-          messages={messages}
-          onSend={messages => onSend(messages)}
-          user={{ _id: 1 }}
-          minComposerHeight={55}
-          renderBubble={props => (
-            <Bubble
-              {...props}
-              wrapperStyle={{
-                right: { backgroundColor: '#0b84ff' },
-                left: { backgroundColor: 'white' },
-              }}
-            />
-          )}
-          renderInputToolbar={props => (
-            <InputToolbar
-              {...props}
-              containerStyle={{
-                borderTopWidth: 1,
-                borderTopColor: '#ddd',
-                paddingTop: 6,
-                paddingBottom: Platform.OS === 'ios' ? 12 : 6,
-                marginBottom: Platform.OS === 'ios' ? 20 : 0, // Raise input bar
-              }}
-            />
-          )}
-          renderComposer={props => (
-            <Composer
-              {...props}
-              textInputProps={{
-                placeholder: 'Type your message here...',
-                placeholderTextColor: '#999',
-                style: { fontSize: 16, minHeight: 50 },
-              }}
-            />
-          )}
-        />
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0} style={{ flex: 1 }}>
+          <GiftedChat
+            messages={messages}
+            onSend={messages => onSend(messages)}
+            user={{ _id: 1 }}
+            minComposerHeight={55}
+            renderBubble={props => (
+              <Bubble
+                {...props}
+                wrapperStyle={{
+                  right: { backgroundColor: '#0b84ff' },
+                  left: { backgroundColor: 'white' },
+                }}
+              />
+            )}
+            renderInputToolbar={props => (
+              <InputToolbar
+                {...props}
+                containerStyle={{
+                  borderTopWidth: 1,
+                  borderTopColor: '#ddd',
+                  paddingTop: 6,
+                  paddingBottom: Platform.OS === 'ios' ? 12 : 6,
+                  marginBottom: Platform.OS === 'ios' ? 20 : 0, // Raise input bar
+                }}
+              />
+            )}
+            renderComposer={props => (
+              <Composer
+                {...props}
+                textInputProps={{
+                  placeholder: 'Type your message here...',
+                  placeholderTextColor: '#999',
+                  style: { fontSize: 16, minHeight: 50 },
+                  editable: true,
+                }}
+              />
+            )}
+          />
+>>>>>>>>> Temporary merge branch 2
+        </KeyboardAvoidingView>
       </SafeAreaView>
     </LinearGradient>
     </GestureHandlerRootView>
