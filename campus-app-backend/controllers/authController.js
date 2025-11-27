@@ -5,29 +5,63 @@ const signup = async (req, res) => {
   const { email, password, name } = req.body;
 
   try {
-    // 1. Create the Firebase user
-    const userRecord = await admin.auth().createUser({
-      email,
-      password,
-      displayName: name,
-    });
+    let userRecord;
 
-    // 2. Write to Firestore
-    const db = admin.firestore();
+    try {
+      // Try creating a new Firebase user
+      userRecord = await admin.auth().createUser({
+        email,
+        password,
+        displayName: name,
+      });
 
-    await db.collection("users")
-      .doc(userRecord.uid)
-      .set({
+      // If created, write to Firestore
+      const db = admin.firestore();
+      await db.collection('users').doc(userRecord.uid).set({
         email,
         name,
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
       });
+    } catch (createErr) {
+      console.warn('createUser error (may be existing user):', createErr);
+
+      // If the email already exists, fetch the existing user and proceed
+      if (createErr?.errorInfo?.code === 'auth/email-already-exists' || createErr?.code === 'auth/email-already-exists') {
+        userRecord = await admin.auth().getUserByEmail(email);
+
+        // Ensure Firestore has a user doc (create or update)
+        try {
+          const db = admin.firestore();
+          const userRef = db.collection('users').doc(userRecord.uid);
+          const userDoc = await userRef.get();
+          if (!userDoc.exists) {
+            await userRef.set({
+              email,
+              name: name || userRecord.displayName || email.split('@')[0],
+              createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            });
+          } else if (name && userDoc.data()?.name !== name) {
+            await userRef.update({ name });
+          }
+        } catch (dbErr) {
+          console.warn('Failed to ensure Firestore user doc for existing user:', dbErr);
+        }
+      } else {
+        console.error('Error creating user:', createErr);
+        return res.status(400).json({ error: createErr.message || 'User creation failed' });
+      }
+    }
 
     // 3. Generate custom token for immediate login
     const customToken = await admin.auth().createCustomToken(userRecord.uid);
-    
+
     // 4. Exchange custom token for ID token using Firebase REST API
     const apiKey = process.env.FIREBASE_API_KEY;
+    if (!apiKey) {
+      console.error('Missing FIREBASE_API_KEY in environment');
+      return res.status(500).json({ error: 'Missing FIREBASE_API_KEY in server configuration' });
+    }
+
     const tokenResponse = await fetch(
       `https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key=${apiKey}`,
       {
@@ -43,23 +77,29 @@ const signup = async (req, res) => {
     const tokenData = await tokenResponse.json();
 
     if (tokenData.error) {
-      return res.status(400).json({ error: tokenData.error.message });
+      console.error('Token exchange error:', tokenData);
+      return res.status(400).json({ error: tokenData.error.message || tokenData.error });
     }
 
     res.json({
-      message: "Signup successful",
+      message: 'Signup successful',
       user: {
         uid: userRecord.uid,
         email,
-        name,
+        name: name || userRecord.displayName || email.split('@')[0],
       },
       idToken: tokenData.idToken,
       refreshToken: tokenData.refreshToken,
     });
 
   } catch (err) {
-    console.error("Error during signup:", err);
-    res.status(400).json({ error: err.message });
+    console.error('Error during signup:', err);
+    // If this is a FirebaseAuthError with code info, forward a cleaner message
+    const code = err?.errorInfo?.code || err?.code;
+    if (code === 'auth/email-already-exists') {
+      return res.status(400).json({ error: 'Email already in use' });
+    }
+    res.status(400).json({ error: err.message || 'Signup failed' });
   }
 };
 
@@ -110,6 +150,7 @@ const login = async (req, res) => {
       refreshToken: data.refreshToken,
     });
   } catch (error) {
+    console.error('Login error:', error);
     res.status(500).json({ error: error.message });
   }
 };

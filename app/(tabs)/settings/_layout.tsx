@@ -31,20 +31,6 @@ export default function SettingsLayout() {
       />
 
       <Stack.Screen 
-        name="my-events" 
-        options={{
-          title: 'My Events',
-        }}
-      />
-
-      <Stack.Screen 
-        name="my-groups" 
-        options={{
-          title: 'My Groups',
-        }}
-      />
-
-      <Stack.Screen 
         name="profile" 
         options={{
           title: 'Profile',
