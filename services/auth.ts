@@ -75,11 +75,15 @@ export async function signup(name: string, email: string, password: string): Pro
       body: JSON.stringify({ email, password, name }),
     });
 
+    // Parse response body (may contain error message)
+    const body = await response.json().catch(() => null);
     if (!response.ok) {
-      return null;
+      const msg = body?.error || body?.message || response.statusText || 'Signup failed';
+      console.error('Signup failed:', response.status, msg, body);
+      throw new Error(msg);
     }
 
-    const data: AuthResponse = await response.json();
+    const data: AuthResponse = body as AuthResponse;
     await setAuthData(data.user, data.idToken, data.refreshToken);
     
     // Set profile name
@@ -88,7 +92,7 @@ export async function signup(name: string, email: string, password: string): Pro
     return data.user;
   } catch (error) {
     console.error('Signup error:', error);
-    return null;
+    throw error;
   }
 }
 
