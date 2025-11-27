@@ -1,9 +1,10 @@
 // app/settings/index.tsx
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { logout } from '@/services/auth';
 
 const ACCENT_COLOR = '#46e0e0ff';
 const BACKGROUND_COLOR = '#ffffffff';
@@ -43,6 +44,22 @@ const SettingsButton: React.FC<SettingsButtonProps> = ({ iconName, label, href, 
 
 // --- Screen ---
 export default function SettingsScreen() {
+  const router = useRouter();
+
+  const handleLogout = () => {
+    Alert.alert('Logout', 'Are you sure you want to logout?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Logout',
+        style: 'destructive',
+        onPress: async () => {
+          await logout();
+          router.replace('/login');
+        },
+      },
+    ]);
+  };
+
   return (
     <LinearGradient
       // soft orange core + light green/teal glow + white edges
@@ -64,6 +81,11 @@ export default function SettingsScreen() {
       <SettingsButton iconName="calendar" label="My Events" href={SettingsRoutes.MY_EVENTS} iconColor={iconColors[2]} />
       <SettingsButton iconName="people" label="My Groups" href={SettingsRoutes.MY_GROUPS} iconColor={iconColors[3]} />
       <SettingsButton iconName="person" label="Profile" href={SettingsRoutes.PROFILE} iconColor={iconColors[0]} />
+      
+      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+        <Ionicons name="log-out-outline" size={24} color="#fff" style={styles.icon} />
+        <Text style={styles.logoutText}>Logout</Text>
+      </TouchableOpacity>
     </LinearGradient>
   );
 }
@@ -108,5 +130,28 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     fontFamily: 'Inter_400Regular',
+  },
+  logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '90%',
+    marginTop: 30,
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    backgroundColor: '#ff6b6b',
+    borderRadius: 15,
+    shadowColor: '#ff6b6b',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  logoutText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
+    fontFamily: 'Inter_700Bold',
+    marginLeft: 8,
   },
 });

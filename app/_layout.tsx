@@ -1,9 +1,9 @@
 // app/_layout.tsx
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Stack } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Text, TextInput } from 'react-native';
 import 'react-native-reanimated';
 
@@ -11,6 +11,7 @@ import { GlobalEffects } from '@/components/GlobalEffects';
 import LoadingScreen from '@/components/LoadingScreen';
 import { PreferencesProvider } from '@/hooks/PreferencesContext';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { isLoggedIn, seedDefaultUser } from '@/services/auth';
 
 
 import {
@@ -26,12 +27,38 @@ export const unstable_settings = {
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [splashDismissed, setSplashDismissed] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
+  const router = useRouter();
+  const segments = useSegments();
 
   // ✅ Load fonts BEFORE ANY UI shows
   const [fontsLoaded] = useFonts({
     Inter_400Regular,
     Inter_700Bold,
   });
+
+  // Check authentication after splash
+  useEffect(() => {
+    if (!splashDismissed || !fontsLoaded) return;
+
+    const checkAuth = async () => {
+      // Seed the default test user
+      await seedDefaultUser();
+      
+      const loggedIn = await isLoggedIn();
+      setAuthChecked(true);
+
+      const inAuthGroup = segments[0] === 'login';
+
+      if (!loggedIn && !inAuthGroup) {
+        router.replace('/login');
+      } else if (loggedIn && inAuthGroup) {
+        router.replace('/(tabs)');
+      }
+    };
+
+    checkAuth();
+  }, [splashDismissed, fontsLoaded]);
 
   // 🚨 Prevent rendering UNTIL fonts load (important!)
   if (!fontsLoaded) {
@@ -96,6 +123,7 @@ export default function RootLayout() {
                 contentStyle: { backgroundColor: 'transparent' },
               }}
             >
+              <Stack.Screen name="login" options={{ headerShown: false }} />
               <Stack.Screen name="(tabs)" options={{ headerShown: true }} />
               <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
             </Stack>

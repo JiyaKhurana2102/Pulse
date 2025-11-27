@@ -49,6 +49,8 @@ interface EditableRowProps {
   onChangeText?: (text: string) => void;
   onPress?: () => void;
   keyboardType?: 'default' | 'number-pad' | 'phone-pad';
+  showPassword?: boolean;
+  onTogglePassword?: () => void;
 }
 
 const EditableRow = ({
@@ -60,6 +62,8 @@ const EditableRow = ({
   onChangeText,
   onPress,
   keyboardType = 'default',
+  showPassword = false,
+  onTogglePassword,
 }: EditableRowProps) => {
   return (
     <View style={styles.row}>
@@ -77,18 +81,24 @@ const EditableRow = ({
             onChangeText={onChangeText}
             placeholder={label}
             placeholderTextColor={TEXT_COLOR_DARK + '80'}
-            secureTextEntry={isPassword}
+            secureTextEntry={isPassword && !showPassword}
             keyboardType={keyboardType}
           />
         )}
       </Pressable>
 
-      <SafeIcon
-        name={isPassword ? ('eye-off' as MaterialName) : ('pencil' as MaterialName)}
-        library="mci"
-        size={24}
-        color={ICON_COLOR}
-      />
+      {isPassword && onTogglePassword ? (
+        <Pressable onPress={onTogglePassword}>
+          <SafeIcon
+            name={showPassword ? ('eye' as MaterialName) : ('eye-off' as MaterialName)}
+            library="mci"
+            size={24}
+            color={ICON_COLOR}
+          />
+        </Pressable>
+      ) : (
+        <View style={{ width: 30 }} />
+      )}
     </View>
   );
 };
@@ -105,6 +115,7 @@ export default function SettingsScreen() {
   const [password, setPassword] = useState('********');
   const [profileImageUri, setProfileImageUri] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -199,6 +210,8 @@ export default function SettingsScreen() {
               iconName="lock"
               library="mci"
               isPassword
+              showPassword={showPassword}
+              onTogglePassword={() => setShowPassword(!showPassword)}
             />
           </View>
           <Pressable

@@ -2,11 +2,12 @@
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import GlobalText from '@/components/GlobalText';
+import { EventRecord, getUserId, listUserEvents } from '@/services/events';
 
 // Experimental trial colors for homepage action cards.
 // KEEP existing styling; these can be toggled off by setting USE_EXPERIMENTAL_CARD_COLORS = false.
@@ -19,6 +20,34 @@ export const options = {
 
 export default function HomeScreen() {
   const router = useRouter();
+  const [todayEvents, setTodayEvents] = useState<EventRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadTodayEvents();
+  }, []);
+
+  const loadTodayEvents = async () => {
+    try {
+      const uid = await getUserId();
+      const userEvents = await listUserEvents(uid);
+      
+      // Filter for today's events
+      const today = new Date();
+      const todayStr = today.toDateString();
+      
+      const eventsToday = userEvents.filter(event => {
+        const eventDate = new Date(event.date);
+        return eventDate.toDateString() === todayStr;
+      });
+      
+      setTodayEvents(eventsToday);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <LinearGradient
@@ -47,25 +76,25 @@ export default function HomeScreen() {
             <View style={styles.todayCard}>
               <GlobalText style={styles.todayTitle}>Today's events:</GlobalText>
 
-              <View style={styles.eventItem}>
-                <View style={styles.eventBullet} />
-                <View style={styles.eventTextBlock}>
-                  <GlobalText style={styles.eventTitle}>
-                    Fraternity Meeting
-                  </GlobalText>
-                  <GlobalText style={styles.eventTime}>6:00 PM</GlobalText>
-                </View>
-              </View>
+              {loading && (
+                <GlobalText style={styles.eventNoEvents}>Loading...</GlobalText>
+              )}
 
-              <View style={styles.eventItem}>
-                <View style={styles.eventBullet} />
-                <View style={styles.eventTextBlock}>
-                  <GlobalText style={styles.eventTitle}>
-                    CS 101 Study Group
-                  </GlobalText>
-                  <GlobalText style={styles.eventTime}>2:00 PM</GlobalText>
+              {!loading && todayEvents.length === 0 && (
+                <GlobalText style={styles.eventNoEvents}>No saved events today</GlobalText>
+              )}
+
+              {!loading && todayEvents.map(event => (
+                <View key={event.id} style={styles.eventItem}>
+                  <View style={styles.eventBullet} />
+                  <View style={styles.eventTextBlock}>
+                    <GlobalText style={styles.eventTitle}>
+                      {event.name}
+                    </GlobalText>
+                    <GlobalText style={styles.eventTime}>{event.time}</GlobalText>
+                  </View>
                 </View>
-              </View>
+              ))}
             </View>
           </BlurView>
 
@@ -369,6 +398,12 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#ffffffff',
     marginTop: 2,
+  },
+  eventNoEvents: {
+    fontSize: 14,
+    color: '#ffffffff',
+    opacity: 0.8,
+    fontStyle: 'italic',
   },
   cardInnerGlass: {
     flex: 1,

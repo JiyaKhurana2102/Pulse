@@ -25,8 +25,24 @@ async function loadEvents(): Promise<EventRecord[]> {
     const raw = await AsyncStorage.getItem(EVENTS_KEY);
     if (!raw) return [];
     const events: EventRecord[] = JSON.parse(raw);
-    // Migration: ensure savedBy exists
-    return events.map(e => ({ ...e, savedBy: e.savedBy || [] }));
+    
+    // Get today's date at midnight for comparison
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Filter out past events and ensure savedBy exists
+    const currentEvents = events.filter(e => {
+      const eventDate = new Date(e.date);
+      eventDate.setHours(0, 0, 0, 0);
+      return eventDate >= today;
+    }).map(e => ({ ...e, savedBy: e.savedBy || [] }));
+    
+    // Save back the filtered list (auto-cleanup)
+    if (currentEvents.length !== events.length) {
+      await saveEvents(currentEvents);
+    }
+    
+    return currentEvents;
   } catch {
     return [];
   }
