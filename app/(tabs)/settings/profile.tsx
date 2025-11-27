@@ -1,7 +1,9 @@
+// Removed duplicate screen; integrate profile storage into existing SettingsScreen below.
 import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
+  Alert,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -15,6 +17,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { getProfile, setProfile } from '@/services/profile';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 // ---- ICON TYPE SAFETY ----
@@ -97,10 +100,18 @@ const ICON_COLOR = '#4DB6AC';
 const TEXT_COLOR_DARK = '#ffffffff';
 
 export default function SettingsScreen() {
-  const [name, setName] = useState('Jiya Khurana');
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('test@email');
   const [password, setPassword] = useState('********');
   const [profileImageUri, setProfileImageUri] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const p = await getProfile();
+      setName(p.name);
+    })();
+  }, []);
 
   // const handleDateChange = (event: any, selectedDate?: Date) => {
   //  // const currentDate = selectedDate || dateOfBirth;
@@ -190,6 +201,19 @@ export default function SettingsScreen() {
               isPassword
             />
           </View>
+          <Pressable
+            onPress={async () => {
+              const newName = name.trim();
+              if (!newName) return;
+              setSaving(true);
+              await setProfile({ name: newName });
+              setSaving(false);
+              Alert.alert('Profile Saved', 'Your changes have been saved.');
+            }}
+            style={{ marginTop: 12, backgroundColor: '#5cc4a4', paddingVertical: 10, paddingHorizontal: 18, borderRadius: 12, alignItems: 'center', alignSelf: 'center' }}
+          >
+            <Text style={{ color: '#fff', fontFamily: 'Inter_700Bold', fontSize: 16 }}>{saving ? 'Saving…' : 'Save'}</Text>
+          </Pressable>
         </ScrollView>
       </KeyboardAvoidingView>
       </SafeAreaView>

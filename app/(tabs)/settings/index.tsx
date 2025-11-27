@@ -7,6 +7,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const ACCENT_COLOR = '#46e0e0ff';
 const BACKGROUND_COLOR = '#ffffffff';
+const iconColors = ['#ff9966', '#b8e6b8', '#5cc4a4', '#f6a278'];
 
 // --- Route Enum ---
 const SettingsRoutes = {
@@ -24,13 +25,14 @@ interface SettingsButtonProps {
   iconName: keyof typeof Ionicons.glyphMap;
   label: string;
   href: SettingsRoute;
+  iconColor: string;
 }
 
 // --- Button Component ---
-const SettingsButton: React.FC<SettingsButtonProps> = ({ iconName, label, href }) => (
+const SettingsButton: React.FC<SettingsButtonProps> = ({ iconName, label, href, iconColor }) => (
   <Link href={href} asChild>
     <TouchableOpacity style={styles.buttonContainer}>
-      <Ionicons name={iconName} size={28} color={ACCENT_COLOR} style={styles.icon} />
+      <Ionicons name={iconName} size={28} color={iconColor} style={styles.icon} />
       <View style={styles.buttonTextWrapper}>
         <Text style={styles.buttonText}>{label}</Text>
       </View>
@@ -57,11 +59,11 @@ export default function SettingsScreen() {
       end={{ x: 0.5, y: 1 }}
       style={styles.container}
     >
-      <SettingsButton iconName="sunny-outline" label="Appearance" href={SettingsRoutes.APPEARANCE} />
-      <SettingsButton iconName="notifications-outline" label="Notifications" href={SettingsRoutes.NOTIFICATIONS} />
-      <SettingsButton iconName="calendar-outline" label="My Events" href={SettingsRoutes.MY_EVENTS} />
-      <SettingsButton iconName="people-outline" label="My Groups" href={SettingsRoutes.MY_GROUPS} />
-      <SettingsButton iconName="person-outline" label="Profile" href={SettingsRoutes.PROFILE} />
+      <SettingsButton iconName="sunny" label="Appearance" href={SettingsRoutes.APPEARANCE} iconColor={iconColors[0]} />
+      <SettingsButton iconName="notifications" label="Notifications" href={SettingsRoutes.NOTIFICATIONS} iconColor={iconColors[1]} />
+      <SettingsButton iconName="calendar" label="My Events" href={SettingsRoutes.MY_EVENTS} iconColor={iconColors[2]} />
+      <SettingsButton iconName="people" label="My Groups" href={SettingsRoutes.MY_GROUPS} iconColor={iconColors[3]} />
+      <SettingsButton iconName="person" label="Profile" href={SettingsRoutes.PROFILE} iconColor={iconColors[0]} />
     </LinearGradient>
   );
 }
@@ -95,9 +97,6 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginRight: 15,
-    backgroundColor: 'rgba(0,0,0,0.06)',
-    padding: 5,
-    borderRadius: 50,
   },
   buttonTextWrapper: {
     flex: 1,

@@ -90,8 +90,8 @@ export default function TabLayout() {
       })}
     >
       <Tabs.Screen name="index" options={{ title: 'Home' }} />
-      <Tabs.Screen name="create" options={{ title: 'Add' }} />
       <Tabs.Screen name="search" options={{ title: 'Search' }} />
+      <Tabs.Screen name="create" options={{ title: 'Add' }} />
       <Tabs.Screen name="messages" options={{ title: 'Chatbox' }} />
       <Tabs.Screen name="settings" options={{ title: 'Settings' }} />
       {/* modal is provided by root Stack at app/_layout.tsx; remove from tabs to avoid duplicate route warnings */}

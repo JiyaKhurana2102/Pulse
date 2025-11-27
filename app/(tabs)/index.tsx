@@ -42,7 +42,63 @@ export default function HomeScreen() {
             </GlobalText>
           </View>
 
+          {/* Today's events – move to top */}
+          <BlurView intensity={40} tint="light" style={styles.todayBlur}>
+            <View style={styles.todayCard}>
+              <GlobalText style={styles.todayTitle}>Today's events:</GlobalText>
+
+              <View style={styles.eventItem}>
+                <View style={styles.eventBullet} />
+                <View style={styles.eventTextBlock}>
+                  <GlobalText style={styles.eventTitle}>
+                    Fraternity Meeting
+                  </GlobalText>
+                  <GlobalText style={styles.eventTime}>6:00 PM</GlobalText>
+                </View>
+              </View>
+
+              <View style={styles.eventItem}>
+                <View style={styles.eventBullet} />
+                <View style={styles.eventTextBlock}>
+                  <GlobalText style={styles.eventTitle}>
+                    CS 101 Study Group
+                  </GlobalText>
+                  <GlobalText style={styles.eventTime}>2:00 PM</GlobalText>
+                </View>
+              </View>
+            </View>
+          </BlurView>
+
           {/* Action cards - full width buttons */}
+          {/* My Groups & My Events - Half Width Row */}
+          <View style={styles.cardRow}>
+            <Pressable
+              style={({ pressed }) => [styles.cardWrapperHalf, pressed && styles.cardPressed]}
+              onPress={() => router.push('/my-groups')}
+            >
+              <View
+                style={[
+                  styles.cardInnerGlass,
+                  USE_EXPERIMENTAL_CARD_COLORS && { backgroundColor: experimentalCardColors[2] },
+                ]}
+              >
+                <GlobalText style={styles.cardTitleHalf}>My Groups</GlobalText>
+              </View>
+            </Pressable>
+            <Pressable
+              style={({ pressed }) => [styles.cardWrapperHalf, pressed && styles.cardPressed]}
+              onPress={() => router.push('/my-events')}
+            >
+              <View
+                style={[
+                  styles.cardInnerGlass,
+                  USE_EXPERIMENTAL_CARD_COLORS && { backgroundColor: experimentalCardColors[0] },
+                ]}
+              >
+                <GlobalText style={styles.cardTitleHalf}>My Events</GlobalText>
+              </View>
+            </Pressable>
+          </View>
           {/* Find an Event - Medium */}
           <Pressable
             style={({ pressed }) => [
@@ -135,32 +191,7 @@ export default function HomeScreen() {
             </View>
           </Pressable>
 
-          {/* Today's events – also glassy */}
-          <BlurView intensity={40} tint="light" style={styles.todayBlur}>
-            <View style={styles.todayCard}>
-              <GlobalText style={styles.todayTitle}>Today's events:</GlobalText>
-
-              <View style={styles.eventItem}>
-                <View style={styles.eventBullet} />
-                <View style={styles.eventTextBlock}>
-                  <GlobalText style={styles.eventTitle}>
-                    Fraternity Meeting
-                  </GlobalText>
-                  <GlobalText style={styles.eventTime}>6:00 PM</GlobalText>
-                </View>
-              </View>
-
-              <View style={styles.eventItem}>
-                <View style={styles.eventBullet} />
-                <View style={styles.eventTextBlock}>
-                  <GlobalText style={styles.eventTitle}>
-                    CS 101 Study Group
-                  </GlobalText>
-                  <GlobalText style={styles.eventTime}>2:00 PM</GlobalText>
-                </View>
-              </View>
-            </View>
-          </BlurView>
+          {/* Today's events moved above */}
         </ScrollView>
       </SafeAreaView>
     </LinearGradient>
@@ -176,7 +207,7 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: 24,
-    paddingTop: 25,
+    paddingTop: 30,
     paddingBottom: 24,
   },
 
@@ -207,6 +238,12 @@ const styles = StyleSheet.create({
     height: 130,
     borderRadius: 32,
     overflow: 'hidden', // important so blur/gradient stay rounded
+  },
+  cardWrapperHalf: {
+    flex: 1,
+    height: 100,
+    borderRadius: 32,
+    overflow: 'hidden',
   },
   cardWrapperFull: {
     width: '100%',
@@ -274,6 +311,14 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     marginBottom: 4,
   },
+  cardTitleHalf: {
+    fontSize: 21,
+    fontWeight: '700',
+    fontFamily: 'Inter_700Bold',
+    color: '#FFFFFF',
+    textAlign: 'center',
+    marginBottom: 0,
+  },
   cardDescription: {
     fontSize: 15,
     fontWeight: '400',
@@ -282,7 +327,7 @@ const styles = StyleSheet.create({
   },
 
   todayBlur: {
-    marginTop: 2,
+    marginBottom: 16,
     borderRadius: 32,
     overflow: 'hidden',
   },

@@ -1,14 +1,14 @@
+import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
 import {
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
-  View,
-  ScrollView,
   TouchableOpacity,
+  View,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 
 // 🔧 FIX: Type for each resource item so icon names are valid
 type ResourceItem = {
@@ -142,7 +142,7 @@ export default function SearchScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 80,
+    paddingTop: 100,
     paddingHorizontal: 22,
   },
 
@@ -151,16 +151,19 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontSize: 34,
+    fontSize: 26,
+    textAlign: 'center',
     fontWeight: '700',
     marginBottom: 6,
     fontFamily: 'Inter_700Bold',
+    color: '#111827',
   },
 
   subtitle: {
     fontSize: 16,
     color: '#444',
     marginBottom: 25,
+    textAlign: 'center',
   },
 
   searchBox: {

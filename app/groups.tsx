@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
+  Alert,
   ScrollView,
   StyleSheet,
   Text,
@@ -11,12 +12,9 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-type Group = {
-  id: string;
-  name: string;
-  members: string;   // e.g. "234 members"
-  category: string;  // e.g. "Academic"
-};
+import { getUserId, GroupRecord, joinGroup, listGroups } from '@/services/groups';
+
+type Group = GroupRecord & { category?: string };
 
 const categories = ['All', 'Academic', 'Sports', 'Creative', 'Social', 'Other'];
 
@@ -25,18 +23,38 @@ const GroupsScreen: React.FC = () => {
 
   
   const [groups, setGroups] = useState<Group[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      const uid = await getUserId();
+      setUserId(uid);
+      setLoading(true);
+      try {
+        const data = await listGroups();
+        // assign default category only if missing
+        setGroups(data.map(g => ({ ...g, category: g.category || 'Other' })));
+      } catch (e: any) {
+        setError(e.message);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
   const filteredGroups = groups.filter((group) => {
     const matchesCategory =
-      selectedCategory === 'All' || group.category === selectedCategory;
+      selectedCategory === 'All' || (group.category || 'Other') === selectedCategory;
 
     const q = searchQuery.trim().toLowerCase();
     const matchesSearch =
       q.length === 0 ||
       group.name.toLowerCase().includes(q) ||
-      group.category.toLowerCase().includes(q);
+      (group.category ? group.category.toLowerCase().includes(q) : false);
 
     return matchesCategory && matchesSearch;
   });
@@ -54,12 +72,12 @@ const GroupsScreen: React.FC = () => {
           <Ionicons
             name="search"
             size={18}
-            color="#7A9A8A"
+            color="#fff"
             style={styles.searchIcon}
           />
           <TextInput
             placeholder="Search groups"
-            placeholderTextColor="#7A9A8A"
+            placeholderTextColor="rgba(255,255,255,0.7)"
             style={styles.searchInput}
             value={searchQuery}
             onChangeText={setSearchQuery}
@@ -104,7 +122,13 @@ const GroupsScreen: React.FC = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Available Groups</Text>
 
-          {filteredGroups.length === 0 ? (
+          {loading && (
+            <View style={styles.emptyState}><Text style={styles.emptyTitle}>Loading groups...</Text></View>
+          )}
+          {!loading && error && (
+            <View style={styles.emptyState}><Text style={styles.emptyTitle}>Error</Text><Text style={styles.emptySubtitle}>{error}</Text></View>
+          )}
+          {!loading && !error && filteredGroups.length === 0 ? (
             <View style={styles.emptyState}>
               <Text style={styles.emptyTitle}>No groups available yet</Text>
               <Text style={styles.emptySubtitle}>
@@ -118,11 +142,45 @@ const GroupsScreen: React.FC = () => {
                   <View style={styles.groupInfo}>
                     <Text style={styles.groupName}>{group.name}</Text>
                     <Text style={styles.groupMeta}>
-                      {group.members} • {group.category}
+                      {group.members.length} members • {(group.category || 'Other')}
                     </Text>
                   </View>
-                  <TouchableOpacity style={styles.joinButton}>
-                    <Text style={styles.joinButtonText}>Join</Text>
+                  <TouchableOpacity
+                    style={[
+                      styles.joinButton,
+                      userId && group.members.includes(userId) && styles.joinButtonDisabled,
+                    ]}
+                    disabled={userId ? group.members.includes(userId) : true}
+                    onPress={() => {
+                      if (!userId) return;
+                      Alert.alert(
+                        'Join Group',
+                        `Do you want to join "${group.name}"?`,
+                        [
+                          { text: 'Cancel', style: 'cancel' },
+                          {
+                            text: 'Yes',
+                            onPress: async () => {
+                              try {
+                                await joinGroup(group.id, userId);
+                                setGroups(prev => prev.map(g => {
+                                  if (g.id === group.id) {
+                                    return g.members.includes(userId) ? g : { ...g, members: [...g.members, userId] };
+                                  }
+                                  return g;
+                                }));
+                              } catch (e: any) {
+                                setError(e.message);
+                              }
+                            },
+                          },
+                        ],
+                      );
+                    }}
+                  >
+                    <Text style={styles.joinButtonText}>
+                      {userId && group.members.includes(userId) ? 'Joined' : 'Join'}
+                    </Text>
                   </TouchableOpacity>
                 </View>
               ))}
@@ -141,7 +199,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 16,
-    paddingTop: 20,
+    paddingTop: 30,
   },
   headerRow: {
     marginBottom: 32,
@@ -157,7 +215,7 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#b8e6b8',
+    backgroundColor: '#5cc4a4',
     borderRadius: 999,
     paddingHorizontal: 14,
     paddingVertical: 10,
@@ -170,7 +228,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 4,
     fontSize: 16,
-    color: '#1F2937',
+    color: '#fff',
     fontFamily: 'Inter_400Regular',
   },
   section: {
@@ -235,6 +293,10 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 999,
     backgroundColor: '#ff9966',
+  },
+  joinButtonDisabled: {
+    backgroundColor: '#f6a278',
+    opacity: 0.8,
   },
   joinButtonText: {
     color: '#FFFFFF',

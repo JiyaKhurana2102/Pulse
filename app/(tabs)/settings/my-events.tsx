@@ -200,16 +200,17 @@ const styles = StyleSheet.create({
     },
     header: {
       flexDirection: 'row',
-      justifyContent: 'space-between',
+      justifyContent: 'center',
       alignItems: 'center',
       paddingVertical: 10,
       marginBottom: 20,
     },
     title: {
-      fontSize: 28,
+      fontSize: 40,
       fontWeight: '700',
       fontFamily: 'Inter_700Bold',
       color: colors.darkTealAccent,
+      textAlign: 'center',
     },
     calendarHeader: {
       flexDirection: 'row',

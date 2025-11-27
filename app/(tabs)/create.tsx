@@ -1,3 +1,5 @@
+import { createEvent } from '@/services/events';
+import { createGroup, getUserId, joinGroup } from '@/services/groups';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -64,13 +66,28 @@ const NewGroupForm = ({ onBack }: { onBack: () => void }) => {
   const [description, setDescription] = useState('');
   const [inviteNeeded, setInviteNeeded] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const categories = ['Academic','Sports','Creative','Social','Other'];
+  const [category, setCategory] = useState<string>('Other');
 
-  const handleCreateGroup = () => {
-    setMessage(`Group "${groupName || 'Untitled Group'}" Created!`);
-    setTimeout(() => {
-      setMessage(null);
-      onBack();
-    }, 1500);
+  const handleCreateGroup = async () => {
+    try {
+      if (!groupName.trim() || !description.trim()) {
+        setMessage('Name & description required');
+        setTimeout(() => setMessage(null), 1500);
+        return;
+      }
+      const userId = await getUserId();
+      const groupId = await createGroup(groupName.trim(), description.trim(), category);
+      await joinGroup(groupId, userId); // auto-join creator
+      setMessage(`Group "${groupName.trim()}" Created!`);
+      setTimeout(() => {
+        setMessage(null);
+        onBack();
+      }, 1500);
+    } catch (e: any) {
+      setMessage(e.message || 'Error creating group');
+      setTimeout(() => setMessage(null), 2000);
+    }
   };
 
   return (
@@ -120,6 +137,22 @@ const NewGroupForm = ({ onBack }: { onBack: () => void }) => {
               />
             </View>
 
+            {/* Category selector */}
+            <View style={styles.categoryRow}>
+              {categories.map(c => {
+                const selected = category === c;
+                return (
+                  <Pressable
+                    key={c}
+                    onPress={() => setCategory(c)}
+                    style={[styles.categoryChip, selected && styles.categoryChipSelected]}
+                  >
+                    <Text style={[styles.categoryChipText, selected && styles.categoryChipTextSelected]}>{c}</Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+
             <MobileButton onPress={handleCreateGroup} disabled={!!message} style={styles.formActionWideSpaced}>
               Create Group
             </MobileButton>
@@ -132,19 +165,37 @@ const NewGroupForm = ({ onBack }: { onBack: () => void }) => {
 
 /* --- New Event Form --- */
 const NewEventForm = ({ onBack }: { onBack: () => void }) => {
-  const [groupNameEvent, setGroupNameEvent] = useState('');
+  const [location, setLocation] = useState('');
   const [eventName, setEventName] = useState('');
   const [description, setDescription] = useState('');
   const [message, setMessage] = useState<string | null>(null);
   const [date, setDate] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
 
-  const handleScheduleEvent = () => {
-    setMessage(`Event "${eventName || 'Untitled Event'}" Scheduled!`);
-    setTimeout(() => {
-      setMessage(null);
-      onBack();
-    }, 1500);
+  const handleScheduleEvent = async () => {
+    try {
+      if (!eventName.trim()) {
+        setMessage('Event name required');
+        setTimeout(() => setMessage(null), 1500);
+        return;
+      }
+      await createEvent(
+        eventName.trim(),
+        description.trim(),
+        date,
+        undefined, // groupName
+        location.trim() || undefined,
+        undefined  // category
+      );
+      setMessage(`Event "${eventName.trim()}" Scheduled!`);
+      setTimeout(() => {
+        setMessage(null);
+        onBack();
+      }, 1500);
+    } catch (e: any) {
+      setMessage(e.message || 'Error creating event');
+      setTimeout(() => setMessage(null), 2000);
+    }
   };
 
   const onChange = (event: any, selectedDate?: Date) => {
@@ -187,11 +238,11 @@ const NewEventForm = ({ onBack }: { onBack: () => void }) => {
               />
             </View>
             <View style={[styles.cardContainerThin, { backgroundColor: '#b8e6b8' }]}>
-              <Ionicons name="people" size={28} color="#fff" style={styles.cardIcon} />
+              <Ionicons name="location" size={28} color="#fff" style={styles.cardIcon} />
               <TextInput
-                value={groupNameEvent}
-                onChangeText={setGroupNameEvent}
-                placeholder="Group Name"
+                value={location}
+                onChangeText={setLocation}
+                placeholder="Location"
                 placeholderTextColor="rgba(255,255,255,0.7)"
                 style={styles.cardInput}
               />
@@ -490,7 +541,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'flex-start',
-    paddingTop: 60,
+    paddingTop: 30,
     paddingBottom: 80,
     paddingHorizontal: 22,
   },
@@ -500,12 +551,12 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   pageTitle: {
-    fontSize: 26,
-    fontWeight: '300',
+    fontSize: 24,
+    fontWeight: '700',
     marginTop: 8,
     marginBottom: 12,
-    color: TEXT_COLOR_DARK,
-    fontFamily: 'Inter_400Regular',
+    color: '#111827',
+    fontFamily: 'Inter_700Bold',
   },
   pageSubtitle: {
     fontSize: 18,
@@ -751,5 +802,28 @@ const styles = StyleSheet.create({
   datePickerIOS: {
     width: '100%',
     transform: [{ scale: 1 }],
+  },
+  categoryRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 12,
+  },
+  categoryChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 999,
+    backgroundColor: '#f6a278',
+  },
+  categoryChipSelected: {
+    backgroundColor: '#ff9966',
+  },
+  categoryChipText: {
+    color: '#FFFFFF',
+    fontFamily: 'Inter_400Regular',
+    fontSize: 14,
+  },
+  categoryChipTextSelected: {
+    fontFamily: 'Inter_700Bold',
   },
 });
