@@ -32,17 +32,18 @@ export async function getAuthToken(): Promise<string | null> {
   const token = await AsyncStorage.getItem(AUTH_TOKEN_KEY);
   if (!token) return null;
 
-  // Check if token is expired (tokens expire after 1 hour)
   try {
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    const expirationTime = payload.exp * 1000; // Convert to milliseconds
-    const currentTime = Date.now();
-    
-    // If token expires in less than 5 minutes, refresh it
-    if (expirationTime - currentTime < 5 * 60 * 1000) {
-      console.log('Token expiring soon, refreshing...');
-      const refreshed = await refreshAuthToken();
-      if (refreshed) return refreshed;
+    const hasAtob = typeof (globalThis as any).atob === 'function';
+    if (hasAtob) {
+      const base64 = token.split('.')[1];
+      const payload = JSON.parse((globalThis as any).atob(base64));
+      const expirationTime = payload.exp * 1000;
+      const currentTime = Date.now();
+      if (expirationTime - currentTime < 5 * 60 * 1000) {
+        console.log('Token expiring soon, refreshing...');
+        const refreshed = await refreshAuthToken();
+        if (refreshed) return refreshed;
+      }
     }
   } catch (error) {
     console.log('Token check error, will try to use existing token:', error);
@@ -59,31 +60,27 @@ async function refreshAuthToken(): Promise<string | null> {
       return null;
     }
 
-   const apiKey = process.env.EXPO_PUBLIC_GOOGLE_API_KEY;
-    const response = await fetch(
-      `https://securetoken.googleapis.com/v1/token?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          grant_type: 'refresh_token',
-          refresh_token: refreshToken,
-        }),
-      }
-    );
+    const response = await fetch(`${API_BASE}/auth/refresh`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken }),
+    });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Token refresh failed:', errorData);
+      let errMsg = 'Token refresh failed';
+      try {
+        const err = await response.json();
+        errMsg = err.error || errMsg;
+      } catch {}
+      console.error('Token refresh failed:', errMsg);
       return null;
     }
 
     const data = await response.json();
-    await AsyncStorage.setItem(AUTH_TOKEN_KEY, data.id_token);
-    await AsyncStorage.setItem(REFRESH_TOKEN_KEY, data.refresh_token);
-    
+    if (data.idToken) await AsyncStorage.setItem(AUTH_TOKEN_KEY, data.idToken);
+    if (data.refreshToken) await AsyncStorage.setItem(REFRESH_TOKEN_KEY, data.refreshToken);
     console.log('Token refreshed successfully');
-    return data.id_token;
+    return data.idToken || null;
   } catch (error) {
     console.error('Token refresh error:', error);
     return null;

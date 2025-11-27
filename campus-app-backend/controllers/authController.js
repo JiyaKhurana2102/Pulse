@@ -203,4 +203,43 @@ const changePassword = async (req, res) => {
   }
 };
 
-module.exports = { signup, login, changePassword };
+// REFRESH TOKEN
+const refreshToken = async (req, res) => {
+  try {
+    const { refreshToken } = req.body || {};
+    if (!refreshToken) return res.status(400).json({ error: 'Missing refreshToken' });
+
+    const apiKey = process.env.FIREBASE_API_KEY;
+    if (!apiKey) return res.status(500).json({ error: 'Missing FIREBASE_API_KEY' });
+
+    const response = await fetch(
+      `https://securetoken.googleapis.com/v1/token?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          grant_type: 'refresh_token',
+          refresh_token: refreshToken,
+        }),
+      }
+    );
+
+    const data = await response.json();
+    if (!response.ok || data.error) {
+      const msg = data.error?.message || 'Token refresh failed';
+      return res.status(401).json({ error: msg });
+    }
+
+    return res.json({
+      idToken: data.id_token,
+      refreshToken: data.refresh_token,
+      expiresIn: data.expires_in,
+      userId: data.user_id,
+    });
+  } catch (err) {
+    console.error('Refresh token error:', err);
+    res.status(500).json({ error: 'Internal error refreshing token' });
+  }
+};
+
+module.exports = { signup, login, changePassword, refreshToken };
