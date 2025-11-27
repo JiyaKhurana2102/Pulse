@@ -137,70 +137,9 @@ export default function MessagesScreen() {
               <Text style={styles.clearText}>Clear</Text>
             </Pressable>
           </View>
-=========
-  return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-    <LinearGradient
-      colors={['#FFFFFF', '#FFF7ED', '#FED7AA', '#D1FAE5', '#ECFEFF', '#FFFFFF']}
-      locations={[0, 0.2, 0.4, 0.6, 0.8, 1]}
-      start={{ x: 0.5, y: 0 }}
-      end={{ x: 0.5, y: 1 }}
-      style={styles.container}
-      pointerEvents="box-none"
-    >
-      {loading && (
-        <ActivityIndicator
-          size="small"
-          color="#0b84ff"
-          style={{ position: 'absolute', top: 10, right: 10 }}
-        />
-      )}
-
-      <SafeAreaView style={{ flex: 1 }}>
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0} style={{ flex: 1 }}>
-          <GiftedChat
-            messages={messages}
-            onSend={messages => onSend(messages)}
-            user={{ _id: 1 }}
-            minComposerHeight={55}
-            renderBubble={props => (
-              <Bubble
-                {...props}
-                wrapperStyle={{
-                  right: { backgroundColor: '#0b84ff' },
-                  left: { backgroundColor: 'white' },
-                }}
-              />
-            )}
-            renderInputToolbar={props => (
-              <InputToolbar
-                {...props}
-                containerStyle={{
-                  borderTopWidth: 1,
-                  borderTopColor: '#ddd',
-                  paddingTop: 6,
-                  paddingBottom: Platform.OS === 'ios' ? 12 : 6,
-                  marginBottom: Platform.OS === 'ios' ? 20 : 0, // Raise input bar
-                }}
-              />
-            )}
-            renderComposer={props => (
-              <Composer
-                {...props}
-                textInputProps={{
-                  placeholder: 'Type your message here...',
-                  placeholderTextColor: '#999',
-                  style: { fontSize: 16, minHeight: 50 },
-                  editable: true,
-                }}
-              />
-            )}
-          />
->>>>>>>>> Temporary merge branch 2
         </KeyboardAvoidingView>
       </SafeAreaView>
     </LinearGradient>
-    </GestureHandlerRootView>
   );
 }
 
