@@ -91,8 +91,16 @@ export async function listUserGroups(userId: string): Promise<GroupRecord[]> {
 
 export async function leaveGroup(groupId: string, userId: string): Promise<void> {
   if (!LOCAL_MODE) {
-    // Backend doesn't have leave endpoint yet, filter locally after fetch
-    const groups = await listGroups();
+    // Call backend to leave; user determined from auth token
+    const res = await fetch(`${API_BASE}/groups/${groupId}/leave`, {
+      method: 'POST',
+      headers: await getAuthHeaders(),
+    });
+    if (!res.ok) {
+      let msg = 'Failed to leave group';
+      try { const err = await res.json(); msg = err.error || msg; } catch {}
+      throw new Error(msg);
+    }
     return;
   }
   const groups = await listGroups();
