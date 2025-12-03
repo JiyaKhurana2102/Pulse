@@ -1,3 +1,4 @@
+import { SearchIcon } from '@/components/SearchIcon';
 import { Brand } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
@@ -50,6 +51,20 @@ export default function TabLayout() {
 
         tabBarIcon: ({ focused }) => {
           let name: keyof typeof Ionicons.glyphMap = 'ellipse-outline';
+          
+          // Special handling for search icon
+          if (route.name === 'search') {
+            return (
+              <View style={styles.iconContainer}>
+                <SearchIcon 
+                  size={TAB_ICON_SIZE} 
+                  color={ACCENT_COLOR} 
+                  filled={focused} 
+                />
+              </View>
+            );
+          }
+          
           switch (route.name) {
             case 'index':
               name = focused ? 'home' : 'home-outline';
@@ -60,9 +75,6 @@ export default function TabLayout() {
             case 'create':
               name = focused ? 'add-circle' : 'add-circle-outline';
               break;
-            case 'search':
-              name = focused ? 'search' : 'search-outline';
-              break;
             case 'messages':
               name = focused ? 'chatbubble-ellipses' : 'chatbubble-ellipses-outline';
               break;
@@ -72,18 +84,11 @@ export default function TabLayout() {
 
           return (
             <View style={styles.iconContainer}>
-              {focused ? (
-                <View style={styles.outerRing}>
-                  <View style={styles.innerCircle} />
-                </View>
-              ) : null}
               <Ionicons
                 name={name}
                 size={TAB_ICON_SIZE}
                 color={focused ? ACCENT_COLOR : ACCENT_COLOR}
-                style={{ zIndex: 3 }}
               />
-              {/* removed active dot — the white inner circle is sufficient */}
             </View>
           );
         },
