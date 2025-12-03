@@ -59,12 +59,32 @@ async function refreshAuthToken(): Promise<string | null> {
       console.log('No refresh token available');
       return null;
     }
+    // Add timeout + logging so network issues are clearer on real devices.
+    console.log('[Auth] Refreshing token via', API_BASE);
+    const controller = new AbortController();
+    const timeoutMs = 8000; // 8s network timeout
+    const timeout = setTimeout(() => {
+      controller.abort();
+    }, timeoutMs);
 
-    const response = await fetch(`${API_BASE}/auth/refresh`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refreshToken }),
-    });
+    let response: Response | null = null;
+    try {
+      response = await fetch(`${API_BASE}/auth/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken }),
+        signal: controller.signal,
+      });
+    } catch (fetchErr: any) {
+      if (fetchErr?.name === 'AbortError') {
+        console.error(`[Auth] Refresh request timed out after ${timeoutMs}ms`);
+      } else {
+        console.error('[Auth] Network error during refresh:', fetchErr?.message || fetchErr);
+      }
+      return null;
+    } finally {
+      clearTimeout(timeout);
+    }
 
     if (!response.ok) {
       let errMsg = 'Token refresh failed';

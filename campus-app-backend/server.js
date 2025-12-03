@@ -24,8 +24,21 @@ app.use(bodyParser.json());
 // -------------------
 // Firebase Admin Init
 // -------------------
-const serviceAccount = require(process.env.FIREBASE_KEY_PATH);
-
+let serviceAccount;
+try {
+  if (process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
+    serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON);
+    console.log('Loaded service account from FIREBASE_SERVICE_ACCOUNT_JSON env variable');
+  } else if (process.env.FIREBASE_KEY_PATH) {
+    serviceAccount = require(process.env.FIREBASE_KEY_PATH);
+    console.log('Loaded service account from FIREBASE_KEY_PATH file');
+  } else {
+    throw new Error('Missing both FIREBASE_SERVICE_ACCOUNT_JSON and FIREBASE_KEY_PATH');
+  }
+} catch (err) {
+  console.error('Failed to load Firebase service account:', err.message);
+  process.exit(1);
+}
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -50,6 +63,10 @@ app.use('/chatbot', chatbotRoutes);
 app.get('/ping', (req, res) => {
   console.log('Ping route hit');
   res.send('pong');
+});
+// Lightweight health endpoint for deployment/tunnel checks
+app.get('/health', (req, res) => {
+  res.json({ ok: true, time: Date.now() });
 });
 
 // Optional Firebase test route (can remove later)
@@ -131,7 +148,9 @@ app.post('/groups', async (req, res) => {
 // -------------------
 // Start server
 // -------------------
-const PORT = process.env.PORT || 5000;
+// Switched default port to 8080 to align with mobile client API base.
+// You can override via environment variable PORT.
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Access from device: Run 'ipconfig' to find your IP, then use http://YOUR_IP:${PORT}`);

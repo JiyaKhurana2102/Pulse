@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
   chatContent: { paddingHorizontal: 16, paddingBottom: 16, gap: 8 },
   bubble: { maxWidth: '80%', borderRadius: 18, paddingHorizontal: 14, paddingVertical: 10 },
   bubbleMine: { alignSelf: 'flex-end', backgroundColor: '#ff9966' },
-  bubbleOther: { alignSelf: 'flex-start', backgroundColor: '#b8e6b8' },
+  bubbleOther: { alignSelf: 'flex-start', backgroundColor: '#2c9e6f' },
   senderText: { color: '#ffffff', opacity: 0.95, fontSize: 12, marginBottom: 4, fontFamily: 'Inter_700Bold' },
   bubbleText: { color: '#ffffff', fontFamily: 'Inter_400Regular' },
   timeText: { color: '#ffffff', opacity: 0.85, fontSize: 12, marginTop: 4, fontFamily: 'Inter_400Regular' },
